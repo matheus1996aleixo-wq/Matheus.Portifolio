@@ -1,96 +1,106 @@
 {
-  "profile": {
-    "full_name": "Matheus Aleixo",
-    "date_of_birth": "20/02/1996",
-    "city": "Várzea Paulista",
-    "state": "SP",
-    "country": "Brasil",
-    "graduation": "Bacharelado",
-    "course": "Tecnologia da Informação",
-    "university": "Universidade Virtual do Estado de São Paulo"
-  },
-  "skills": [
-    {
-      "id": "skill-1",
-      "category": "Sistemas ERP & SAP",
-      "name": "SAP ECC, SAP S/4HANA (FI, CO, SD, MM, ABAP, Basis), Parametrizações, IDocs"
+    "profile": {
+        "full_name": "Matheus Aleixo",
+        "date_of_birth": "20/02/1996",
+        "city": "Várzea Paulista",
+        "state": "SP",
+        "country": "Brasil",
+        "graduation": "Bacharelado",
+        "course": "Tecnologia da Informação",
+        "university": "Universidade Virtual do Estado de São Paulo"
     },
-    {
-      "id": "skill-2",
-      "category": "Programação & Desenvolvimento",
-      "name": "Python (Avançado), Java (Básico), C (Básico), POO, Flask, Dash, FastAPI"
-    },
-    {
-      "id": "skill-3",
-      "category": "Automação & Web Scraping",
-      "name": "RPA (Python, UiPath), Scrapy, Playwright, BeautifulSoup, Automação Office/Web"
-    },
-    {
-      "id": "skill-4",
-      "category": "Dados & Banco de Dados",
-      "name": "ETL, Pandas, PostgreSQL, SQL, MongoDB, Dashboards"
-    },
-    {
-      "id": "skill-5",
-      "category": "Cloud & DevOps",
-      "name": "Git, GitHub, AWS Lambda, Apache Airflow"
-    },
-    {
-      "id": "skill-6",
-      "category": "Idiomas",
-      "name": "Inglês Básico"
-    }
-  ],
-  "projects": [],
-  "experiences": [
-    {
-      "id": "exp-1",
-      "type": "Experiência Profissional",
-      "title": "Professor de Tecnologia e Matemática - Secretaria da Educação",
-      "description": "Experiência com Ensino Fundamental II e Ensino Médio, com foco no desenvolvimento de competências lógicas, digitais e matemáticas.",
-      "period": "Outubro 2025 a Fevereiro 2026"
-    },
-    {
-      "id": "exp-2",
-      "type": "Experiência Profissional",
-      "title": "Consultor SAP JR - Stefanini",
-      "description": "Suporte Funcional SAP S/4HANA (Nível I e II) para usuários finais nos módulos FI, CO e SD. Gestão de Dados e Localização Brasil.",
-      "period": "Tempo Determinado"
-    },
-    {
-      "id": "exp-3",
-      "type": "Experiência Profissional",
-      "title": "Estagiário de Tecnologia da Informação - Continental Automotive",
-      "description": "Atuação em Suporte Funcional SAP ECC e S/4HANA. Desenvolvimento de automações utilizando UiPath e participação no projeto global SPIRIT.",
-      "period": "Junho 2023 a Fevereiro 2025"
-    },
-    {
-      "id": "exp-4",
-      "type": "Curso",
-      "title": "UiPath - Academia de Automação e Desenvolvimento",
-      "description": "Formação em automação de processos e desenvolvimento com a ferramenta UiPath.",
-      "period": "Conclusão: 21/04/2024"
-    },
-    {
-      "id": "exp-5",
-      "type": "Curso",
-      "title": "Fundamentos básicos do Sap S/4Hana - KA Solutions",
-      "description": "Capacitação nos conceitos e funcionalidades básicas do sistema SAP S/4HANA.",
-      "period": "Carga horária: 8 horas"
-    },
-    {
-      "id": "exp-6",
-      "type": "Curso",
-      "title": "Power BI Avançado - Udemy",
-      "description": "Curso avançado de análise de dados e criação de dashboards interativos.",
-      "period": "Conclusão: 31/07/2025"
-    },
-    {
-      "id": "exp-7",
-      "type": "Curso",
-      "title": "Python Avançado - Udemy",
-      "description": "Aprofundamento na linguagem Python para desenvolvimento robusto.",
-      "period": "Conclusão: 30/12/2025"
-    }
-  ]
+    "skills": [
+        {
+            "id": "skill-1",
+            "category": "Sistemas ERP & SAP",
+            "name": "SAP ECC, SAP S/4HANA (FI, CO, SD, MM, ABAP, Basis), Parametrizações, IDocs"
+        },
+        {
+            "id": "skill-2",
+            "category": "Programação & Desenvolvimento",
+            "name": "Python (Avançado), Java (Básico), C (Básico), POO, Flask, Dash, FastAPI"
+        },
+        {
+            "id": "skill-3",
+            "category": "Automação & Web Scraping",
+            "name": "RPA (Python, UiPath), Scrapy, Playwright, BeautifulSoup, Automação Office/Web"
+        },
+        {
+            "id": "skill-4",
+            "category": "Dados & Banco de Dados",
+            "name": "ETL, Pandas, PostgreSQL, SQL, MongoDB, Dashboards"
+        },
+        {
+            "id": "skill-5",
+            "category": "Cloud & DevOps",
+            "name": "Git, GitHub, AWS Lambda, Apache Airflow"
+        },
+        {
+            "id": "skill-6",
+            "category": "Idiomas",
+            "name": "Inglês Básico"
+        }
+    ],
+    "projects": [],
+    "experiences": [
+        {
+            "id": "exp-1",
+            "type": "Experiência Profissional",
+            "title": "Professor de Tecnologia e Matemática - Secretaria da Educação",
+            "description": "Experiência com Ensino Fundamental II e Ensino Médio, com foco no desenvolvimento de competências lógicas, digitais e matemáticas.",
+            "period": "Outubro 2025 a Fevereiro 2026"
+        },
+        {
+            "id": "exp-2",
+            "type": "Experiência Profissional",
+            "title": "Consultor SAP JR - Stefanini",
+            "description": "Suporte Funcional SAP S/4HANA (Nível I e II) para usuários finais nos módulos FI, CO e SD. Gestão de Dados e Localização Brasil.",
+            "period": "Tempo Determinado"
+        },
+        {
+            "id": "exp-3",
+            "type": "Experiência Profissional",
+            "title": "Estagiário de Tecnologia da Informação - Continental Automotive",
+            "description": "Atuação em Suporte Funcional SAP ECC e S/4HANA. Desenvolvimento de automações utilizando UiPath e participação no projeto global SPIRIT.",
+            "period": "Junho 2023 a Fevereiro 2025"
+        },
+        {
+            "id": "exp-4",
+            "type": "Curso",
+            "title": "UiPath - Academia de Automação e Desenvolvimento",
+            "description": "Formação em automação de processos e desenvolvimento com a ferramenta UiPath.",
+            "period": "Conclusão: 21/04/2024"
+        },
+        {
+            "id": "exp-5",
+            "type": "Curso",
+            "title": "Fundamentos básicos do Sap S/4Hana - KA Solutions",
+            "description": "Capacitação nos conceitos e funcionalidades básicas do sistema SAP S/4HANA.",
+            "period": "Carga horária: 8 horas"
+        },
+        {
+            "id": "exp-6",
+            "type": "Curso",
+            "title": "Power BI Avançado - Udemy",
+            "description": "Curso avançado de análise de dados e criação de dashboards interativos.",
+            "period": "Conclusão: 31/07/2025"
+        },
+        {
+            "id": "exp-7",
+            "type": "Curso",
+            "title": "Python Avançado - Udemy",
+            "description": "Aprofundamento na linguagem Python para desenvolvimento robusto.",
+            "period": "Conclusão: 30/12/2025"
+        }
+    ],
+    "formations": [
+        {
+            "id": "3a8c68e5-63b3-43e9-8d2b-d82089d10472",
+            "level": "Graduação",
+            "course": "Tecnologia da Informação",
+            "entity_type": "Universidade",
+            "entity_name": "UNIVESP",
+            "completion_date": "20/08/2025"
+        }
+    ]
 }
