@@ -3,80 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo | Portfólio</title>
+    <title>Painel Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-950 text-gray-200 p-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-            <h1 class="text-2xl font-bold text-white"><i class="fa-solid fa-gauge-high text-cyan-400 mr-2"></i> Painel Admin - Gerenciamento</h1>
-            <div class="space-x-4">
-                <a href="/" target="_blank" class="text-cyan-400 hover:underline text-sm font-semibold"><i class="fa-solid fa-globe mr-1"></i> Ver Site</a>
-                <a href="/logout" class="bg-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 text-white"><i class="fa-solid fa-right-from-bracket mr-1"></i> Sair</a>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- GERENCIAR FORMAÇÕES E CURSOS -->
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl lg:col-span-2">
-                <h2 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-graduation-cap text-cyan-400 mr-2"></i> Adicionar Formação / Curso</h2>
-                <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <input type="hidden" name="action" value="add_formation">
-                    
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Nível / Segmento</label>
-                        <select name="level" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
-                            <option>Graduação</option>
-                            <option>Pós Graduação</option>
-                            <option>MBA</option>
-                            <option>Técnico</option>
-                            <option>Curso</option>
-                            <option>Certificações</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Curso</label>
-                        <input type="text" name="course" placeholder="Ex: Tecnologia da Informação" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tipo de Entidade</label>
-                        <select name="entity_type" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
-                            <option>Universidade</option>
-                            <option>Instituição</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Universidade / Instituição</label>
-                        <input type="text" name="entity_name" placeholder="Ex: UNIVESP" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Data de Formação</label>
-                        <input type="text" name="completion_date" placeholder="Ex: 20/08/2025" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">&nbsp;</label>
-                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl transition text-sm">Adicionar Formação</button>
-                    </div>
-                </form>
-
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Formações Cadastradas</h3>
-                <div class="space-y-2 max-h-48 overflow-y-auto">
-                    {% for form in data.formations %}
-                    <form method="POST" class="flex justify-between items-center bg-gray-800 p-2.5 rounded-lg border border-gray-700">
-                        <input type="hidden" name="action" value="delete_formation">
-                        <input type="hidden" name="form_id" value="{{ form.id }}">
-                        <span class="text-xs text-white truncate"><b>{{ form.level }}:</b> {{ form.course }} ({{ form.entity_name }})</span>
-                        <button type="submit" class="bg-red-600 text-white text-xs px-3 py-1 rounded">Excluir</button>
-                    </form>
-                    {% endfor %}
-                </div>
-            </div>
+    <div class="max-w-4xl mx-auto flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
+        <h1 class="text-2xl font-bold text-white">Painel Administrativo</h1>
+        <div class="space-x-4">
+            <a href="/" class="text-cyan-400 text-sm">Ver Site</a>
+            <a href="/logout" class="bg-red-600 px-4 py-2 rounded text-sm text-white">Sair</a>
         </div>
     </div>
 </body>

@@ -47,7 +47,7 @@ def save_data(data):
         init_git_repo()
         repo = Repo(os.getcwd())
         repo.git.add(DATA_FILE)
-        repo.index.commit("Atualização automática bilíngue via Painel Admin - Matheus.Portifolio")
+        repo.index.commit("Atualização automática via Painel Admin - Matheus.Portifolio")
         
         origin = repo.remote(name='origin')
         origin.push(refspec='main:main')
@@ -92,15 +92,7 @@ def admin():
     if request.method == 'POST':
         action = request.form.get('action')
         
-        if action == 'update_profile':
-            data['profile'] = {
-                "full_name": request.form.get('full_name'),
-                "date_of_birth": request.form.get('date_of_birth'),
-                "city": request.form.get('city'),
-                "state": request.form.get('state'),
-                "country": request.form.get('country')
-            }
-        elif action == 'add_formation':
+        if action == 'add_formation':
             new_formation = {
                 "id": str(uuid.uuid4()),
                 "level": request.form.get('level'),
