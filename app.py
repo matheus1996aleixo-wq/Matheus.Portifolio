@@ -7,8 +7,9 @@ from git import Repo
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
 
-ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
-ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin123')
+# Credenciais vindas dos Secrets do GitHub (ou fallback padrão)
+ADMIN_USER = os.environ.get('ADMIN_PORT', 'admin')
+ADMIN_PASS = os.environ.get('SENHA_PORT', 'admin123')
 
 DATA_FILE = 'data.json'
 REPO_URL = 'https://github.com/matheus1996aleixo-wq/Matheus.Portifolio.git'
@@ -61,8 +62,14 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Se já estiver logado, vai direto para o admin sem loop
+    if session.get('logged_in'):
+        return redirect(url_for('admin'))
+
     if request.method == 'POST':
-        if request.form['username'] == ADMIN_USER and request.form['password'] == ADMIN_PASS:
+        user = request.form.get('username')
+        password = request.form.get('password')
+        if user == ADMIN_USER and password == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin'))
         else:
@@ -71,8 +78,9 @@ def login():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
+    # Se não estiver logado, redireciona estritamente para o login (evitando loop)
     if not session.get('logged_in'):
-        return redirect(url_for('admin')) # Corrigido para login
+        return redirect(url_for('login'))
     
     data = load_data()
     
