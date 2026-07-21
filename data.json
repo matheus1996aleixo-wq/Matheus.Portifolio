@@ -93,14 +93,5 @@
             "period": "Conclusão: 30/12/2025"
         }
     ],
-    "formations": [
-        {
-            "id": "3a8c68e5-63b3-43e9-8d2b-d82089d10472",
-            "level": "Graduação",
-            "course": "Tecnologia da Informação",
-            "entity_type": "Universidade",
-            "entity_name": "UNIVESP",
-            "completion_date": "20/08/2025"
-        }
-    ]
+    "formations": []
 }
