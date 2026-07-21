@@ -27,14 +27,17 @@ def init_git_repo():
 
 def load_data():
     if not os.path.exists(DATA_FILE):
-        return {"profile": {}, "skills": [], "projects": [], "formations": [], "experiences": []}
+        data = {"profile": {}, "skills": [], "projects": [], "formations": [], "experiences": []}
+    else:
+        with open(DATA_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+    if 'skills' not in data: data['skills'] = []
+    if 'experiences' not in data: data['experiences'] = []
+    if 'projects' not in data: data['projects'] = []
+    if 'formations' not in data: data['formations'] = []
     
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        if 'skills' not in data: data['skills'] = []
-        if 'formations' not in data: data['formations'] = []
-        if 'experiences' not in data: data['experiences'] = []
-        return data
+    return data
 
 def save_data(data):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
@@ -69,7 +72,7 @@ def login():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if not session.get('logged_in'):
-        return redirect(url_for('login'))
+        return redirect(url_for('admin')) # Corrigido para login
     
     data = load_data()
     
@@ -82,10 +85,7 @@ def admin():
                 "date_of_birth": request.form.get('date_of_birth'),
                 "city": request.form.get('city'),
                 "state": request.form.get('state'),
-                "country": request.form.get('country'),
-                "graduation": request.form.get('graduation'),
-                "course": request.form.get('course'),
-                "university": request.form.get('university')
+                "country": request.form.get('country')
             }
         elif action == 'add_formation':
             new_formation = {
@@ -94,8 +94,7 @@ def admin():
                 "course": request.form.get('course'),
                 "entity_type": request.form.get('entity_type'),
                 "entity_name": request.form.get('entity_name'),
-                "completion_date": request.form.get('completion_date'),
-                "subjects": request.form.get('subjects')
+                "completion_date": request.form.get('completion_date')
             }
             data['formations'].append(new_formation)
             
