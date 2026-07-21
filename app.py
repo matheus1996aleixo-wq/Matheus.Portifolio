@@ -90,12 +90,12 @@ def admin():
         elif action == 'add_formation':
             new_formation = {
                 "id": str(uuid.uuid4()),
-                "level": request.form.get('level'), # Graduação, Pós, Certificação, etc.
+                "level": request.form.get('level'),
                 "course": request.form.get('course'),
-                "entity_type": request.form.get('entity_type'), # Universidade ou Instituição
+                "entity_type": request.form.get('entity_type'),
                 "entity_name": request.form.get('entity_name'),
                 "completion_date": request.form.get('completion_date'),
-                "subjects": request.form.get('subjects') # Matérias e conhecimentos separados por vírgula
+                "subjects": request.form.get('subjects')
             }
             data['formations'].append(new_formation)
             
