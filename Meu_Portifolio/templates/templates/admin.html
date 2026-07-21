@@ -1,4 +1,3 @@
-cat << 'EOF' > templates/admin.html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,6 +16,74 @@ cat << 'EOF' > templates/admin.html
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- FORMAÇÕES, CURSOS E CERTIFICAÇÕES -->
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl lg:col-span-2">
+                <h2 class="text-lg font-bold text-white mb-4">Adicionar Formação / Curso / Certificação</h2>
+                <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <input type="hidden" name="action" value="add_formation">
+                    
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Tipo / Nível</label>
+                        <select name="level" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
+                            <option>Graduação</option>
+                            <option>Pós Graduação</option>
+                            <option>MBA</option>
+                            <option>Doutorado</option>
+                            <option>Pós Doutorado</option>
+                            <option>Técnico</option>
+                            <option>Curso</option>
+                            <option>Certificação</option>
+                            <option>Licença</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nome do Curso / Formação</label>
+                        <input type="text" name="course" placeholder="Ex: Tecnologia da Informação" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Tipo de Instituição</label>
+                        <select name="entity_type" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
+                            <option>Universidade</option>
+                            <option>Instituição</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nome da Universidade / Instituição</label>
+                        <input type="text" name="entity_name" placeholder="Ex: UNIVESP" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Data de Formação</label>
+                        <input type="text" name="completion_date" placeholder="Ex: 20/08/2025" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">&nbsp;</label>
+                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl transition text-sm">Adicionar Formação</button>
+                    </div>
+
+                    <div class="md:col-span-3">
+                        <label class="block text-xs text-gray-400 mb-1">Matérias e Conhecimentos (separados por vírgula)</label>
+                        <input type="text" name="subjects" placeholder="Ex: Algoritmos, Estrutura de Dados, POO, Banco de Dados..." required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
+                    </div>
+                </form>
+
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Gerenciar / Excluir Formações Cadastradas</h3>
+                <div class="space-y-2 max-h-48 overflow-y-auto">
+                    {% for form in data.formations %}
+                    <form method="POST" class="flex justify-between items-center bg-gray-800 p-2.5 rounded-lg border border-gray-700">
+                        <input type="hidden" name="action" value="delete_formation">
+                        <input type="hidden" name="form_id" value="{{ form.id }}">
+                        <span class="text-xs text-white truncate"><b>{{ form.level }}:</b> {{ form.course }} ({{ form.entity_name }})</span>
+                        <button type="submit" class="bg-red-600 text-white text-xs px-3 py-1 rounded">Excluir</button>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+
             <!-- PROFILE -->
             <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
                 <h2 class="text-lg font-bold text-white mb-4">Perfil</h2>
@@ -26,21 +93,17 @@ cat << 'EOF' > templates/admin.html
                     <input type="text" name="date_of_birth" value="{{ data.profile.date_of_birth }}" placeholder="Data Nasc." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
                     <input type="text" name="city" value="{{ data.profile.city }}" placeholder="Cidade" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
                     <input type="text" name="state" value="{{ data.profile.state }}" placeholder="Estado" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="country" value="{{ data.profile.country }}" placeholder="País" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="graduation" value="{{ data.profile.graduation }}" placeholder="Graduação" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="course" value="{{ data.profile.course }}" placeholder="Curso" class="col-span-2 w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="university" value="{{ data.profile.university }}" placeholder="Universidade" class="col-span-2 w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
                     <button type="submit" class="col-span-2 bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2 rounded-xl transition">Salvar Perfil</button>
                 </form>
             </div>
 
-            <!-- SKILLS -->
+            <!-- HABILIDADES -->
             <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
                 <h2 class="text-lg font-bold text-white mb-4">Habilidades (Skills)</h2>
                 <form method="POST" class="flex gap-2 mb-4">
                     <input type="hidden" name="action" value="add_skill">
-                    <input type="text" name="category" placeholder="Categoria (Ex: Cloud)" required class="w-1/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="name" placeholder="Tecnologias..." required class="w-2/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
+                    <input type="text" name="category" placeholder="Categoria" required class="w-1/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
+                    <input type="text" name="name" placeholder="Nome..." required class="w-2/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
                     <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 rounded-xl">+</button>
                 </form>
                 <div class="space-y-2 max-h-48 overflow-y-auto">
@@ -48,64 +111,7 @@ cat << 'EOF' > templates/admin.html
                     <form method="POST" class="flex justify-between items-center bg-gray-800 p-2 rounded-lg border border-gray-700">
                         <input type="hidden" name="action" value="delete_skill">
                         <input type="hidden" name="skill_id" value="{{ skill.id }}">
-                        <span class="text-xs text-white truncate max-w-[250px]"><b>{{ skill.category }}</b>: {{ skill.name }}</span>
-                        <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded">X</button>
-                    </form>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- EXPERIENCES -->
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
-                <h2 class="text-lg font-bold text-white mb-4">Experiência & Educação</h2>
-                <form method="POST" class="space-y-2 mb-4">
-                    <input type="hidden" name="action" value="add_experience">
-                    <div class="flex gap-2">
-                        <select name="type" class="w-1/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                            <option>Experiência Profissional</option>
-                            <option>Curso</option>
-                            <option>Certificação</option>
-                        </select>
-                        <input type="text" name="title" placeholder="Título (Ex: Consultor SAP JR)" required class="w-2/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    </div>
-                    <input type="text" name="description" placeholder="Descrição da atividade..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <div class="flex gap-2">
-                        <input type="text" name="period" placeholder="Período (Ex: 2023 - 2025)" required class="w-2/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                        <button type="submit" class="w-1/3 bg-cyan-500 text-gray-950 font-bold rounded-xl">+</button>
-                    </div>
-                </form>
-                <div class="space-y-2 max-h-48 overflow-y-auto">
-                    {% for exp in data.experiences %}
-                    <form method="POST" class="flex justify-between items-center bg-gray-800 p-2 rounded-lg border border-gray-700">
-                        <input type="hidden" name="action" value="delete_experience">
-                        <input type="hidden" name="exp_id" value="{{ exp.id }}">
-                        <span class="text-xs text-white truncate max-w-[250px]"><b>{{ exp.type }}</b>: {{ exp.title }}</span>
-                        <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded">X</button>
-                    </form>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- PROJECTS -->
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
-                <h2 class="text-lg font-bold text-white mb-4">Projetos</h2>
-                <form method="POST" class="space-y-2 mb-4">
-                    <input type="hidden" name="action" value="add_project">
-                    <input type="text" name="title" placeholder="Título" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="description" placeholder="Descrição" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="tech" placeholder="Tecnologias (vírgula)" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <div class="flex gap-2">
-                        <input type="text" name="link_live" placeholder="Link Demo" class="w-1/2 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                        <input type="text" name="link_github" placeholder="Link GitHub" class="w-1/2 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    </div>
-                    <button type="submit" class="w-full bg-cyan-500 text-gray-950 font-bold py-2 rounded-xl mt-2">+</button>
-                </form>
-                <div class="space-y-2 max-h-48 overflow-y-auto">
-                    {% for project in data.projects %}
-                    <form method="POST" class="flex justify-between items-center bg-gray-800 p-2 rounded-lg border border-gray-700">
-                        <input type="hidden" name="action" value="delete_project">
-                        <input type="hidden" name="project_id" value="{{ project.id }}">
-                        <span class="text-xs text-white truncate max-w-[250px]">{{ project.title }}</span>
+                        <span class="text-xs text-white truncate max-w-[250px]"><b>{{ skill.category }}</b></span>
                         <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded">X</button>
                     </form>
                     {% endfor %}
@@ -116,4 +122,3 @@ cat << 'EOF' > templates/admin.html
     </div>
 </body>
 </html>
-EOF

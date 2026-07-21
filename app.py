@@ -27,11 +27,12 @@ def init_git_repo():
 
 def load_data():
     if not os.path.exists(DATA_FILE):
-        return {"profile": {}, "skills": [], "projects": [], "experiences": []}
+        return {"profile": {}, "skills": [], "projects": [], "formations": [], "experiences": []}
     
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         data = json.load(f)
         if 'skills' not in data: data['skills'] = []
+        if 'formations' not in data: data['formations'] = []
         if 'experiences' not in data: data['experiences'] = []
         return data
 
@@ -86,6 +87,22 @@ def admin():
                 "course": request.form.get('course'),
                 "university": request.form.get('university')
             }
+        elif action == 'add_formation':
+            new_formation = {
+                "id": str(uuid.uuid4()),
+                "level": request.form.get('level'), # Graduação, Pós, Certificação, etc.
+                "course": request.form.get('course'),
+                "entity_type": request.form.get('entity_type'), # Universidade ou Instituição
+                "entity_name": request.form.get('entity_name'),
+                "completion_date": request.form.get('completion_date'),
+                "subjects": request.form.get('subjects') # Matérias e conhecimentos separados por vírgula
+            }
+            data['formations'].append(new_formation)
+            
+        elif action == 'delete_formation':
+            form_id = request.form.get('form_id')
+            data['formations'] = [f for f in data['formations'] if f.get('id') != form_id]
+
         elif action == 'add_project':
             new_project = {
                 "id": str(uuid.uuid4()),
@@ -116,7 +133,6 @@ def admin():
         elif action == 'add_experience':
             new_experience = {
                 "id": str(uuid.uuid4()),
-                "type": request.form.get('type'),
                 "title": request.form.get('title'),
                 "description": request.form.get('description'),
                 "period": request.form.get('period')
