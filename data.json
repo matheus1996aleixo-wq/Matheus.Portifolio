@@ -3,95 +3,63 @@
         "full_name": "Matheus Aleixo",
         "date_of_birth": "20/02/1996",
         "city": "Várzea Paulista",
-        "state": "SP",
-        "country": "Brasil",
-        "graduation": "Bacharelado",
-        "course": "Tecnologia da Informação",
-        "university": "Universidade Virtual do Estado de São Paulo"
+        "state": "São Paulo",
+        "country": "Brasil"
     },
-    "skills": [
+    "formations": [
         {
-            "id": "skill-1",
-            "category": "Sistemas ERP & SAP",
-            "name": "SAP ECC, SAP S/4HANA (FI, CO, SD, MM, ABAP, Basis), Parametrizações, IDocs"
-        },
-        {
-            "id": "skill-2",
-            "category": "Programação & Desenvolvimento",
-            "name": "Python (Avançado), Java (Básico), C (Básico), POO, Flask, Dash, FastAPI"
-        },
-        {
-            "id": "skill-3",
-            "category": "Automação & Web Scraping",
-            "name": "RPA (Python, UiPath), Scrapy, Playwright, BeautifulSoup, Automação Office/Web"
-        },
-        {
-            "id": "skill-4",
-            "category": "Dados & Banco de Dados",
-            "name": "ETL, Pandas, PostgreSQL, SQL, MongoDB, Dashboards"
-        },
-        {
-            "id": "skill-5",
-            "category": "Cloud & DevOps",
-            "name": "Git, GitHub, AWS Lambda, Apache Airflow"
-        },
-        {
-            "id": "skill-6",
-            "category": "Idiomas",
-            "name": "Inglês Básico"
+            "id": "1",
+            "level": "Bacharelado",
+            "course": "Tecnologia da Informação",
+            "entity_type": "Universidade",
+            "entity_name": "UNIVESP - Universidade Virtual do Estado de São Paulo",
+            "completion_date": "20/08/2025"
         }
     ],
-    "projects": [],
+    "skills": [
+        {"id": "1", "category": "Python", "name": "Automação, RPA, ETL & IA"},
+        {"id": "2", "category": "SQL / Databases", "name": "Modelagem MER/DER & Consultas"},
+        {"id": "3", "category": "SAP ERP", "name": "ECC & S/4HANA (FI, CO, SD, MM)"},
+        {"id": "4", "category": "UiPath RPA", "name": "Automação de Processos"},
+        {"id": "5", "category": "Power BI", "name": "Dashboards & DataViz"},
+        {"id": "6", "category": "Git & GitHub", "name": "Versionamento & Deploy"}
+    ],
     "experiences": [
         {
-            "id": "exp-1",
-            "type": "Experiência Profissional",
-            "title": "Professor de Tecnologia e Matemática - Secretaria da Educação",
-            "description": "Experiência com Ensino Fundamental II e Ensino Médio, com foco no desenvolvimento de competências lógicas, digitais e matemáticas.",
-            "period": "Outubro 2025 a Fevereiro 2026"
+            "id": "1",
+            "title": "Junior SAP Consultant | Stefanini",
+            "period": "Fev 2025 - Mai 2025 (Jaguariúna)",
+            "description": "Atuação em suporte funcional SAP ECC e S/4HANA (módulos FI, CO, SD, MM), resolução de incidentes complexos, parametrização e alinhamento com regras de negócio globais no Projeto SPIRIT."
         },
         {
-            "id": "exp-2",
-            "type": "Experiência Profissional",
-            "title": "Consultor SAP JR - Stefanini",
-            "description": "Suporte Funcional SAP S/4HANA (Nível I e II) para usuários finais nos módulos FI, CO e SD. Gestão de Dados e Localização Brasil.",
-            "period": "Tempo Determinado"
+            "id": "2",
+            "title": "IT Business Application Intern | Continental",
+            "period": "Jun 2023 - Fev 2025 (Várzea Paulista)",
+            "description": "Suporte a sistemas corporativos, automação de processos internos com scripts em Python e ferramentas RPA, engenharia de dados em relatórios gerenciais e melhoria contínua de infraestrutura de TI."
         },
         {
-            "id": "exp-3",
-            "type": "Experiência Profissional",
-            "title": "Estagiário de Tecnologia da Informação - Continental Automotive",
-            "description": "Atuação em Suporte Funcional SAP ECC e S/4HANA. Desenvolvimento de automações utilizando UiPath e participação no projeto global SPIRIT.",
-            "period": "Junho 2023 a Fevereiro 2025"
-        },
-        {
-            "id": "exp-4",
-            "type": "Curso",
-            "title": "UiPath - Academia de Automação e Desenvolvimento",
-            "description": "Formação em automação de processos e desenvolvimento com a ferramenta UiPath.",
-            "period": "Conclusão: 21/04/2024"
-        },
-        {
-            "id": "exp-5",
-            "type": "Curso",
-            "title": "Fundamentos básicos do Sap S/4Hana - KA Solutions",
-            "description": "Capacitação nos conceitos e funcionalidades básicas do sistema SAP S/4HANA.",
-            "period": "Carga horária: 8 horas"
-        },
-        {
-            "id": "exp-6",
-            "type": "Curso",
-            "title": "Power BI Avançado - Udemy",
-            "description": "Curso avançado de análise de dados e criação de dashboards interativos.",
-            "period": "Conclusão: 31/07/2025"
-        },
-        {
-            "id": "exp-7",
-            "type": "Curso",
-            "title": "Python Avançado - Udemy",
-            "description": "Aprofundamento na linguagem Python para desenvolvimento robusto.",
-            "period": "Conclusão: 30/12/2025"
+            "id": "3",
+            "title": "Mathematics & Technology Teacher",
+            "period": "Out 2025 - Fev 2026",
+            "description": "Docência de matemática e tecnologia para níveis fundamentais e médio, introduzindo lógica computacional, pensamento analítico e resolução de problemas estruturados."
         }
     ],
-    "formations": []
+    "projects": [
+        {
+            "id": "1",
+            "title": "Project SPIRIT - SAP Global Integration",
+            "description": "Como foi desenvolvido: Harmonização e unificação de processos globais corporativos integrando módulos financeiros e logísticos do SAP ECC para S/4HANA.\nFerramentas & Linguagens: SAP GUI, ABAP Debugging, SQL, Excel Avançado e Jira.",
+            "tech": "SAP S/4HANA, SQL, ABAP",
+            "link_live": "https://www.linkedin.com/in/matheus-aleixo-299a05247",
+            "link_github": "https://github.com/matheus1996aleixo-wq"
+        },
+        {
+            "id": "2",
+            "title": "Automated Data Pipeline & RPA Bot",
+            "description": "Como foi desenvolvido: Criação de robôs inteligentes para extração de dados diários de faturamento, validação automática de planilhas e carga em banco de dados centralizado.\nFerramentas & Linguagens: Python (Pandas, Requests), UiPath Studio e SQLite.",
+            "tech": "Python, UiPath, SQL",
+            "link_live": "https://www.linkedin.com/in/matheus-aleixo-299a05247",
+            "link_github": "https://github.com/matheus1996aleixo-wq"
+        }
+    ]
 }
