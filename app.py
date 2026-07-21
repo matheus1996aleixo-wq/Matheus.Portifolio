@@ -7,7 +7,6 @@ from git import Repo
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
 
-# Leitura robusta das credenciais (suporta variáveis de ambiente do Codespaces ou padrão)
 ADMIN_USER = os.environ.get('ADMIN_PORT', os.environ.get('ADMIN_USER', 'admin'))
 ADMIN_PASS = os.environ.get('SENHA_PORT', os.environ.get('ADMIN_PASS', 'admin123'))
 
@@ -68,8 +67,6 @@ def login():
     if request.method == 'POST':
         user = request.form.get('username')
         password = request.form.get('password')
-        
-        # Validação das credenciais
         if user == ADMIN_USER and password == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin'))
@@ -124,7 +121,7 @@ def admin():
             
         elif action == 'delete_project':
             project_id = request.form.get('project_id')
-            data['projects']  = [p for p in data['projects'] if p.get('id') != project_id]
+            data['projects'] = [p for p in data['projects'] if p.get('id') != project_id]
             
         elif action == 'add_skill':
             new_skill = {
