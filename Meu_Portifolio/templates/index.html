@@ -59,11 +59,11 @@
                 </a>
             </nav>
 
+            <!-- BOTÕES DE IDIOMA E ADMIN LOGIN NO TOPO -->
             <div class="flex items-center space-x-4">
-                <!-- BOTÃO DE ALTERNÂNCIA DE IDIOMA -->
-                <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold">
-                    <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
-                    <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
+                <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
+                    <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
+                    <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
                 </div>
 
                 <a href="/admin" class="border border-cyan-400 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN LOGIN</a>
@@ -110,10 +110,11 @@
                         Atuo na área de Tecnologia da Informação como Analista de Sistemas e Desenvolvedor, focando na otimização de processos, infraestrutura e criação de soluções robustas. Com sólida vivência em suporte funcional ERP (SAP ECC e S/4HANA), desenvolvimento de automações comerciais/RPA e engenharia de dados, busco constantemente entregar segurança, eficiência e alta performance técnica.
                         {% endif %}
                     </p>
-                    <div class="flex gap-4 pt-2">
+                    <div class="flex flex-wrap gap-4 pt-2">
                         <a href="#projetos" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 px-6 py-3 rounded-xl font-bold transition">
                             {% if lang == 'en' %}View Projects{% else %}Ver Projetos{% endif %}
                         </a>
+                        <a href="https://www.linkedin.com/in/matheus-aleixo-299a05247" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-6 py-3 rounded-xl font-bold transition"><i class="fa-brands fa-linkedin mr-2 text-cyan-400"></i>LinkedIn</a>
                         <a href="https://github.com/matheus1996aleixo-wq" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-6 py-3 rounded-xl font-bold transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
                     </div>
                 </div>
