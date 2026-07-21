@@ -16,17 +16,21 @@
     </style>
     <script>
         function switchTab(tabId) {
+            // Esconde todas as abas
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
             
+            // Remove a classe ativa dos botões do menu
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => link.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400'));
             
+            // Mostra a aba selecionada
             const targetTab = document.getElementById(tabId);
             if (targetTab) {
                 targetTab.classList.add('active');
             }
             
+            // Destaca o botão correspondente
             const activeLink = document.getElementById('link-' + tabId);
             if (activeLink) {
                 activeLink.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
@@ -45,7 +49,7 @@
                 <span class="text-xl font-bold text-white tracking-wider">DEV PORTFOLIO</span>
             </div>
             
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold">
                 <button onclick="switchTab('sobre')" id="link-sobre" class="nav-link text-cyan-400 border-b-2 border-cyan-400 pb-1 transition">
                     {% if lang == 'en' %}About Me{% else %}Sobre Mim{% endif %}
                 </button>
@@ -64,13 +68,13 @@
             </nav>
 
             <div class="flex items-center space-x-4">
-                <!-- BOTÕES PT / EN NO TOPO -->
+                <!-- BOTÕES PT / EN -->
                 <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
                     <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
                     <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
                 </div>
 
-                <a href="/admin" class="border border-cyan-400 text-cyan-400 px-4 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN LOGIN</a>
+                <a href="/admin" class="border border-cyan-400 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN LOGIN</a>
             </div>
         </div>
     </header>
@@ -80,6 +84,7 @@
         <!-- ABA 1: SOBRE MIM -->
         <div id="sobre" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-16">
+                <!-- Bloco de Perfil Requisitado -->
                 <div class="card-glass p-8 rounded-3xl glow-border text-center">
                     <div class="w-32 h-32 mx-auto bg-gray-800 rounded-full border-4 border-cyan-400 mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,204,0.4)]">
                         <img src="https://github.com/matheus1996aleixo-wq.png" alt="Foto de Perfil" class="w-full h-full object-cover">
@@ -90,8 +95,8 @@
                     
                     <div class="space-y-2 text-sm text-left bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
                         <p><strong class="text-gray-300">{% if lang == 'en' %}City:{% else %}Cidade:{% endif %}</strong> Várzea Paulista</p>
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}State:{% else %}Estado:{% endif %}</strong> São Paulo</p>
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}Country:{% else %}País:{% endif %}</strong> Brasil</p>
+                        <p><strong class="text-gray-300">{% if lang == 'en' %}State:{% else %}Estado:{% endif %}</strong> São Paulo (SP)</p>
+                        <p><strong class="text-gray-300">{% if lang == 'en' %}Country:{% else %}País:{% endif %}</strong> Brasil / Brazil</p>
                     </div>
 
                     <div class="text-left bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2">
@@ -206,7 +211,7 @@
             </div>
         </div>
 
-        <!-- ABA 3: HABILIDADES COM SÍMBOLOS/LOGOS OFICIAIS -->
+        <!-- ABA 3: HABILIDADES -->
         <div id="habilidades" class="tab-content">
             <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
                 {% if lang == 'en' %}Technical Skills & Course Knowledge Symbols{% else %}Habilidades Técnicas e Símbolos de Conhecimento{% endif %}
@@ -214,7 +219,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Python -->
                 <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
                         <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png" alt="Python" class="w-10 h-10 object-contain">
                     </div>
                     <div>
@@ -224,7 +229,7 @@
                 </div>
                 <!-- SQL -->
                 <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
                         <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png" alt="SQL" class="w-10 h-10 object-contain">
                     </div>
                     <div>
@@ -234,7 +239,7 @@
                 </div>
                 <!-- SAP -->
                 <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
                         <img src="https://www.vectorlogo.zone/logos/sap/sap-icon.svg" alt="SAP" class="w-10 h-10 object-contain">
                     </div>
                     <div>
@@ -244,7 +249,7 @@
                 </div>
                 <!-- UiPath -->
                 <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
                         <img src="https://www.vectorlogo.zone/logos/uipath/uipath-icon.svg" alt="UiPath" class="w-10 h-10 object-contain">
                     </div>
                     <div>
@@ -254,7 +259,7 @@
                 </div>
                 <!-- Power BI -->
                 <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="w-10 h-10 object-contain">
                     </div>
                     <div>
@@ -264,7 +269,7 @@
                 </div>
                 <!-- Git & GitHub -->
                 <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
                         <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png" alt="Git" class="w-10 h-10 object-contain">
                     </div>
                     <div>
