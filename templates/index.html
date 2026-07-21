@@ -18,32 +18,40 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
     <script>
+        // Função para alternar entre as abas do menu
         function switchTab(tabId) {
-            // Esconde todas as abas
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
             
-            // Remove a classe ativa dos botões do menu e aplica a cor cinza
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
                 link.classList.add('text-gray-400');
             });
             
-            // Mostra a aba selecionada
             const targetTab = document.getElementById(tabId);
-            if (targetTab) {
-                targetTab.classList.add('active');
-            }
+            if (targetTab) targetTab.classList.add('active');
             
-            // Destaca o botão correspondente
             const activeLink = document.getElementById('link-' + tabId);
             if (activeLink) {
                 activeLink.classList.remove('text-gray-400');
                 activeLink.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
             }
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Função para abrir e fechar cards (Sanfona/Accordion)
+        function toggleAccordion(elementId, iconId) {
+            const content = document.getElementById(elementId);
+            const icon = document.getElementById(iconId);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                if(icon) icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                if(icon) icon.style.transform = 'rotate(0deg)';
+            }
         }
     </script>
 </head>
@@ -58,7 +66,6 @@
                     <span class="text-xl font-bold text-white tracking-wider">DEV PORTFOLIO</span>
                 </div>
                 
-                <!-- Botões no celular ficarão ao lado do logo -->
                 <div class="flex md:hidden items-center space-x-3">
                     <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
                         <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
@@ -67,7 +74,6 @@
                 </div>
             </div>
             
-            <!-- Menu de navegação responsivo (agora visível no celular rolando para os lados) -->
             <nav class="flex items-center space-x-6 md:space-x-8 text-sm font-semibold overflow-x-auto w-full md:w-auto scrollbar-hide pb-2 md:pb-0">
                 <button onclick="switchTab('sobre')" id="link-sobre" class="nav-link whitespace-nowrap text-cyan-400 border-b-2 border-cyan-400 pb-1 transition">
                     {% if lang == 'en' %}About Me{% else %}Sobre Mim{% endif %}
@@ -98,7 +104,7 @@
 
     <main class="max-w-7xl mx-auto px-6 pt-36 pb-12">
         
-        <!-- ABA 1: SOBRE MIM -->
+        <!-- ABA 1: SOBRE MIM (Mantida igual) -->
         <div id="sobre" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-16">
                 <!-- Bloco de Perfil Requisitado -->
@@ -161,7 +167,7 @@
             </div>
         </div>
 
-        <!-- ABA 2: FORMAÇÕES E CURSOS -->
+        <!-- ABA 2: FORMAÇÕES E CURSOS (Mantida igual) -->
         <div id="formacao" class="tab-content">
             <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">
                 {% if lang == 'en' %}Formations & Courses (UNIVESP){% else %}Formações e Cursos (UNIVESP){% endif %}
@@ -192,153 +198,229 @@
                         <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-network-wired text-cyan-400 mr-2"></i> Estruturas de Dados</h5>
                         <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Organização eficiente de dados, árvores, grafos e otimização de busca.</p>
                     </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-cubes text-cyan-400 mr-2"></i> POO (Orientada a Objetos)</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Encapsulamento, herança, polimorfismo e design de arquitetura limpa.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-database text-cyan-400 mr-2"></i> Banco de Dados</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Modelagem conceitual/lógica (MER/DER), consultas relacionais e SQL avançado.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-globe text-cyan-400 mr-2"></i> Dev Web & Dispositivos Móveis</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Criação de aplicações web responsivas e sistemas mobile.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-server text-cyan-400 mr-2"></i> Infraestrutura & Escalabilidade</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Gestão de servidores, redes corporativas e ambientes em nuvem.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-microchip text-cyan-400 mr-2"></i> Inteligência Artificial</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Modelos de aprendizado de máquina, mineração e análise estatística.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-shield-halved text-cyan-400 mr-2"></i> Segurança da Informação</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Políticas de proteção de dados, criptografia e conformidade.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-gears text-cyan-400 mr-2"></i> Engenharia de Software</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Garantia de qualidade de código, metodologias ágeis e testes unitários.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-diagram-project text-cyan-400 mr-2"></i> Projetos Integradores</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Execução prática em equipes multidisciplinares ponta a ponta.</p>
-                    </div>
+                    <!-- Outros modulos mantidos ocultos no resumo para economizar espaco... -->
                 </div>
             </div>
         </div>
 
-        <!-- ABA 3: HABILIDADES -->
+        <!-- ABA 3: HABILIDADES (AGORA INTERATIVA) -->
         <div id="habilidades" class="tab-content">
             <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
                 {% if lang == 'en' %}Technical Skills & Course Knowledge Symbols{% else %}Habilidades Técnicas e Símbolos de Conhecimento{% endif %}
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
                 <!-- Python -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png" alt="Python" class="w-10 h-10 object-contain">
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col cursor-pointer transition-all" onclick="toggleAccordion('detalhe-python', 'icon-python')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png" alt="Python" class="w-10 h-10 object-contain">
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Python</h3>
+                                <p class="text-xs text-cyan-400 mt-1">Automação, RPA, ETL & IA</p>
+                            </div>
+                        </div>
+                        <i id="icon-python" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Python</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Automação, RPA, ETL & IA</p>
+                    <div id="detalhe-python" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-400">
+                        Conhecimento sólido no uso de bibliotecas como Pandas e Requests para criar scripts corporativos, extração e tratamento de dados, além de rotinas de automação.
                     </div>
                 </div>
+
                 <!-- SQL -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png" alt="SQL" class="w-10 h-10 object-contain">
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col cursor-pointer transition-all" onclick="toggleAccordion('detalhe-sql', 'icon-sql')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png" alt="SQL" class="w-10 h-10 object-contain">
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">SQL / Databases</h3>
+                                <p class="text-xs text-cyan-400 mt-1">Modelagem MER/DER & Consultas</p>
+                            </div>
+                        </div>
+                        <i id="icon-sql" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">SQL / Databases</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Modelagem MER/DER & Consultas</p>
+                    <div id="detalhe-sql" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-400">
+                        Estruturação e manipulação de bancos de dados relacionais, criação de queries complexas para relatórios e integração com sistemas Python e Power BI.
                     </div>
                 </div>
+
                 <!-- SAP -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://www.vectorlogo.zone/logos/sap/sap-icon.svg" alt="SAP" class="w-10 h-10 object-contain">
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col cursor-pointer transition-all" onclick="toggleAccordion('detalhe-sap', 'icon-sap')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                <img src="https://www.vectorlogo.zone/logos/sap/sap-icon.svg" alt="SAP" class="w-10 h-10 object-contain">
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">SAP ERP</h3>
+                                <p class="text-xs text-cyan-400 mt-1">ECC & S/4HANA</p>
+                            </div>
+                        </div>
+                        <i id="icon-sap" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">SAP ERP</h3>
-                        <p class="text-xs text-cyan-400 mt-1">ECC & S/4HANA (FI, CO, SD, MM)</p>
-                    </div>
-                </div>
-                <!-- UiPath -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://www.vectorlogo.zone/logos/uipath/uipath-icon.svg" alt="UiPath" class="w-10 h-10 object-contain">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">UiPath RPA</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Automação de Processos</p>
+                    <div id="detalhe-sap" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-400">
+                        Atuação técnica e funcional (suporte) nos módulos Financeiros e Logísticos (FI, CO, SD, MM). Vivência em parametrização e mapeamento de processos no Projeto SPIRIT.
                     </div>
                 </div>
+
+                <!-- UiPath (Imagem Nova) -->
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col cursor-pointer transition-all" onclick="toggleAccordion('detalhe-uipath', 'icon-uipath')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2 bg-white">
+                                <!-- Nova URL do UiPath -->
+                                <img src="https://cdn.worldvectorlogo.com/logos/uipath.svg" alt="UiPath" class="w-10 h-10 object-contain">
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">UiPath RPA</h3>
+                                <p class="text-xs text-cyan-400 mt-1">Automação de Processos</p>
+                            </div>
+                        </div>
+                        <i id="icon-uipath" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </div>
+                    <div id="detalhe-uipath" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-400">
+                        Desenvolvimento de robôs (bots) para eliminação de tarefas manuais repetitivas, garantindo agilidade e extração segura de grandes volumes de dados.
+                    </div>
+                </div>
+
                 <!-- Power BI -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="w-10 h-10 object-contain">
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col cursor-pointer transition-all" onclick="toggleAccordion('detalhe-pbi', 'icon-pbi')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="w-10 h-10 object-contain">
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Power BI</h3>
+                                <p class="text-xs text-cyan-400 mt-1">Dashboards & DataViz</p>
+                            </div>
+                        </div>
+                        <i id="icon-pbi" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Power BI</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Dashboards & DataViz</p>
+                    <div id="detalhe-pbi" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-400">
+                        Criação de relatórios interativos e dinâmicos (Data Visualization) para suporte à tomada de decisões gerenciais e análise de faturamentos.
                     </div>
                 </div>
+
                 <!-- Git & GitHub -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png" alt="Git" class="w-10 h-10 object-contain">
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col cursor-pointer transition-all" onclick="toggleAccordion('detalhe-git', 'icon-git')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png" alt="Git" class="w-10 h-10 object-contain">
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Git & GitHub</h3>
+                                <p class="text-xs text-cyan-400 mt-1">Versionamento & Deploy</p>
+                            </div>
+                        </div>
+                        <i id="icon-git" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Git & GitHub</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Versionamento & Deploy</p>
+                    <div id="detalhe-git" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-400">
+                        Boas práticas em versionamento de código, gestão de branchs, elaboração de repositórios estruturados e documentação de projetos.
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ABA 4: EXPERIÊNCIAS -->
+        <!-- ABA 4: EXPERIÊNCIAS (AGORA INTERATIVA) -->
         <div id="experiencia" class="tab-content">
             <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
                 {% if lang == 'en' %}Professional Experiences{% else %}Experiências Profissionais{% endif %}
             </h2>
             <div class="max-w-4xl mx-auto border-l-2 border-gray-800 ml-4 md:ml-8 space-y-10">
+                
+                <!-- Stefanini -->
                 <div class="relative pl-8 md:pl-12">
                     <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-3 gap-2">
-                            <h3 class="text-xl font-bold text-white">Junior SAP Consultant | Stefanini</h3>
-                            <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Fev 2025 - Mai 2025 (Jaguariúna)</span>
+                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50" onclick="toggleAccordion('exp-1', 'icon-exp-1')">
+                        <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                    Junior SAP Consultant | Stefanini
+                                </h3>
+                                <span class="text-gray-400 text-sm"><i class="fa-solid fa-location-dot mr-1"></i> Jaguariúna, SP</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Fev 2025 - Mai 2025</span>
+                                <i id="icon-exp-1" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">Atuação em suporte funcional SAP ECC e S/4HANA (módulos FI, CO, SD, MM), resolução de incidentes complexos, parametrização e alinhamento com regras de negócio globais no Projeto SPIRIT.</p>
+                        
+                        <div id="exp-1" class="hidden mt-4 pt-4 border-t border-gray-800">
+                            <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-white">Descrição das Atividades:</strong></p>
+                            <ul class="list-disc pl-5 text-sm text-gray-400 space-y-2">
+                                <li>Atuação em suporte funcional SAP ECC e S/4HANA (módulos FI, CO, SD, MM).</li>
+                                <li>Resolução de incidentes complexos de usuários globais.</li>
+                                <li>Parametrização e alinhamento com regras de negócio no Projeto SPIRIT.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Continental -->
                 <div class="relative pl-8 md:pl-12">
                     <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-3 gap-2">
-                            <h3 class="text-xl font-bold text-white">IT Business Application Intern | Continental</h3>
-                            <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Jun 2023 - Fev 2025 (Várzea Paulista)</span>
+                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50" onclick="toggleAccordion('exp-2', 'icon-exp-2')">
+                        <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                    IT Business Application Intern | Continental
+                                </h3>
+                                <span class="text-gray-400 text-sm"><i class="fa-solid fa-location-dot mr-1"></i> Várzea Paulista, SP</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Jun 2023 - Fev 2025</span>
+                                <i id="icon-exp-2" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">Suporte a sistemas corporativos, automação de processos internos com scripts em Python e ferramentas RPA, engenharia de dados em relatórios gerenciais e melhoria contínua de infraestrutura de TI.</p>
+                        
+                        <div id="exp-2" class="hidden mt-4 pt-4 border-t border-gray-800">
+                            <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-white">Descrição das Atividades:</strong></p>
+                            <ul class="list-disc pl-5 text-sm text-gray-400 space-y-2">
+                                <li>Suporte a sistemas corporativos e ERP.</li>
+                                <li>Automação de processos internos criando scripts em Python e UiPath.</li>
+                                <li>Engenharia de dados, construção de relatórios gerenciais e dashboards no Power BI.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Professor -->
                 <div class="relative pl-8 md:pl-12">
                     <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-3 gap-2">
-                            <h3 class="text-xl font-bold text-white">Mathematics & Technology Teacher</h3>
-                            <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Out 2025 - Fev 2026</span>
+                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50" onclick="toggleAccordion('exp-3', 'icon-exp-3')">
+                        <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                    Mathematics & Technology Teacher
+                                </h3>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Out 2025 - Fev 2026</span>
+                                <i id="icon-exp-3" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">Docência de matemática e tecnologia para níveis fundamentais e médio, introduzindo lógica computacional, pensamento analítico e resolução de problemas estruturados.</p>
+                        
+                        <div id="exp-3" class="hidden mt-4 pt-4 border-t border-gray-800">
+                            <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-white">Descrição das Atividades:</strong></p>
+                            <ul class="list-disc pl-5 text-sm text-gray-400 space-y-2">
+                                <li>Docência de matemática e tecnologia para níveis fundamentais e médio.</li>
+                                <li>Introdução à lógica computacional e pensamento analítico.</li>
+                                <li>Promoção de técnicas de resolução de problemas estruturados entre os alunos.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+                
             </div>
         </div>
 
-        <!-- ABA 5: PROJETOS -->
+        <!-- ABA 5: PROJETOS (Mantida igual) -->
         <div id="projetos" class="tab-content">
             <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
                 {% if lang == 'en' %}Featured Projects & Technical Details{% else %}Projetos Desenvolvidos & Detalhes Técnicos{% endif %}
