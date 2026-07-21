@@ -1,3 +1,4 @@
+cat << 'EOF' > app.py
 import os
 import json
 import uuid
@@ -5,19 +6,20 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from git import Repo
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta_aqui_para_o_login'
+app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
+
+ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
+ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin123')
 
 DATA_FILE = 'data.json'
 REPO_URL = 'https://github.com/matheus1996aleixo-wq/Matheus.Portifolio.git'
 
 def init_git_repo():
-    """Garante que o repositório local está inicializado e conectado ao GitHub correto."""
     if not os.path.exists('.git'):
         repo = Repo.init(os.getcwd())
     else:
         repo = Repo(os.getcwd())
     
-    # Configura ou atualiza o remote origin para o seu repositório
     if 'origin' in [r.name for r in repo.remotes]:
         origin = repo.remote(name='origin')
         origin.set_url(REPO_URL)
@@ -30,7 +32,6 @@ def load_data():
     
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         data = json.load(f)
-        # Garante que as listas existam mesmo se o JSON for antigo
         if 'skills' not in data: data['skills'] = []
         if 'experiences' not in data: data['experiences'] = []
         return data
@@ -39,7 +40,6 @@ def save_data(data):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
     
-    # Sincronização Automática com o GitHub (Matheus.Portifolio)
     try:
         init_git_repo()
         repo = Repo(os.getcwd())
@@ -48,7 +48,6 @@ def save_data(data):
         
         origin = repo.remote(name='origin')
         origin.push(refspec='main:main')
-        print("Sincronizado com sucesso com o GitHub!")
     except Exception as e:
         print(f"Erro ao subir para o GitHub: {e}")
 
@@ -60,9 +59,11 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['username'] == 'admin' and request.form['password'] == 'admin123':
+        if request.form['username'] == ADMIN_USER and request.form['password'] == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin'))
+        else:
+            return render_template('login.html', erro="Usuário ou senha incorretos.")
     return render_template('login.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -75,7 +76,6 @@ def admin():
     if request.method == 'POST':
         action = request.form.get('action')
         
-        # --- ATUALIZAR PROFILE ---
         if action == 'update_profile':
             data['profile'] = {
                 "full_name": request.form.get('full_name'),
@@ -87,8 +87,6 @@ def admin():
                 "course": request.form.get('course'),
                 "university": request.form.get('university')
             }
-            
-        # --- GERENCIAR PROJETOS ---
         elif action == 'add_project':
             new_project = {
                 "id": str(uuid.uuid4()),
@@ -104,7 +102,6 @@ def admin():
             project_id = request.form.get('project_id')
             data['projects'] = [p for p in data['projects'] if p.get('id') != project_id]
             
-        # --- GERENCIAR HABILIDADES (Conhecimentos) ---
         elif action == 'add_skill':
             new_skill = {
                 "id": str(uuid.uuid4()),
@@ -117,11 +114,10 @@ def admin():
             skill_id = request.form.get('skill_id')
             data['skills'] = [s for s in data['skills'] if s.get('id') != skill_id]
 
-        # --- GERENCIAR EXPERIÊNCIAS (Cursos, Certificações, Formações) ---
         elif action == 'add_experience':
             new_experience = {
                 "id": str(uuid.uuid4()),
-                "type": request.form.get('type'), # Ex: Curso, Experiência, Certificação
+                "type": request.form.get('type'),
                 "title": request.form.get('title'),
                 "description": request.form.get('description'),
                 "period": request.form.get('period')
@@ -145,3 +141,4 @@ def logout():
 if __name__ == '__main__':
     init_git_repo()
     app.run(debug=True, host='0.0.0.0', port=5000)
+EOF
