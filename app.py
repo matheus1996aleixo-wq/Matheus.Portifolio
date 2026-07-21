@@ -47,17 +47,24 @@ def save_data(data):
         init_git_repo()
         repo = Repo(os.getcwd())
         repo.git.add(DATA_FILE)
-        repo.index.commit("Atualização automática via Painel Admin - Matheus.Portifolio")
+        repo.index.commit("Atualização automática bilíngue via Painel Admin - Matheus.Portifolio")
         
         origin = repo.remote(name='origin')
         origin.push(refspec='main:main')
     except Exception as e:
         print(f"Erro ao subir para o GitHub: {e}")
 
+@app.route('/lang/<lang_code>')
+def set_language(lang_code):
+    if lang_code in ['pt', 'en']:
+        session['lang'] = lang_code
+    return redirect(url_for('index'))
+
 @app.route('/')
 def index():
     data = load_data()
-    return render_template('index.html', data=data)
+    lang = session.get('lang', 'pt')
+    return render_template('index.html', data=data, lang=lang)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -71,7 +78,7 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('admin'))
         else:
-            return render_template('login.html', erro="Usuário ou senha incorretos.")
+            return render_template('login.html', erro="Usuário ou senha incorretos." if session.get('lang','pt')=='pt' else "Incorrect username or password.")
             
     return render_template('login.html')
 
