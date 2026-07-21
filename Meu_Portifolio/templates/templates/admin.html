@@ -2,28 +2,29 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Portfólio</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-950 text-gray-200 p-8">
     <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-            <h1 class="text-2xl font-bold text-white">Painel Admin - Portfólio</h1>
+            <h1 class="text-2xl font-bold text-white">Painel Admin - Gerenciamento</h1>
             <div class="space-x-4">
-                <a href="/" target="_blank" class="text-cyan-400 hover:underline">Ver Site</a>
+                <a href="/" target="_blank" class="text-cyan-400 hover:underline text-sm font-semibold">Ver Site</a>
                 <a href="/logout" class="bg-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700">Sair</a>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- FORMAÇÕES, CURSOS E CERTIFICAÇÕES -->
+            <!-- GERENCIAR FORMAÇÕES E CURSOS -->
             <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl lg:col-span-2">
                 <h2 class="text-lg font-bold text-white mb-4">Adicionar Formação / Curso / Certificação</h2>
                 <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <input type="hidden" name="action" value="add_formation">
                     
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tipo / Nível</label>
+                        <label class="block text-xs text-gray-400 mb-1">Nível / Segmento</label>
                         <select name="level" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
                             <option>Graduação</option>
                             <option>Pós Graduação</option>
@@ -32,18 +33,18 @@
                             <option>Pós Doutorado</option>
                             <option>Técnico</option>
                             <option>Curso</option>
-                            <option>Certificação</option>
-                            <option>Licença</option>
+                            <option>Certificações</option>
+                            <option>Licenças</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Nome do Curso / Formação</label>
+                        <label class="block text-xs text-gray-400 mb-1">Curso</label>
                         <input type="text" name="course" placeholder="Ex: Tecnologia da Informação" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tipo de Instituição</label>
+                        <label class="block text-xs text-gray-400 mb-1">Tipo de Entidade</label>
                         <select name="entity_type" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
                             <option>Universidade</option>
                             <option>Instituição</option>
@@ -51,7 +52,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Nome da Universidade / Instituição</label>
+                        <label class="block text-xs text-gray-400 mb-1">Universidade / Instituição</label>
                         <input type="text" name="entity_name" placeholder="Ex: UNIVESP" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
                     </div>
 
@@ -64,14 +65,9 @@
                         <label class="block text-xs text-gray-400 mb-1">&nbsp;</label>
                         <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl transition text-sm">Adicionar Formação</button>
                     </div>
-
-                    <div class="md:col-span-3">
-                        <label class="block text-xs text-gray-400 mb-1">Matérias e Conhecimentos (separados por vírgula)</label>
-                        <input type="text" name="subjects" placeholder="Ex: Algoritmos, Estrutura de Dados, POO, Banco de Dados..." required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm">
-                    </div>
                 </form>
 
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Gerenciar / Excluir Formações Cadastradas</h3>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Formações Cadastradas</h3>
                 <div class="space-y-2 max-h-48 overflow-y-auto">
                     {% for form in data.formations %}
                     <form method="POST" class="flex justify-between items-center bg-gray-800 p-2.5 rounded-lg border border-gray-700">
@@ -83,41 +79,6 @@
                     {% endfor %}
                 </div>
             </div>
-
-            <!-- PROFILE -->
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
-                <h2 class="text-lg font-bold text-white mb-4">Perfil</h2>
-                <form method="POST" class="grid grid-cols-2 gap-4">
-                    <input type="hidden" name="action" value="update_profile">
-                    <input type="text" name="full_name" value="{{ data.profile.full_name }}" placeholder="Nome" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="date_of_birth" value="{{ data.profile.date_of_birth }}" placeholder="Data Nasc." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="city" value="{{ data.profile.city }}" placeholder="Cidade" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="state" value="{{ data.profile.state }}" placeholder="Estado" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <button type="submit" class="col-span-2 bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2 rounded-xl transition">Salvar Perfil</button>
-                </form>
-            </div>
-
-            <!-- HABILIDADES -->
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
-                <h2 class="text-lg font-bold text-white mb-4">Habilidades (Skills)</h2>
-                <form method="POST" class="flex gap-2 mb-4">
-                    <input type="hidden" name="action" value="add_skill">
-                    <input type="text" name="category" placeholder="Categoria" required class="w-1/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <input type="text" name="name" placeholder="Nome..." required class="w-2/3 bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-sm">
-                    <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 rounded-xl">+</button>
-                </form>
-                <div class="space-y-2 max-h-48 overflow-y-auto">
-                    {% for skill in data.skills %}
-                    <form method="POST" class="flex justify-between items-center bg-gray-800 p-2 rounded-lg border border-gray-700">
-                        <input type="hidden" name="action" value="delete_skill">
-                        <input type="hidden" name="skill_id" value="{{ skill.id }}">
-                        <span class="text-xs text-white truncate max-w-[250px]"><b>{{ skill.category }}</b></span>
-                        <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded">X</button>
-                    </form>
-                    {% endfor %}
-                </div>
-            </div>
-
         </div>
     </div>
 </body>
