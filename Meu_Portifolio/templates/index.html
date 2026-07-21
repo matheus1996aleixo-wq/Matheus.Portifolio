@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfólio | Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0b0f19; color: #94a3b8; font-family: 'Inter', sans-serif; }
+        .card-glass { background: #111827; border: 1px solid #1f2937; box-shadow: 0 0 15px rgba(0, 255, 204, 0.05); }
+        .glow-border { border: 1px solid rgba(0, 242, 254, 0.3); box-shadow: 0 0 20px rgba(0, 242, 254, 0.1); }
+    </style>
+</head>
+<body class="p-6">
+    <!-- Header / Navbar -->
+    <header class="flex justify-between items-center max-w-7xl mx-auto mb-8 pb-4 border-b border-gray-800">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-bold text-white tracking-wider">DEV | PORTFOLIO</span>
+        </div>
+        <nav class="flex space-x-6 text-sm font-medium">
+            <a href="#" class="text-cyan-400">Projects</a>
+            <a href="#" class="hover:text-white transition">Skills</a>
+            <a href="#" class="hover:text-white transition">Experience</a>
+            <a href="/admin" class="border border-cyan-400 text-cyan-400 px-4 py-1.5 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition">ADMIN LOGIN</a>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Coluna da Esquerda: Perfil e Skills -->
+        <aside class="space-y-6 lg:col-span-1">
+            <!-- Box Profile solicitado -->
+            <div class="card-glass p-5 rounded-2xl glow-border">
+                <h2 class="text-white font-bold text-lg mb-4 border-b border-gray-800 pb-2">PROFILE</h2>
+                <div class="space-y-2 text-sm">
+                    <p><strong class="text-white">Full name:</strong> {{ data.profile.full_name }}</p>
+                    <p><strong class="text-white">Date of birth:</strong> {{ data.profile.date_of_brith }}</p>
+                    <hr class="border-gray-800 my-2">
+                    <p><strong class="text-white">City:</strong> {{ data.profile.city }}</p>
+                    <p><strong class="text-white">State:</strong> {{ data.profile.state }}</p>
+                    <p><strong class="text-white">Country:</strong> {{ data.profile.country }}</p>
+                    <hr class="border-gray-800 my-2">
+                    <p><strong class="text-white">Graduation:</strong> {{ data.profile.graduation }}</p>
+                    <p><strong class="text-white">Course:</strong> {{ data.profile.course }}</p>
+                    <p><strong class="text-white">University:</strong> {{ data.profile.university }}</p>
+                </div>
+            </div>
+
+            <!-- Skills Box -->
+            <div class="card-glass p-5 rounded-2xl">
+                <h2 class="text-white font-bold text-lg mb-4">SKILLS</h2>
+                {% for skill in data.skills %}
+                <div class="mb-3">
+                    <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">{{ skill.category }}</span>
+                    <p class="text-sm text-gray-300 mt-1">{{ skill.name }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <!-- Coluna Principal: Featured Projects -->
+        <section class="lg:col-span-3">
+            <h2 class="text-2xl font-bold text-white mb-6 tracking-wide">FEATURED PROJECTS</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for project in data.projects %}
+                <div class="card-glass p-6 rounded-2xl glow-border flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-white">{{ project.title }}</h3>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">{{ project.description }}</p>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            {% for t in project.tech.split(',') %}
+                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-2.5 py-1 rounded-full">{{ t.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="{{ project.link_live }}" class="flex-1 text-center bg-cyan-400 hover:bg-cyan-500 text-gray-950 font-semibold py-2 rounded-xl text-sm transition">View Live</a>
+                        <a href="{{ project.link_github }}" class="flex-1 text-center bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 rounded-xl text-sm border border-gray-700 transition">GitHub</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

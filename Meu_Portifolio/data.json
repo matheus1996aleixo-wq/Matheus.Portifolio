@@ -1,0 +1,26 @@
+{
+  "profile": {
+    "full_name": "Matheus Aleixo",
+    "date_of_brith": "20/02/1996",
+    "city": "Varzea Paulista",
+    "state": "São Paulo",
+    "country": "Brasil",
+    "graduation": "Bacharelado",
+    "course": "Tecnologia Da Informação",
+    "university": "UNIVESP - Universidade Virtual do Estado de São Paulo"
+  },
+  "skills": [
+    {"category": "Languages", "name": "JavaScript, Python, Go, SQL"},
+    {"category": "Frameworks", "name": "React, Node.js, Next.js, Docker"}
+  ],
+  "projects": [
+    {
+      "id": "1",
+      "title": "SecureFlow API Gateway",
+      "description": "Scalable gateway for microservices",
+      "tech": "Node.js, AWS Lambda",
+      "link_live": "#",
+      "link_github": "#"
+    }
+  ]
+}
