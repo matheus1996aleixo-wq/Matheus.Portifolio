@@ -1,10 +1,10 @@
 {
     "profile": {
         "nome": "Matheus Aleixo",
-        "titulo_pt": "Analista de Sistemas | Desenvolvedor Python & RPA | Consultor SAP",
-        "titulo_en": "Systems Analyst | Python & RPA Developer | SAP Consultant",
-        "sobre_pt": "Profissional de TI com experiência em desenvolvimento, automação de processos (RPA) e suporte funcional SAP.",
-        "sobre_en": "IT professional with experience in development, process automation (RPA), and SAP functional support.",
+        "titulo_pt": null,
+        "titulo_en": null,
+        "sobre_pt": null,
+        "sobre_en": null,
         "curriculo_file": "",
         "carta_file": ""
     },
