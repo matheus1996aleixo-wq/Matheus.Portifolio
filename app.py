@@ -7,8 +7,9 @@ from git import Repo
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
 
-ADMIN_USER = os.environ.get('ADMIN_PORT', os.environ.get('ADMIN_USER', 'admin'))
-ADMIN_PASS = os.environ.get('SENHA_PORT', os.environ.get('ADMIN_PASS', 'admin123'))
+# IMPORTANTE: Pegando as variáveis exatas da sua imagem (Repository Secrets)
+ADMIN_USER = os.environ.get('ADMIN_PORT', 'admin')
+ADMIN_PASS = os.environ.get('SENHA_PORT', 'admin123')
 
 DATA_FILE = 'data.json'
 REPO_URL = 'https://github.com/matheus1996aleixo-wq/Matheus.Portifolio.git'
@@ -32,6 +33,7 @@ def load_data():
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
+    if 'profile' not in data: data['profile'] = {}
     if 'skills' not in data: data['skills'] = []
     if 'experiences' not in data: data['experiences'] = []
     if 'projects' not in data: data['projects'] = []
@@ -52,7 +54,7 @@ def save_data(data):
         origin = repo.remote(name='origin')
         origin.push(refspec='main:main')
     except Exception as e:
-        print(f"Erro ao subir para o GitHub: {e}")
+        print(f"Aviso Git: {e}")
 
 @app.route('/lang/<lang_code>')
 def set_language(lang_code):
@@ -74,11 +76,13 @@ def login():
     if request.method == 'POST':
         user = request.form.get('username')
         password = request.form.get('password')
+        
         if user == ADMIN_USER and password == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin'))
         else:
-            return render_template('login.html', erro="Usuário ou senha incorretos." if session.get('lang','pt')=='pt' else "Incorrect username or password.")
+            erro_msg = "Usuário ou senha incorretos." if session.get('lang', 'pt') == 'pt' else "Incorrect username or password."
+            return render_template('login.html', erro=erro_msg)
             
     return render_template('login.html')
 
@@ -92,7 +96,14 @@ def admin():
     if request.method == 'POST':
         action = request.form.get('action')
         
-        if action == 'add_formation':
+        if action == 'update_profile':
+            data['profile']['nome'] = request.form.get('nome')
+            data['profile']['titulo_pt'] = request.form.get('titulo_pt')
+            data['profile']['titulo_en'] = request.form.get('titulo_en')
+            data['profile']['sobre_pt'] = request.form.get('sobre_pt')
+            data['profile']['sobre_en'] = request.form.get('sobre_en')
+
+        elif action == 'add_formation':
             new_formation = {
                 "id": str(uuid.uuid4()),
                 "level": request.form.get('level'),

@@ -1,18 +1,221 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin</title>
+    <title>Painel Admin | Matheus Aleixo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0f19; color: #94a3b8; font-family: 'Inter', sans-serif; }
+        .card-glass { background: #111827; border: 1px solid #1f2937; box-shadow: 0 0 15px rgba(0, 255, 204, 0.05); }
+        .glow-border:focus-within { border-color: rgba(0, 242, 254, 0.5); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-cyan-500', 'text-gray-950');
+                link.classList.add('bg-gray-800', 'text-cyan-400');
+            });
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.remove('bg-gray-800', 'text-cyan-400');
+            document.getElementById('btn-' + tabId).classList.add('bg-cyan-500', 'text-gray-950');
+        }
+    </script>
 </head>
-<body class="bg-gray-950 text-gray-200 p-8">
-    <div class="max-w-4xl mx-auto flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-        <h1 class="text-2xl font-bold text-white">Painel Administrativo</h1>
-        <div class="space-x-4">
-            <a href="/" class="text-cyan-400 text-sm">Ver Site</a>
-            <a href="/logout" class="bg-red-600 px-4 py-2 rounded text-sm text-white">Sair</a>
+<body class="antialiased selection:bg-cyan-500 selection:text-white pb-20">
+
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-code-branch text-cyan-400 text-2xl"></i>
+                <span class="text-xl font-bold text-white tracking-wider">PAINEL ADMIN</span>
+            </div>
+            <div class="space-x-4 flex items-center">
+                <a href="/" class="text-cyan-400 text-sm font-bold hover:underline"><i class="fa-solid fa-eye mr-2"></i>Ver Site</a>
+                <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition"><i class="fa-solid fa-power-off mr-2"></i>Sair</a>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pt-10">
+        <!-- Navegação de Abas -->
+        <div class="flex flex-wrap gap-4 mb-10">
+            <button id="btn-perfil" onclick="switchTab('perfil')" class="nav-link active bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl font-bold text-sm transition">Sobre Mim</button>
+            <button id="btn-formacao" onclick="switchTab('formacao')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Formações</button>
+            <button id="btn-habilidades" onclick="switchTab('habilidades')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Habilidades</button>
+            <button id="btn-experiencias" onclick="switchTab('experiencias')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Experiências</button>
+            <button id="btn-projetos" onclick="switchTab('projetos')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Projetos</button>
+        </div>
+
+        <!-- ABA: PERFIL (SOBRE MIM) -->
+        <div id="perfil" class="tab-content active">
+            <div class="card-glass p-8 rounded-3xl mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Editar Perfil</h2>
+                <form method="POST" action="/admin" class="space-y-4">
+                    <input type="hidden" name="action" value="update_profile">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nome Completo</label>
+                        <input type="text" name="nome" value="{{ data.profile.nome }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Título Profissional (PT)</label>
+                            <input type="text" name="titulo_pt" value="{{ data.profile.titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Título Profissional (EN)</label>
+                            <input type="text" name="titulo_en" value="{{ data.profile.titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Resumo (PT)</label>
+                            <textarea name="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.sobre_pt }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Resumo (EN)</label>
+                            <textarea name="sobre_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.sobre_en }}</textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm">Salvar Perfil</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ABA: FORMAÇÕES -->
+        <div id="formacao" class="tab-content">
+            <div class="card-glass p-8 rounded-3xl mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Formação</h2>
+                <form method="POST" action="/admin" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="hidden" name="action" value="add_formation">
+                    <input type="text" name="level" placeholder="Nível (ex: Bacharelado)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <input type="text" name="course" placeholder="Curso (ex: Tecnologia da Informação)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <input type="text" name="entity_type" placeholder="Tipo Instituição (ex: Universidade)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <input type="text" name="entity_name" placeholder="Nome da Instituição (ex: UNIVESP)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <input type="text" name="completion_date" placeholder="Data de Conclusão (ex: 20/08/2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Lista Formações -->
+            <div class="space-y-4">
+                {% for f in data.formations %}
+                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <h4 class="text-white font-bold">{{ f.course }}</h4>
+                        <p class="text-xs text-gray-400">{{ f.entity_name }} - {{ f.completion_date }}</p>
+                    </div>
+                    <form method="POST" action="/admin">
+                        <input type="hidden" name="action" value="delete_formation">
+                        <input type="hidden" name="form_id" value="{{ f.id }}">
+                        <button type="submit" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ABA: HABILIDADES -->
+        <div id="habilidades" class="tab-content">
+            <div class="card-glass p-8 rounded-3xl mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Habilidade</h2>
+                <form method="POST" action="/admin" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="hidden" name="action" value="add_skill">
+                    <input type="text" name="category" placeholder="Categoria (ex: Programação)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <input type="text" name="name" placeholder="Habilidade (ex: Python, SAP FI)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar</button>
+                </form>
+            </div>
+            <!-- Lista Habilidades -->
+            <div class="space-y-4">
+                {% for s in data.skills %}
+                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <h4 class="text-white font-bold">{{ s.name }}</h4>
+                        <p class="text-xs text-gray-400">{{ s.category }}</p>
+                    </div>
+                    <form method="POST" action="/admin">
+                        <input type="hidden" name="action" value="delete_skill">
+                        <input type="hidden" name="skill_id" value="{{ s.id }}">
+                        <button type="submit" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ABA: EXPERIÊNCIAS -->
+        <div id="experiencias" class="tab-content">
+            <div class="card-glass p-8 rounded-3xl mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Experiência</h2>
+                <form method="POST" action="/admin" class="space-y-4">
+                    <input type="hidden" name="action" value="add_experience">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" name="title" placeholder="Cargo e Empresa (ex: Consultor SAP Jr | Stefanini)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="period" placeholder="Período (ex: Fev 2025 - Maio 2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    </div>
+                    <textarea name="description" rows="3" placeholder="Descrição das atividades (use <li>...</li> para tópicos)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Experiência</button>
+                </form>
+            </div>
+            <!-- Lista Experiências -->
+            <div class="space-y-4">
+                {% for e in data.experiences %}
+                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <h4 class="text-white font-bold">{{ e.title }}</h4>
+                        <p class="text-xs text-gray-400">{{ e.period }}</p>
+                    </div>
+                    <form method="POST" action="/admin">
+                        <input type="hidden" name="action" value="delete_experience">
+                        <input type="hidden" name="exp_id" value="{{ e.id }}">
+                        <button type="submit" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ABA: PROJETOS -->
+        <div id="projetos" class="tab-content">
+            <div class="card-glass p-8 rounded-3xl mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Projeto</h2>
+                <form method="POST" action="/admin" class="space-y-4">
+                    <input type="hidden" name="action" value="add_project">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" name="title" placeholder="Título do Projeto (ex: Projeto SPIRIT)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="tech" placeholder="Tecnologias (ex: Python, SAP, SQL)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="link_live" placeholder="Link Online (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="link_github" placeholder="Link GitHub" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                    </div>
+                    <textarea name="description" rows="3" placeholder="Descrição técnica do projeto..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Projeto</button>
+                </form>
+            </div>
+            <!-- Lista Projetos -->
+            <div class="space-y-4">
+                {% for p in data.projects %}
+                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <h4 class="text-white font-bold">{{ p.title }}</h4>
+                        <p class="text-xs text-cyan-400">{{ p.tech }}</p>
+                    </div>
+                    <form method="POST" action="/admin">
+                        <input type="hidden" name="action" value="delete_project">
+                        <input type="hidden" name="project_id" value="{{ p.id }}">
+                        <button type="submit" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </main>
 </body>
 </html>
