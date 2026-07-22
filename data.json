@@ -1,10 +1,12 @@
 {
     "profile": {
-        "full_name": "Matheus Aleixo",
-        "date_of_birth": "20/02/1996",
-        "city": "Várzea Paulista",
-        "state": "São Paulo",
-        "country": "Brasil"
+        "nome": "Matheus Aleixo",
+        "titulo_pt": "Analista de Sistemas | Desenvolvedor Python & RPA | Consultor SAP",
+        "titulo_en": "Systems Analyst | Python & RPA Developer | SAP Consultant",
+        "sobre_pt": "Profissional de TI com experiência em desenvolvimento, automação de processos (RPA) e suporte funcional SAP. Tenho vivência no Projeto SPIRIT e na integração de sistemas complexos. Minha trajetória também inclui background em Qualidade e Química de Alimentos, além de experiência com docência em Matemática e Tecnologia.",
+        "sobre_en": "IT professional with experience in development, process automation (RPA), and SAP functional support. I have hands-on experience with Project SPIRIT and complex system integration. My background also includes Quality and Food Chemistry, as well as teaching experience in Mathematics and Technology.",
+        "curriculo_file": "",
+        "carta_file": ""
     },
     "formations": [
         {
@@ -13,16 +15,53 @@
             "course": "Tecnologia da Informação",
             "entity_type": "Universidade",
             "entity_name": "UNIVESP - Universidade Virtual do Estado de São Paulo",
-            "completion_date": "20/08/2025"
+            "completion_date": "20/08/2025",
+            "description": "Algoritmos e Programação: Lógica estruturada, desenvolvimento de scripts e algoritmos avançados.\nEstrutura de Dados: Organização eficiente de dados, árvores, grafos e otimização de busca.\nPOO (Orientada a Objetos): Encapsulamento, herança, polimorfismo e design de arquitetura limpa.\nBanco de Dados: Modelagem conceitual/lógica (MER/DER), consultas relacionais e SQL avançado.\nDev Web & Dispositivos Móveis: Criação de aplicações web responsivas e sistemas mobile.\nInfraestrutura & Escalabilidade: Gestão de servidores, redes corporativas e ambientes em nuvem.\nInteligência Artificial: Modelos de aprendizado de máquina, mineração e análise estatística.\nSegurança da Informação: Políticas de proteção de dados, criptografia e conformidade.\nEngenharia de Software: Garantia de qualidade de código, metodologias ágeis e testes unitários.\nProjetos Integradores: Execução prática em equipes multidisciplinares ponta a ponta."
         }
     ],
     "skills": [
-        {"id": "1", "category": "Python", "name": "Automação, RPA, ETL & IA"},
-        {"id": "2", "category": "SQL / Databases", "name": "Modelagem MER/DER & Consultas"},
-        {"id": "3", "category": "SAP ERP", "name": "ECC & S/4HANA (FI, CO, SD, MM)"},
-        {"id": "4", "category": "UiPath RPA", "name": "Automação de Processos"},
-        {"id": "5", "category": "Power BI", "name": "Dashboards & DataViz"},
-        {"id": "6", "category": "Git & GitHub", "name": "Versionamento & Deploy"}
+        {
+            "id": "1",
+            "category": "Python",
+            "name": "Automação, RPA, ETL & IA",
+            "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png",
+            "detalhes": "Desenvolvimento avançado de scripts, criação de robôs de automação, manipulação de dados com Pandas em pipelines ETL e introdução a inteligência artificial."
+        },
+        {
+            "id": "2",
+            "category": "SQL / Databases",
+            "name": "Modelagem MER/DER & Consultas",
+            "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png",
+            "detalhes": "Modelagem conceitual e lógica de banco de dados (MER/DER), criação de consultas relacionais avançadas, otimização de queries e gerenciamento de dados."
+        },
+        {
+            "id": "3",
+            "category": "SAP ERP",
+            "name": "ECC & S/4HANA (FI, CO, SD, MM)",
+            "icon": "https://www.vectorlogo.zone/logos/sap/sap-icon.svg",
+            "detalhes": "Suporte funcional completo e parametrização nos módulos financeiros e logísticos (FI, CO, SD, MM), com vivência em projetos de integração global (Projeto SPIRIT)."
+        },
+        {
+            "id": "4",
+            "category": "UiPath RPA",
+            "name": "Automação de Processos",
+            "icon": "https://cdn.worldvectorlogo.com/logos/uipath.svg",
+            "detalhes": "Construção e implantação de robôs de automação de processos corporativos (RPA) utilizando a plataforma UiPath para ganho de eficiência operacional."
+        },
+        {
+            "id": "5",
+            "category": "Power BI",
+            "name": "Dashboards & DataViz",
+            "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/bi/bi.png",
+            "detalhes": "Desenvolvimento de relatórios gerenciais dinâmicos, painéis interativos e visualização analítica de dados (DataViz) para tomada de decisão."
+        },
+        {
+            "id": "6",
+            "category": "Git & GitHub",
+            "name": "Versionamento & Deploy",
+            "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png",
+            "detalhes": "Controle de versão de código-fonte, gerenciamento de repositórios, fluxos de trabalho com branches e automação de deploys contínuos."
+        }
     ],
     "experiences": [
         {
@@ -48,18 +87,10 @@
         {
             "id": "1",
             "title": "Project SPIRIT - SAP Global Integration",
-            "description": "Como foi desenvolvido: Harmonização e unificação de processos globais corporativos integrando módulos financeiros e logísticos do SAP ECC para S/4HANA.\nFerramentas & Linguagens: SAP GUI, ABAP Debugging, SQL, Excel Avançado e Jira.",
+            "description": "Harmonização e unificação de processos globais corporativos integrando módulos financeiros e logísticos do SAP ECC para S/4HANA.\r\nFerramentas & Linguagens: SAP GUI, ABAP Debugging, SQL, Excel Avançado e Jira.",
             "tech": "SAP S/4HANA, SQL, ABAP",
-            "link_live": "https://www.linkedin.com/in/matheus-aleixo-299a05247",
-            "link_github": "https://github.com/matheus1996aleixo-wq"
-        },
-        {
-            "id": "2",
-            "title": "Automated Data Pipeline & RPA Bot",
-            "description": "Como foi desenvolvido: Criação de robôs inteligentes para extração de dados diários de faturamento, validação automática de planilhas e carga em banco de dados centralizado.\nFerramentas & Linguagens: Python (Pandas, Requests), UiPath Studio e SQLite.",
-            "tech": "Python, UiPath, SQL",
-            "link_live": "https://www.linkedin.com/in/matheus-aleixo-299a05247",
-            "link_github": "https://github.com/matheus1996aleixo-wq"
+            "link_live": "",
+            "link_github": ""
         }
     ]
 }
