@@ -13,373 +13,304 @@
         .nav-glass { background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid #1f2937; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
     <script>
         function switchTab(tabId) {
-            // Esconde todas as abas
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
             
-            // Remove a classe ativa dos botões do menu
             const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => link.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400'));
+            navLinks.forEach(link => {
+                link.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+                link.classList.add('text-gray-400');
+            });
             
-            // Mostra a aba selecionada
             const targetTab = document.getElementById(tabId);
-            if (targetTab) {
-                targetTab.classList.add('active');
-            }
+            if (targetTab) targetTab.classList.add('active');
             
-            // Destaca o botão correspondente
             const activeLink = document.getElementById('link-' + tabId);
             if (activeLink) {
+                activeLink.classList.remove('text-gray-400');
                 activeLink.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
             }
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleAccordion(elementId, iconId) {
+            const content = document.getElementById(elementId);
+            const icon = document.getElementById(iconId);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                if(icon) icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                if(icon) icon.style.transform = 'rotate(0deg)';
+            }
         }
     </script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white">
 
     <header class="fixed top-0 w-full z-50 nav-glass">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('sobre')">
-                <i class="fa-solid fa-code-branch text-cyan-400 text-2xl"></i>
-                <span class="text-xl font-bold text-white tracking-wider">DEV PORTFOLIO</span>
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center justify-between w-full md:w-auto">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('sobre')">
+                    <i class="fa-solid fa-code-branch text-cyan-400 text-2xl"></i>
+                    <span class="text-xl font-bold text-white tracking-wider">DEV PORTFOLIO</span>
+                </div>
+                <div class="flex md:hidden items-center space-x-3">
+                    <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
+                        <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
+                        <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
+                    </div>
+                </div>
             </div>
             
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold">
-                <button onclick="switchTab('sobre')" id="link-sobre" class="nav-link text-cyan-400 border-b-2 border-cyan-400 pb-1 transition">
-                    {% if lang == 'en' %}About Me{% else %}Sobre Mim{% endif %}
-                </button>
-                <button onclick="switchTab('formacao')" id="link-formacao" class="nav-link hover:text-cyan-400 pb-1 transition">
-                    {% if lang == 'en' %}Formations & Courses{% else %}Formações e Cursos{% endif %}
-                </button>
-                <button onclick="switchTab('habilidades')" id="link-habilidades" class="nav-link hover:text-cyan-400 pb-1 transition">
-                    {% if lang == 'en' %}Skills{% else %}Habilidades{% endif %}
-                </button>
-                <button onclick="switchTab('experiencia')" id="link-experiencia" class="nav-link hover:text-cyan-400 pb-1 transition">
-                    {% if lang == 'en' %}Experiences{% else %}Experiências{% endif %}
-                </button>
-                <button onclick="switchTab('projetos')" id="link-projetos" class="nav-link hover:text-cyan-400 pb-1 transition">
-                    {% if lang == 'en' %}Projects{% else %}Projetos{% endif %}
-                </button>
+            <nav class="flex items-center space-x-6 md:space-x-8 text-sm font-semibold overflow-x-auto w-full md:w-auto scrollbar-hide pb-2 md:pb-0">
+                <button onclick="switchTab('sobre')" id="link-sobre" class="nav-link whitespace-nowrap text-cyan-400 border-b-2 border-cyan-400 pb-1 transition">{% if lang == 'en' %}Personal Info{% else %}Informações Pessoais{% endif %}</button>
+                <button onclick="switchTab('formacao')" id="link-formacao" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Formations & Courses{% else %}Formações e Cursos{% endif %}</button>
+                <button onclick="switchTab('habilidades')" id="link-habilidades" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Skills{% else %}Habilidades{% endif %}</button>
+                <button onclick="switchTab('experiencia')" id="link-experiencia" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Experiences{% else %}Experiências{% endif %}</button>
+                <button onclick="switchTab('projetos')" id="link-projetos" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Projects{% else %}Projetos{% endif %}</button>
             </nav>
 
-            <div class="flex items-center space-x-4">
-                <!-- BOTÕES PT / EN -->
+            <div class="hidden md:flex items-center space-x-4">
                 <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
                     <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
                     <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
                 </div>
-
-                <a href="/admin" class="border border-cyan-400 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN LOGIN</a>
+                <a href="/admin" class="border border-cyan-400 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN</a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 pt-32 pb-12">
+    <main class="max-w-7xl mx-auto px-6 pt-36 pb-12">
         
-        <!-- ABA 1: SOBRE MIM -->
+        <!-- INFORMAÇÕES PESSOAIS -->
         <div id="sobre" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-16">
-                <!-- Bloco de Perfil Requisitado -->
+                <!-- Coluna Esquerda: Informações Pessoais -->
                 <div class="card-glass p-8 rounded-3xl glow-border text-center">
                     <div class="w-32 h-32 mx-auto bg-gray-800 rounded-full border-4 border-cyan-400 mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,204,0.4)]">
-                        <img src="https://github.com/matheus1996aleixo-wq.png" alt="Foto de Perfil" class="w-full h-full object-cover">
+                        <img src="https://github.com/matheus1996aleixo-wq.png" alt="Perfil" class="w-full h-full object-cover">
                     </div>
-                    
-                    <h1 class="text-2xl font-bold text-white mb-2">Matheus Aleixo</h1>
-                    <p class="text-xs text-gray-400 mb-6"><strong class="text-gray-300">{% if lang == 'en' %}Birthdate:{% else %}Data de Nascimento:{% endif %}</strong> 20/02/1996</p>
+                    <h1 class="text-2xl font-bold text-white mb-2">{{ data.profile.nome }}</h1>
+                    <p class="text-xs text-gray-400 mb-6">Data de Nascimento: <strong class="text-gray-200">20/02/1996</strong></p>
                     
                     <div class="space-y-2 text-sm text-left bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}City:{% else %}Cidade:{% endif %}</strong> Várzea Paulista</p>
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}State:{% else %}Estado:{% endif %}</strong> São Paulo (SP)</p>
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}Country:{% else %}País:{% endif %}</strong> Brasil / Brazil</p>
+                        <p><strong class="text-gray-300">Cidade:</strong> Várzea Paulista</p>
+                        <p><strong class="text-gray-300">Estado:</strong> São Paulo (SP)</p>
+                        <p><strong class="text-gray-300">País:</strong> Brasil / Brazil</p>
                     </div>
 
-                    <div class="text-left bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2">
-                        <p class="font-bold text-cyan-400"><i class="fa-solid fa-briefcase mr-1.5"></i> {% if lang == 'en' %}Work Availability:{% else %}Disponibilidade para Trabalhar:{% endif %}</p>
-                        <p>Home Office, Híbrido e Presencial</p>
-                        <p class="pt-2 text-gray-400 leading-relaxed">
-                            {% if lang == 'en' %}Available for hire by foreign companies, with flexibility for remote work or international relocation.{% else %}Disponível para contratação por empresas estrangeiras, com flexibilidade para atuação remota ou alocação internacional.{% endif %}
+                    <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6">
+                        <p class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-briefcase mr-1.5"></i> Disponibilidade para Trabalhar:</p>
+                        <p class="text-gray-200 font-medium">Home Office, Híbrido e Presencial</p>
+                        <p class="text-gray-400 pt-1 leading-relaxed">
+                            Disponível para contratação por empresas estrangeiras, com flexibilidade para atuação remota ou alocação internacional.
                         </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        {% if data.profile.curriculo_file %}
+                        <a href="{{ data.profile.curriculo_file }}" target="_blank" class="block w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-file-pdf mr-2"></i>Baixar Currículo</a>
+                        {% endif %}
+                        {% if data.profile.carta_file %}
+                        <a href="{{ data.profile.carta_file }}" target="_blank" class="block w-full bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-envelope-open-text mr-2"></i>Carta de Apresentação</a>
+                        {% endif %}
                     </div>
                 </div>
                 
+                <!-- Coluna Direita -->
                 <div class="lg:col-span-2 space-y-8">
+                    <!-- Objetivo Profissional -->
                     <div class="card-glass p-8 rounded-3xl glow-border">
-                        <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">
-                            {% if lang == 'en' %}Academic Background{% else %}Minha Formação Acadêmica{% endif %}
-                        </h2>
-                        <p class="text-gray-300 leading-relaxed text-base">
-                            <strong class="text-cyan-400">Graduação:</strong> Bacharelado em Tecnologia da Informação.<br>
-                            <strong class="text-gray-300">Pela UNIVESP</strong> - Universidade Virtual do Estado de São Paulo.
-                        </p>
-                        <div class="mt-4">
-                            <button onclick="switchTab('formacao')" class="text-xs bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 px-4 py-2 rounded-lg font-bold hover:bg-cyan-500 hover:text-gray-950 transition">
-                                {% if lang == 'en' %}View detailed courses and acquired skills &rarr;{% else %}Ver cursos detalhados e conhecimentos adquiridos &rarr;{% endif %}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="card-glass p-8 rounded-3xl glow-border">
-                        <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">
-                            {% if lang == 'en' %}Professional Objectives{% else %}Objetivos Profissionais{% endif %}
-                        </h2>
-                        <p class="text-gray-300 leading-relaxed text-sm mb-4">
-                            {% if lang == 'en' %}
-                            Act as a Systems Analyst and Software Developer delivering high-performance tech solutions, intelligent RPA automations, data engineering pipelines, and robust enterprise support (SAP ECC & S/4HANA). Aiming for international career expansion and high-impact structural projects.
-                            {% else %}
-                            Atuar como Analista de Sistemas e Desenvolvedor de Software entregando soluções tecnológicas de alta performance, automações inteligentes em RPA, pipelines de engenharia de dados e suporte empresarial robusto (SAP ECC & S/4HANA). Buscando expansão de carreira internacional e projetos estruturais de grande impacto.
-                            {% endif %}
-                        </p>
+                        <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">Objetivos Profissionais</h2>
+                        <h3 class="text-lg font-bold text-cyan-400 mb-2">{% if lang == 'en' %}{{ data.profile.titulo_en }}{% else %}{{ data.profile.titulo_pt }}{% endif %}</h3>
+                        <p class="text-gray-300 leading-relaxed text-sm mb-4">{% if lang == 'en' %}{{ data.profile.sobre_en }}{% else %}{{ data.profile.sobre_pt }}{% endif %}</p>
                         <div class="flex flex-wrap gap-4 pt-2">
                             <a href="https://www.linkedin.com/in/matheus-aleixo-299a05247" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-linkedin mr-2 text-cyan-400"></i>LinkedIn</a>
                             <a href="https://github.com/matheus1996aleixo-wq" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
                         </div>
                     </div>
+
+                    <!-- Formação Acadêmica -->
+                    <div class="card-glass p-8 rounded-3xl glow-border">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                            <h2 class="text-2xl font-bold text-white border-l-4 border-cyan-400 pl-4">Formação Acadêmica</h2>
+                            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+                                <p class="text-xs text-gray-400">Data da Formação: <strong class="text-cyan-400">20/08/2025</strong></p>
+                            </div>
+                        </div>
+                        <div class="text-gray-300 space-y-2 mb-6">
+                            <p class="text-base font-bold text-white">Bacharelado em Tecnologia da Informação</p>
+                            <p class="text-sm text-gray-400 mb-3">Universidade: Universidade Virtual do Estado de São Paulo (UNIVESP)</p>
+                            
+                            <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2">
+                                <p class="font-bold text-cyan-400"><i class="fa-solid fa-graduation-cap mr-1.5"></i> Competências e Habilidades Adquiridas:</p>
+                                <p class="leading-relaxed">
+                                    Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button onclick="switchTab('formacao')" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-6 rounded-xl transition text-xs flex items-center shadow-md">
+                                <i class="fa-solid fa-arrow-right mr-2"></i> Mais Formações
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ABA 2: FORMAÇÕES E CURSOS -->
+        <!-- FORMAÇÕES E CURSOS (Com interatividade de hover e clique por módulo) -->
         <div id="formacao" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">
-                {% if lang == 'en' %}Formations & Courses (UNIVESP){% else %}Formações e Cursos (UNIVESP){% endif %}
-            </h2>
-            
+            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">Formações e Cursos</h2>
+            {% for f in data.formations %}
             <div class="card-glass p-8 rounded-3xl glow-border mb-10">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-6 gap-4">
                     <div>
-                        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1"><i class="fa-solid fa-graduation-cap mr-2"></i>Graduação: Bacharelado</span>
-                        <h3 class="text-2xl font-bold text-white">Curso: Tecnologia da Informação</h3>
-                        <p class="text-gray-400 text-sm mt-1">Universidade: UNIVESP - Universidade Virtual do Estado de São Paulo</p>
+                        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1"><i class="fa-solid fa-graduation-cap mr-2"></i>{{ f.entity_type }}: {{ f.level }}</span>
+                        <h3 class="text-2xl font-bold text-white">Curso: {{ f.course }}</h3>
+                        <p class="text-gray-400 text-sm mt-1">Instituição: {{ f.entity_name }}</p>
                     </div>
-                    <div class="text-left md:text-right bg-gray-900 p-3.5 rounded-xl border border-gray-800">
-                        <p class="text-xs text-gray-400">Data de Formação: <strong class="text-cyan-400">20/08/2025</strong> (Conclusão: 2º Semestre / 2025)</p>
+                    <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">Data de Formação: <strong class="text-cyan-400">{{ f.completion_date }}</strong></p>
                     </div>
                 </div>
 
+                {% if f.description %}
                 <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-6 flex items-center">
-                    <i class="fa-solid fa-brain text-cyan-400 mr-2"></i> Matérias, Conhecimentos e Capacitações Adquiridas por Módulo:
+                    <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i> Matérias, Conhecimentos e Capacitações Adquiridas por Módulo:
                 </h4>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-code text-cyan-400 mr-2"></i> Algoritmos e Programação</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Lógica estruturada, desenvolvimento de scripts e algoritmos avançados.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-network-wired text-cyan-400 mr-2"></i> Estruturas de Dados</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Organização eficiente de dados, árvores, grafos e otimização de busca.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-cubes text-cyan-400 mr-2"></i> POO (Orientada a Objetos)</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Encapsulamento, herança, polimorfismo e design de arquitetura limpa.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-database text-cyan-400 mr-2"></i> Banco de Dados</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Modelagem conceitual/lógica (MER/DER), consultas relacionais e SQL avançado.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-globe text-cyan-400 mr-2"></i> Dev Web & Dispositivos Móveis</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Criação de aplicações web responsivas e sistemas mobile.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-server text-cyan-400 mr-2"></i> Infraestrutura & Escalabilidade</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Gestão de servidores, redes corporativas e ambientes em nuvem.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-microchip text-cyan-400 mr-2"></i> Inteligência Artificial</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Modelos de aprendizado de máquina, mineração e análise estatística.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-shield-halved text-cyan-400 mr-2"></i> Segurança da Informação</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Políticas de proteção de dados, criptografia e conformidade.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-gears text-cyan-400 mr-2"></i> Engenharia de Software</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Garantia de qualidade de código, metodologias ágeis e testes unitários.</p>
-                    </div>
-                    <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800">
-                        <h5 class="text-white font-bold text-base mb-1"><i class="fa-solid fa-diagram-project text-cyan-400 mr-2"></i> Projetos Integradores</h5>
-                        <p class="text-xs text-gray-400 mt-2"><strong class="text-cyan-300">Capacitação:</strong> Execução prática em equipes multidisciplinares ponta a ponta.</p>
-                    </div>
+                    {% for linha in f.description.split('\n') %}
+                        {% if ':' in linha %}
+                            {% set partes = linha.split(':', 1) %}
+                            {% set materia = partes[0].strip() %}
+                            {% set resto = partes[1].strip() %}
+                            {% set icon_url = '' %}
+                            {% if '[icon:' in resto %}
+                                {% set resto_split = resto.split('[icon:') %}
+                                {% set desc = resto_split[0].strip() %}
+                                {% set icon_url = resto_split[1].replace(']', '').strip() %}
+                            {% else %}
+                                {% set desc = resto %}
+                            {% endif %}
+                            
+                            <!-- Card interativo: Hover com destaque e Clique para expandir a capacitação -->
+                            <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800 hover:border-cyan-400 cursor-pointer transition-all flex items-start space-x-4 shadow-sm" onclick="toggleAccordion('mod-{{ f.id }}-{{ loop.index }}', 'icon-mod-{{ f.id }}-{{ loop.index }}')">
+                                {% if icon_url %}
+                                <img src="{{ icon_url }}" class="w-10 h-10 object-contain mt-1 flex-shrink-0">
+                                {% else %}
+                                <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-cyan-400 flex-shrink-0"><i class="fa-solid fa-code"></i></div>
+                                {% endif %}
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-center">
+                                        <h5 class="text-white font-bold text-base">{{ materia }}</h5>
+                                        <i id="icon-mod-{{ f.id }}-{{ loop.index }}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300"></i>
+                                    </div>
+                                    <div id="mod-{{ f.id }}-{{ loop.index }}" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs text-gray-300 leading-relaxed">
+                                        <strong class="text-cyan-300">Capacitação:</strong> {{ desc }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
+                {% endif %}
             </div>
+            {% endfor %}
         </div>
 
-        <!-- ABA 3: HABILIDADES -->
+        <!-- HABILIDADES -->
         <div id="habilidades" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
-                {% if lang == 'en' %}Technical Skills & Course Knowledge Symbols{% else %}Habilidades Técnicas e Símbolos de Conhecimento{% endif %}
-            </h2>
+            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Resumo de Competências Técnicas e Habilidades</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Python -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png" alt="Python" class="w-10 h-10 object-contain">
+                {% for s in data.skills %}
+                <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all flex flex-col hover:border-cyan-400" onclick="toggleAccordion('skill-{{ s.id }}', 'icon-skill-{{ s.id }}')" title="Clique para ver todo o conhecimento detalhado">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                {% if s.icon %}
+                                <img src="{{ s.icon }}" alt="{{ s.category }}" class="w-10 h-10 object-contain">
+                                {% else %}
+                                <i class="fa-solid fa-bolt text-cyan-400 text-2xl"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">{{ s.category }}</h3>
+                                <p class="text-xs text-cyan-400 mt-1">{{ s.name }}</p>
+                            </div>
+                        </div>
+                        <i id="icon-skill-{{ s.id }}" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Python</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Automação, RPA, ETL & IA</p>
-                    </div>
-                </div>
-                <!-- SQL -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png" alt="SQL" class="w-10 h-10 object-contain">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">SQL / Databases</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Modelagem MER/DER & Consultas</p>
-                    </div>
-                </div>
-                <!-- SAP -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://www.vectorlogo.zone/logos/sap/sap-icon.svg" alt="SAP" class="w-10 h-10 object-contain">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">SAP ERP</h3>
-                        <p class="text-xs text-cyan-400 mt-1">ECC & S/4HANA (FI, CO, SD, MM)</p>
+                    <div id="skill-{{ s.id }}" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-300 leading-relaxed">
+                        <p><strong class="text-cyan-400">Conhecimento Detalhado:</strong> {{ s.detalhes }}</p>
                     </div>
                 </div>
-                <!-- UiPath -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://www.vectorlogo.zone/logos/uipath/uipath-icon.svg" alt="UiPath" class="w-10 h-10 object-contain">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">UiPath RPA</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Automação de Processos</p>
-                    </div>
-                </div>
-                <!-- Power BI -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="w-10 h-10 object-contain">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Power BI</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Dashboards & DataViz</p>
-                    </div>
-                </div>
-                <!-- Git & GitHub -->
-                <div class="card-glass p-6 rounded-2xl glow-border flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                        <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png" alt="Git" class="w-10 h-10 object-contain">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Git & GitHub</h3>
-                        <p class="text-xs text-cyan-400 mt-1">Versionamento & Deploy</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
-        <!-- ABA 4: EXPERIÊNCIAS -->
+        <!-- EXPERIÊNCIAS -->
         <div id="experiencia" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
-                {% if lang == 'en' %}Professional Experiences{% else %}Experiências Profissionais{% endif %}
-            </h2>
+            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Experiências Profissionais</h2>
             <div class="max-w-4xl mx-auto border-l-2 border-gray-800 ml-4 md:ml-8 space-y-10">
+                {% for e in data.experiences %}
                 <div class="relative pl-8 md:pl-12">
                     <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-3 gap-2">
-                            <h3 class="text-xl font-bold text-white">Junior SAP Consultant | Stefanini</h3>
-                            <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Fev 2025 - Mai 2025 (Jaguariúna)</span>
+                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50" onclick="toggleAccordion('exp-{{ e.id }}', 'icon-exp-{{ e.id }}')">
+                        <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2">
+                            <div><h3 class="text-xl font-bold text-white">{{ e.title }}</h3></div>
+                            <div class="flex items-center gap-4">
+                                <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> {{ e.period }}</span>
+                                <i id="icon-exp-{{ e.id }}" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">Atuação em suporte funcional SAP ECC e S/4HANA (módulos FI, CO, SD, MM), resolução de incidentes complexos, parametrização e alinhamento com regras de negócio globais no Projeto SPIRIT.</p>
+                        <div id="exp-{{ e.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
+                            <p class="text-sm text-gray-300 leading-relaxed">{{ e.description }}</p>
+                        </div>
                     </div>
                 </div>
-
-                <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-3 gap-2">
-                            <h3 class="text-xl font-bold text-white">IT Business Application Intern | Continental</h3>
-                            <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Jun 2023 - Fev 2025 (Várzea Paulista)</span>
-                        </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">Suporte a sistemas corporativos, automação de processos internos com scripts em Python e ferramentas RPA, engenharia de dados em relatórios gerenciais e melhoria contínua de infraestrutura de TI.</p>
-                    </div>
-                </div>
-
-                <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-3 gap-2">
-                            <h3 class="text-xl font-bold text-white">Mathematics & Technology Teacher</h3>
-                            <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> Out 2025 - Fev 2026</span>
-                        </div>
-                        <p class="text-sm text-gray-400 leading-relaxed">Docência de matemática e tecnologia para níveis fundamentais e médio, introduzindo lógica computacional, pensamento analítico e resolução de problemas estruturados.</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
-        <!-- ABA 5: PROJETOS -->
+        <!-- PROJETOS -->
         <div id="projetos" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">
-                {% if lang == 'en' %}Featured Projects & Technical Details{% else %}Projetos Desenvolvidos & Detalhes Técnicos{% endif %}
-            </h2>
+            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Projetos Desenvolvidos</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Projeto 1 -->
+                {% for p in data.projects %}
                 <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col">
                     <div class="h-40 bg-gray-900 flex items-center justify-center border-b border-gray-800 relative">
-                        <i class="fa-solid fa-network-wired text-4xl text-cyan-400"></i>
+                        <i class="fa-solid fa-rocket text-4xl text-cyan-400"></i>
                     </div>
                     <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold text-white mb-2">Project SPIRIT - SAP Global Integration</h3>
-                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">
-                            <strong class="text-gray-300">Como foi desenvolvido:</strong> Harmonização e unificação de processos globais corporativos integrando módulos financeiros e logísticos do SAP ECC para S/4HANA.
-                        </p>
-                        <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                            <strong class="text-gray-300">Ferramentas & Linguagens:</strong> SAP GUI, ABAP Debugging, SQL, Excel Avançado e Jira.
-                        </p>
+                        <h3 class="text-xl font-bold text-white mb-2">{{ p.title }}</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed whitespace-pre-line">{{ p.description }}</p>
                         <div class="flex flex-wrap gap-2 mb-6">
-                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">SAP S/4HANA</span>
-                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">SQL</span>
+                            {% for tag in p.tech.split(',') %}
+                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">{{ tag.strip() }}</span>
+                            {% endfor %}
                         </div>
                         <div class="flex gap-4 mt-auto">
-                            <a href="https://github.com/matheus1996aleixo-wq" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm border border-gray-700 transition"><i class="fa-brands fa-github mr-2"></i>Repositório / GitHub</a>
+                            {% if p.link_github %}
+                            <a href="{{ p.link_github }}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm border border-gray-700 transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
+                            {% endif %}
+                            {% if p.link_live %}
+                            <a href="{{ p.link_live }}" target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition"><i class="fa-solid fa-globe mr-2"></i>Online</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-
-                <!-- Projeto 2 -->
-                <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col">
-                    <div class="h-40 bg-gray-900 flex items-center justify-center border-b border-gray-800 relative">
-                        <i class="fa-solid fa-robot text-4xl text-cyan-400"></i>
-                    </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold text-white mb-2">Automated Data Pipeline & RPA Bot</h3>
-                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">
-                            <strong class="text-gray-300">Como foi desenvolvido:</strong> Criação de robôs inteligentes para extração de dados diários de faturamento, validação automática de planilhas e carga em banco de dados centralizado.
-                        </p>
-                        <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                            <strong class="text-gray-300">Ferramentas & Linguagens:</strong> Python (Pandas, Requests), UiPath Studio e SQLite.
-                        </p>
-                        <div class="flex flex-wrap gap-2 mb-6">
-                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">Python</span>
-                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">UiPath</span>
-                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">SQL</span>
-                        </div>
-                        <div class="flex gap-4 mt-auto">
-                            <a href="https://github.com/matheus1996aleixo-wq" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm border border-gray-700 transition"><i class="fa-brands fa-github mr-2"></i>Repositório / GitHub</a>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
     </main>
-
-    <footer class="text-center py-8 text-gray-600 text-sm border-t border-gray-900 mt-20">
-        <p>&copy; 2026 Matheus Aleixo. {% if lang == 'en' %}All rights reserved.{% else %}Todos os direitos reservados.{% endif %}</p>
-    </footer>
 </body>
 </html>

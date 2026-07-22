@@ -3,8 +3,8 @@
         "nome": "Matheus Aleixo",
         "titulo_pt": "Analista de Sistemas | Desenvolvedor Python & RPA | Consultor SAP",
         "titulo_en": "Systems Analyst | Python & RPA Developer | SAP Consultant",
-        "sobre_pt": "Profissional de TI com experiência em desenvolvimento, automação de processos (RPA) e suporte funcional SAP. Tenho vivência no Projeto SPIRIT e na integração de sistemas complexos. Minha trajetória também inclui background em Qualidade e Química de Alimentos, além de experiência com docência em Matemática e Tecnologia.",
-        "sobre_en": "IT professional with experience in development, process automation (RPA), and SAP functional support. I have hands-on experience with Project SPIRIT and complex system integration. My background also includes Quality and Food Chemistry, as well as teaching experience in Mathematics and Technology.",
+        "sobre_pt": "Profissional de TI com experiência em desenvolvimento, automação de processos (RPA) e suporte funcional SAP.",
+        "sobre_en": "IT professional with experience in development, process automation (RPA), and SAP functional support.",
         "curriculo_file": "",
         "carta_file": ""
     },
@@ -14,9 +14,9 @@
             "level": "Bacharelado",
             "course": "Tecnologia da Informação",
             "entity_type": "Universidade",
-            "entity_name": "UNIVESP - Universidade Virtual do Estado de São Paulo",
+            "entity_name": "Universidade Virtual do Estado de São Paulo - UNIVESP",
             "completion_date": "20/08/2025",
-            "description": "Algoritmos e Programação: Lógica estruturada, desenvolvimento de scripts e algoritmos avançados.\nEstrutura de Dados: Organização eficiente de dados, árvores, grafos e otimização de busca.\nPOO (Orientada a Objetos): Encapsulamento, herança, polimorfismo e design de arquitetura limpa.\nBanco de Dados: Modelagem conceitual/lógica (MER/DER), consultas relacionais e SQL avançado.\nDev Web & Dispositivos Móveis: Criação de aplicações web responsivas e sistemas mobile.\nInfraestrutura & Escalabilidade: Gestão de servidores, redes corporativas e ambientes em nuvem.\nInteligência Artificial: Modelos de aprendizado de máquina, mineração e análise estatística.\nSegurança da Informação: Políticas de proteção de dados, criptografia e conformidade.\nEngenharia de Software: Garantia de qualidade de código, metodologias ágeis e testes unitários.\nProjetos Integradores: Execução prática em equipes multidisciplinares ponta a ponta."
+            "description": "Algoritmos e Programação: Lógica estruturada, desenvolvimento de scripts e algoritmos avançados. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png]\nEstrutura de Dados: Organização eficiente de dados, árvores, grafos e otimização de busca. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png]\nPOO (Orientada a Objetos): Encapsulamento, herança, polimorfismo e design de arquitetura limpa. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/java/java.png]\nBanco de Dados: Modelagem conceitual/lógica (MER/DER), consultas relacionais e SQL avançado. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png]\nDev Web & Dispositivos Móveis: Criação de aplicações web responsivas e sistemas mobile. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/html/html.png]\nInfraestrutura & Escalabilidade: Gestão de servidores, redes corporativas e ambientes em nuvem. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/devops/devops.png]\nInteligência Artificial: Modelos de aprendizado de máquina, mineração e análise estatística. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/AI/ai.png]\nSegurança da Informação: Políticas de proteção de dados, criptografia e conformidade. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/security/security.png]\nEngenharia de Software: Garantia de qualidade de código, metodologias ágeis e testes unitários. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/agile/agile.png]\nProjetos Integradores: Execução prática em equipes multidisciplinares ponta a ponta. [icon: https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/project-management/project-management.png]"
         }
     ],
     "skills": [
@@ -25,72 +25,63 @@
             "category": "Python",
             "name": "Automação, RPA, ETL & IA",
             "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png",
-            "detalhes": "Desenvolvimento avançado de scripts, criação de robôs de automação, manipulação de dados com Pandas em pipelines ETL e introdução a inteligência artificial."
+            "detalhes": "Automação, RPA, ETL & IA"
         },
         {
             "id": "2",
             "category": "SQL / Databases",
             "name": "Modelagem MER/DER & Consultas",
             "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/sql/sql.png",
-            "detalhes": "Modelagem conceitual e lógica de banco de dados (MER/DER), criação de consultas relacionais avançadas, otimização de queries e gerenciamento de dados."
+            "detalhes": "Modelagem MER/DER & Consultas"
         },
         {
             "id": "3",
             "category": "SAP ERP",
             "name": "ECC & S/4HANA (FI, CO, SD, MM)",
             "icon": "https://www.vectorlogo.zone/logos/sap/sap-icon.svg",
-            "detalhes": "Suporte funcional completo e parametrização nos módulos financeiros e logísticos (FI, CO, SD, MM), com vivência em projetos de integração global (Projeto SPIRIT)."
+            "detalhes": "ECC & S/4HANA (FI, CO, SD, MM)"
         },
         {
             "id": "4",
             "category": "UiPath RPA",
             "name": "Automação de Processos",
             "icon": "https://cdn.worldvectorlogo.com/logos/uipath.svg",
-            "detalhes": "Construção e implantação de robôs de automação de processos corporativos (RPA) utilizando a plataforma UiPath para ganho de eficiência operacional."
+            "detalhes": "Automação de Processos"
         },
         {
             "id": "5",
             "category": "Power BI",
             "name": "Dashboards & DataViz",
             "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/bi/bi.png",
-            "detalhes": "Desenvolvimento de relatórios gerenciais dinâmicos, painéis interativos e visualização analítica de dados (DataViz) para tomada de decisão."
+            "detalhes": "Dashboards & DataViz"
         },
         {
             "id": "6",
             "category": "Git & GitHub",
             "name": "Versionamento & Deploy",
             "icon": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/git/git.png",
-            "detalhes": "Controle de versão de código-fonte, gerenciamento de repositórios, fluxos de trabalho com branches e automação de deploys contínuos."
+            "detalhes": "Versionamento & Deploy"
         }
     ],
     "experiences": [
         {
             "id": "1",
-            "title": "Junior SAP Consultant | Stefanini",
-            "period": "Fev 2025 - Mai 2025 (Jaguariúna)",
-            "description": "Atuação em suporte funcional SAP ECC e S/4HANA (módulos FI, CO, SD, MM), resolução de incidentes complexos, parametrização e alinhamento com regras de negócio globais no Projeto SPIRIT."
+            "title": "Professor de Tecnologia e Matemática | Secretaria da Educação",
+            "period": "Outubro 2025 a Fevereiro 2026",
+            "description": "Local: Campo Limpo Paulista, Brasil[cite: 2]. Experiência com Ensino Fundamental II (6º ao 9º ano) e Ensino Médio (1ª a 3ª série), com foco no desenvolvimento de competências lógicas, digitais e matemáticas[cite: 2]. Construção de uma linguagem acessível, empática e motivadora, capaz de criar conexões reais com os alunos e manter alto nível de engajamento[cite: 2]. Abordagem pedagógica baseada em troca mútua, estimulando participação ativa dos estudantes enquanto conduz conteúdos técnicos e matemáticos de forma clara[cite: 2]. Mediação de conflitos e organização de cronogramas de ensino adaptados aos diferentes níveis de maturidade das turmas[cite: 2]. Utilização de ferramentas de TI para ministrar aulas de Tecnologia e uso de materiais digitais oficiais no ensino de Matemática, facilitando a compreensão de conceitos abstratos[cite: 2]."
         },
         {
             "id": "2",
-            "title": "IT Business Application Intern | Continental",
-            "period": "Jun 2023 - Fev 2025 (Várzea Paulista)",
-            "description": "Suporte a sistemas corporativos, automação de processos internos com scripts em Python e ferramentas RPA, engenharia de dados em relatórios gerenciais e melhoria contínua de infraestrutura de TI."
+            "title": "Consultor SAP Jr | Stefanine",
+            "period": "Tempo determinado para cobertura de demanda de projeto",
+            "description": "Local: Remoto, Brasil[cite: 2]. Atuação Suporte Funcional SAP S/4HANA (Nível I e II) para usuários finais nos módulos FI, CO e SD[cite: 2]. Principais Atividades: Gestão de Dados e Localização Brasil, monitoramento de IDocs de dados mestres de fornecedores e clientes[cite: 2]. Suporte na solução fiscal, auxiliando na extração de relatórios e transporte de requests[cite: 2]. Customizing e Melhorias: Execução de parametrizações (customizing), aplicação de notas SAP em ambiente produtivo e acompanhamento de testes funcionais[cite: 2]."
         },
         {
             "id": "3",
-            "title": "Mathematics & Technology Teacher",
-            "period": "Out 2025 - Fev 2026",
-            "description": "Docência de matemática e tecnologia para níveis fundamentais e médio, introduzindo lógica computacional, pensamento analítico e resolução de problemas estruturados."
+            "title": "Estagiário de Tecnologia da Informação | Continental Automotive",
+            "period": "Junho 2023 a Fevereiro 2025",
+            "description": "Local: Várzea Paulista, Brasil[cite: 2]. Atuação em Suporte Funcional SAP ECC & S/4HANA (módulos Basis, FI, CO, SD e MM), realizando atendimento de chamados de Nível I e II para usuários finais[cite: 2]. Processos de Procure-to-Pay (P2P): Suporte operacional e configuração voltada ao fluxo de compras, gestão de materiais e inventário[cite: 2]. Gestão de Dados e Localização Brasil: Monitoramento de IDocs de dados mestres de fornecedores/clientes e suporte na solução fiscal Guepardo, auxiliando na extração de relatórios e transporte de requests[cite: 2]. Customizing e Melhorias: Execução de parametrizações (customizing), aplicação de notas SAP em ambiente produtivo e acompanhamento de testes funcionais[cite: 2]."
         }
     ],
-    "projects": [
-        {
-            "id": "1",
-            "title": "Project SPIRIT - SAP Global Integration",
-            "description": "Harmonização e unificação de processos globais corporativos integrando módulos financeiros e logísticos do SAP ECC para S/4HANA.\r\nFerramentas & Linguagens: SAP GUI, ABAP Debugging, SQL, Excel Avançado e Jira.",
-            "tech": "SAP S/4HANA, SQL, ABAP",
-            "link_live": "",
-            "link_github": ""
-        }
-    ]
+    "projects": []
 }
