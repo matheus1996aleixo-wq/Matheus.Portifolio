@@ -49,6 +49,33 @@
                 if(icon) icon.style.transform = 'rotate(0deg)';
             }
         }
+
+        function openModuleModal(formId, materiaName, currentIcon) {
+            document.getElementById('modal_form_id').value = formId;
+            document.getElementById('modal_materia_nome').value = materiaName;
+            document.getElementById('modal_materia_titulo').innerText = "Editar Ícone: " + materiaName;
+            document.getElementById('modal_icon_url').value = currentIcon.startsWith('http') || currentIcon.startsWith('/') ? currentIcon : '';
+            document.getElementById('moduleModal').classList.remove('hidden');
+        }
+
+        function closeModuleModal() {
+            document.getElementById('moduleModal').classList.add('hidden');
+        }
+
+        function openEditModal(sectionType) {
+            const panels = document.querySelectorAll('.edit-modal-panel');
+            panels.forEach(p => p.classList.add('hidden'));
+            
+            const panel = document.getElementById('modal-panel-' + sectionType);
+            if (panel) {
+                panel.classList.remove('hidden');
+                document.getElementById('globalEditModal').classList.remove('hidden');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('globalEditModal').classList.add('hidden');
+        }
     </script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white">
@@ -92,7 +119,15 @@
         <div id="sobre" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-16">
                 <!-- Coluna Esquerda: Informações Pessoais -->
-                <div class="card-glass p-8 rounded-3xl glow-border text-center">
+                <div class="card-glass p-8 rounded-3xl glow-border text-center relative">
+                    {% if session.get('logged_in') %}
+                    <div class="absolute top-4 right-4 z-10">
+                        <button onclick="openEditModal('perfil')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Informações Pessoais">
+                            <i class="fa-solid fa-pen mr-1"></i> Editar
+                        </button>
+                    </div>
+                    {% endif %}
+
                     <div class="w-32 h-32 mx-auto bg-gray-800 rounded-full border-4 border-cyan-400 mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,204,0.4)]">
                         <img src="https://github.com/matheus1996aleixo-wq.png" alt="Perfil" class="w-full h-full object-cover">
                     </div>
@@ -103,6 +138,21 @@
                         <p><strong class="text-gray-300">Cidade:</strong> Várzea Paulista</p>
                         <p><strong class="text-gray-300">Estado:</strong> São Paulo (SP)</p>
                         <p><strong class="text-gray-300">País:</strong> Brasil / Brazil</p>
+                    </div>
+
+                    <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6 relative">
+                        {% if session.get('logged_in') %}
+                        <div class="absolute top-3 right-3 z-10">
+                            <button onclick="openEditModal('idioma')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2 py-0.5 rounded text-xs font-bold transition" title="Editar Idiomas">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                        <p class="font-bold text-cyan-400 flex items-center mb-2"><i class="fa-solid fa-language mr-1.5"></i> Idiomas</p>
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center"><span class="text-gray-300 font-medium">Português:</span> <span class="text-gray-400">Nativo</span></div>
+                            <div class="flex justify-between items-center"><span class="text-gray-300 font-medium">Inglês:</span> <span class="text-gray-400">Intermediário / Técnico</span></div>
+                        </div>
                     </div>
 
                     <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6">
@@ -126,7 +176,15 @@
                 <!-- Coluna Direita -->
                 <div class="lg:col-span-2 space-y-8">
                     <!-- Objetivo Profissional -->
-                    <div class="card-glass p-8 rounded-3xl glow-border">
+                    <div class="card-glass p-8 rounded-3xl glow-border relative">
+                        {% if session.get('logged_in') %}
+                        <div class="absolute top-6 right-6 z-10">
+                            <button onclick="openEditModal('objetivo')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Objetivo Profissional">
+                                <i class="fa-solid fa-pen mr-1"></i> Editar
+                            </button>
+                        </div>
+                        {% endif %}
+
                         <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">Objetivos Profissionais</h2>
                         <h3 class="text-lg font-bold text-cyan-400 mb-2">{% if lang == 'en' %}{{ data.profile.titulo_en }}{% else %}{{ data.profile.titulo_pt }}{% endif %}</h3>
                         <p class="text-gray-300 leading-relaxed text-sm mb-4">{% if lang == 'en' %}{{ data.profile.sobre_en }}{% else %}{{ data.profile.sobre_pt }}{% endif %}</p>
@@ -137,8 +195,16 @@
                     </div>
 
                     <!-- Formação Acadêmica -->
-                    <div class="card-glass p-8 rounded-3xl glow-border">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                    <div class="card-glass p-8 rounded-3xl glow-border relative">
+                        {% if session.get('logged_in') %}
+                        <div class="absolute top-6 right-6 z-10">
+                            <button onclick="openEditModal('formacao_academica')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Formação Acadêmica">
+                                <i class="fa-solid fa-pen mr-1"></i> Editar
+                            </button>
+                        </div>
+                        {% endif %}
+
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 pr-16">
                             <h2 class="text-2xl font-bold text-white border-l-4 border-cyan-400 pl-4">Formação Acadêmica</h2>
                             <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
                                 <p class="text-xs text-gray-400">Data da Formação: <strong class="text-cyan-400">20/08/2025</strong></p>
@@ -166,11 +232,23 @@
             </div>
         </div>
 
-        <!-- FORMAÇÕES E CURSOS (Com interatividade de hover e clique por módulo) -->
+        <!-- FORMAÇÕES E CURSOS -->
         <div id="formacao" class="tab-content">
             <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">Formações e Cursos</h2>
             {% for f in data.formations %}
-            <div class="card-glass p-8 rounded-3xl glow-border mb-10">
+            <div class="card-glass p-8 rounded-3xl glow-border mb-10 relative">
+                {% if session.get('logged_in') %}
+                <div class="absolute top-6 right-6 flex items-center space-x-2 z-10">
+                    <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta formação?');">
+                        <input type="hidden" name="action" value="delete_formation">
+                        <input type="hidden" name="form_id" value="{{ f.id }}">
+                        <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center" title="Excluir Formação">
+                            <i class="fa-solid fa-trash mr-1"></i> Excluir
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-6 gap-4">
                     <div>
                         <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1"><i class="fa-solid fa-graduation-cap mr-2"></i>{{ f.entity_type }}: {{ f.level }}</span>
@@ -201,20 +279,38 @@
                                 {% set desc = resto %}
                             {% endif %}
                             
-                            <!-- Card interativo: Hover com destaque e Clique para expandir a capacitação -->
-                            <div class="bg-gray-900/80 p-5 rounded-2xl border border-gray-800 hover:border-cyan-400 cursor-pointer transition-all flex items-start space-x-4 shadow-sm" onclick="toggleAccordion('mod-{{ f.id }}-{{ loop.index }}', 'icon-mod-{{ f.id }}-{{ loop.index }}')">
-                                {% if icon_url %}
-                                <img src="{{ icon_url }}" class="w-10 h-10 object-contain mt-1 flex-shrink-0">
-                                {% else %}
-                                <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-cyan-400 flex-shrink-0"><i class="fa-solid fa-code"></i></div>
+                            <!-- Card com opção de edição de ícone e exclusão se logado no ADMIN -->
+                            <div class="relative bg-gray-900/80 p-5 rounded-2xl border border-gray-800 hover:border-cyan-400 transition-all shadow-sm">
+                                {% if session.get('logged_in') %}
+                                <div class="absolute top-3 right-3 flex items-center space-x-1.5 z-10">
+                                    <button onclick="openModuleModal('{{ f.id }}', '{{ materia }}', '{{ icon_url }}')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Adicionar/Alterar Imagem deste Módulo">
+                                        <i class="fa-solid fa-pen mr-1"></i> Imagem
+                                    </button>
+                                    <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta matéria/módulo?');">
+                                        <input type="hidden" name="action" value="delete_formation_module">
+                                        <input type="hidden" name="form_id" value="{{ f.id }}">
+                                        <input type="hidden" name="materia_nome" value="{{ materia }}">
+                                        <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition" title="Excluir este Módulo">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                                 {% endif %}
-                                <div class="flex-grow">
-                                    <div class="flex justify-between items-center">
-                                        <h5 class="text-white font-bold text-base">{{ materia }}</h5>
-                                        <i id="icon-mod-{{ f.id }}-{{ loop.index }}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300"></i>
-                                    </div>
-                                    <div id="mod-{{ f.id }}-{{ loop.index }}" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs text-gray-300 leading-relaxed">
-                                        <strong class="text-cyan-300">Capacitação:</strong> {{ desc }}
+
+                                <div class="flex items-start space-x-4 cursor-pointer" onclick="toggleAccordion('mod-{{ f.id }}-{{ loop.index }}', 'icon-mod-{{ f.id }}-{{ loop.index }}')">
+                                    {% if icon_url %}
+                                    <img src="{{ icon_url }}" class="w-10 h-10 object-contain mt-1 flex-shrink-0">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-cyan-400 flex-shrink-0"><i class="fa-solid fa-code"></i></div>
+                                    {% endif %}
+                                    <div class="flex-grow pr-20">
+                                        <div class="flex justify-between items-center">
+                                            <h5 class="text-white font-bold text-base">{{ materia }}</h5>
+                                            <i id="icon-mod-{{ f.id }}-{{ loop.index }}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300"></i>
+                                        </div>
+                                        <div id="mod-{{ f.id }}-{{ loop.index }}" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs text-gray-300 leading-relaxed">
+                                            <strong class="text-cyan-300">Capacitação:</strong> {{ desc }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -231,25 +327,39 @@
             <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Resumo de Competências Técnicas e Habilidades</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for s in data.skills %}
-                <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all flex flex-col hover:border-cyan-400" onclick="toggleAccordion('skill-{{ s.id }}', 'icon-skill-{{ s.id }}')" title="Clique para ver todo o conhecimento detalhado">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                                {% if s.icon %}
-                                <img src="{{ s.icon }}" alt="{{ s.category }}" class="w-10 h-10 object-contain">
-                                {% else %}
-                                <i class="fa-solid fa-bolt text-cyan-400 text-2xl"></i>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-white">{{ s.category }}</h3>
-                                <p class="text-xs text-cyan-400 mt-1">{{ s.name }}</p>
-                            </div>
-                        </div>
-                        <i id="icon-skill-{{ s.id }}" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all flex flex-col hover:border-cyan-400 relative">
+                    {% if session.get('logged_in') %}
+                    <div class="absolute top-4 right-4 flex items-center space-x-1.5 z-10">
+                        <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta habilidade?');">
+                            <input type="hidden" name="action" value="delete_skill">
+                            <input type="hidden" name="skill_id" value="{{ s.id }}">
+                            <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition" title="Excluir Habilidade">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
-                    <div id="skill-{{ s.id }}" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-300 leading-relaxed">
-                        <p><strong class="text-cyan-400">Conhecimento Detalhado:</strong> {{ s.detalhes }}</p>
+                    {% endif %}
+
+                    <div onclick="toggleAccordion('skill-{{ s.id }}', 'icon-skill-{{ s.id }}')">
+                        <div class="flex items-center justify-between pr-12">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                    {% if s.icon %}
+                                    <img src="{{ s.icon }}" alt="{{ s.category }}" class="w-10 h-10 object-contain">
+                                    {% else %}
+                                    <i class="fa-solid fa-bolt text-cyan-400 text-2xl"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">{{ s.category }}</h3>
+                                    <p class="text-xs text-cyan-400 mt-1">{{ s.name }}</p>
+                                </div>
+                            </div>
+                            <i id="icon-skill-{{ s.id }}" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                        </div>
+                        <div id="skill-{{ s.id }}" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-300 leading-relaxed">
+                            <p><strong class="text-cyan-400">Conhecimento Detalhado:</strong> {{ s.detalhes }}</p>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -263,16 +373,30 @@
                 {% for e in data.experiences %}
                 <div class="relative pl-8 md:pl-12">
                     <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50" onclick="toggleAccordion('exp-{{ e.id }}', 'icon-exp-{{ e.id }}')">
-                        <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2">
-                            <div><h3 class="text-xl font-bold text-white">{{ e.title }}</h3></div>
-                            <div class="flex items-center gap-4">
-                                <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> {{ e.period }}</span>
-                                <i id="icon-exp-{{ e.id }}" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
-                            </div>
+                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50 relative">
+                        {% if session.get('logged_in') %}
+                        <div class="absolute top-4 right-4 flex items-center space-x-1.5 z-10">
+                            <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta experiência?');">
+                                <input type="hidden" name="action" value="delete_experience">
+                                <input type="hidden" name="exp_id" value="{{ e.id }}">
+                                <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition" title="Excluir Experiência">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
-                        <div id="exp-{{ e.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
-                            <p class="text-sm text-gray-300 leading-relaxed">{{ e.description }}</p>
+                        {% endif %}
+
+                        <div onclick="toggleAccordion('exp-{{ e.id }}', 'icon-exp-{{ e.id }}')">
+                            <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2 pr-16">
+                                <div><h3 class="text-xl font-bold text-white">{{ e.title }}</h3></div>
+                                <div class="flex items-center gap-4">
+                                    <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> {{ e.period }}</span>
+                                    <i id="icon-exp-{{ e.id }}" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                            <div id="exp-{{ e.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
+                                <p class="text-sm text-gray-300 leading-relaxed">{{ e.description }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -285,7 +409,19 @@
             <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Projetos Desenvolvidos</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {% for p in data.projects %}
-                <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col">
+                <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col relative">
+                    {% if session.get('logged_in') %}
+                    <div class="absolute top-4 right-4 flex items-center space-x-1.5 z-10">
+                        <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir este projeto?');">
+                            <input type="hidden" name="action" value="delete_project">
+                            <input type="hidden" name="project_id" value="{{ p.id }}">
+                            <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition" title="Excluir Projeto">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+
                     <div class="h-40 bg-gray-900 flex items-center justify-center border-b border-gray-800 relative">
                         <i class="fa-solid fa-rocket text-4xl text-cyan-400"></i>
                     </div>
@@ -312,5 +448,119 @@
         </div>
 
     </main>
+
+    <!-- Modal para inclusão/alteração rápida de ícone da Matéria -->
+    <div id="moduleModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="card-glass w-full max-w-md p-6 rounded-3xl border border-gray-700 shadow-2xl">
+            <h3 id="modal_materia_titulo" class="text-lg font-bold text-white mb-4">Editar Ícone do Módulo</h3>
+            <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
+                <input type="hidden" name="action" value="update_formation_module_icon">
+                <input type="hidden" id="modal_form_id" name="form_id">
+                <input type="hidden" id="modal_materia_nome" name="materia_nome">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Link da Imagem / Símbolo</label>
+                    <input type="text" id="modal_icon_url" name="icon_url" placeholder="https://..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-cyan-400 mb-1">Ou Anexar Imagem do Computador</label>
+                    <input type="file" name="icon_file" accept="image/*" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded file:text-xs">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeModuleModal()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Cancelar</button>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold px-5 py-2 rounded-xl text-xs">Salvar Imagem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Global de Edição Rápida com caixas específicas para cada informação -->
+    <div id="globalEditModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="card-glass w-full max-w-lg p-6 rounded-3xl border border-gray-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <!-- Painel: Informações Pessoais -->
+            <div id="modal-panel-perfil" class="edit-modal-panel hidden space-y-4">
+                <h3 class="text-lg font-bold text-white mb-2">Editar Informações Pessoais</h3>
+                <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
+                    <input type="hidden" name="action" value="update_profile">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nome Completo</label>
+                        <input type="text" name="nome" value="{{ data.profile.nome }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Currículo (PDF)</label>
+                        <input type="file" name="curriculo_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Carta de Apresentação (PDF)</label>
+                        <input type="file" name="carta_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
+                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Painel: Idioma -->
+            <div id="modal-panel-idioma" class="edit-modal-panel hidden space-y-4">
+                <h3 class="text-lg font-bold text-white mb-2">Editar e Incluir Idiomas</h3>
+                <form method="POST" action="/admin" class="space-y-4">
+                    <input type="hidden" name="action" value="update_profile">
+                    <input type="hidden" name="nome" value="{{ data.profile.nome }}">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição de Idiomas (Digite um por linha: Idioma: Nível)</label>
+                        <textarea name="idiomas_txt" rows="4" placeholder="Português: Nativo&#10;Inglês: Intermediário / Técnico" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">Português: Nativo
+Inglês: Intermediário / Técnico</textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
+                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar e Incluir</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Painel: Objetivo Profissional -->
+            <div id="modal-panel-objetivo" class="edit-modal-panel hidden space-y-4">
+                <h3 class="text-lg font-bold text-white mb-2">Editar Objetivo Profissional</h3>
+                <form method="POST" action="/admin" class="space-y-4">
+                    <input type="hidden" name="action" value="update_profile">
+                    <input type="hidden" name="nome" value="{{ data.profile.nome }}">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição do Título / Cargo</label>
+                        <input type="text" name="titulo_pt" value="{{ data.profile.titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição da Descrição / Sobre</label>
+                        <textarea name="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.sobre_pt }}</textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
+                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Painel: Formação Acadêmica -->
+            <div id="modal-panel-formacao_academica" class="edit-modal-panel hidden space-y-4">
+                <h3 class="text-lg font-bold text-white mb-2">Editar Formação Acadêmica</h3>
+                <form method="POST" action="/admin" class="space-y-4">
+                    <input type="hidden" name="action" value="add_formation">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição do Nome do Curso</label>
+                        <input type="text" name="course" placeholder="Tecnologia da Informação" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição da Instituição</label>
+                        <input type="text" name="entity_name" placeholder="UNIVESP" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
+                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Adicionar/Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
