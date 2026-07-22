@@ -1,10 +1,10 @@
 {
     "profile": {
-        "nome": null,
-        "titulo_pt": null,
-        "titulo_en": null,
-        "sobre_pt": null,
-        "sobre_en": null,
+        "nome": "None",
+        "titulo_pt": "None",
+        "titulo_en": "None",
+        "sobre_pt": "None",
+        "sobre_en": "None",
         "curriculo_file": "",
         "carta_file": ""
     },
