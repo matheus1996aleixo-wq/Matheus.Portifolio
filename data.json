@@ -6,7 +6,25 @@
         "sobre_pt": "None",
         "sobre_en": "None",
         "curriculo_file": "",
-        "carta_file": ""
+        "carta_file": "",
+        "foto_perfil": "https://github.com/matheus1996aleixo-wq.png",
+        "data_nascimento": "20/02/1996",
+        "cidade": "Várzea Paulista",
+        "estado": "São Paulo (SP)",
+        "pais": "Brasil",
+        "pais_en": "Brazil",
+        "idiomas_pt": "Português: Nativo\r\nInglês: Basico / Técnico",
+        "idiomas_en": "Portuguese: Native\r\nEnglish: Intermediate / Technical",
+        "disponibilidade_pt": "Home Office, Híbrido e Presencial",
+        "disponibilidade_en": "Remote, Hybrid and On-site",
+        "disponibilidade_desc_pt": "Disponível para contratação por empresas estrangeiras...",
+        "disponibilidade_desc_en": "Available for hiring by foreign companies...",
+        "grad_date": "20/08/2025",
+        "university": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
+        "degree_pt": "Bacharelado em Tecnologia da Informação",
+        "degree_en": "Bachelor's Degree in Information Technology",
+        "academic_desc_pt": "Base sólida em algoritmos...",
+        "academic_desc_en": "Solid foundation in algorithms..."
     },
     "formations": [
         {
