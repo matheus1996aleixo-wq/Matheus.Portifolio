@@ -145,6 +145,34 @@ def index():
     data = load_data()
     lang = session.get('lang', 'pt')
     
+    translated_profile = data['profile'].copy()
+
+    # Mapeia dinamicamente os arquivos de acordo com o idioma ativo para exibição correta no site
+    if lang == 'en':
+        if data['profile'].get('curriculo_file_en'):
+            translated_profile['curriculo_file'] = data['profile']['curriculo_file_en']
+        if data['profile'].get('carta_file_en'):
+            translated_profile['carta_file'] = data['profile']['carta_file_en']
+        if data['profile'].get('curriculo_titulo_en'):
+            translated_profile['curriculo_titulo'] = data['profile']['curriculo_titulo_en']
+        if data['profile'].get('carta_titulo_en'):
+            translated_profile['carta_titulo'] = data['profile']['carta_titulo_en']
+    else:
+        if data['profile'].get('curriculo_file_pt'):
+            translated_profile['curriculo_file'] = data['profile']['curriculo_file_pt']
+        elif data['profile'].get('curriculo_file'):
+            translated_profile['curriculo_file'] = data['profile']['curriculo_file']
+            
+        if data['profile'].get('carta_file_pt'):
+            translated_profile['carta_file'] = data['profile']['carta_file_pt']
+        elif data['profile'].get('carta_file'):
+            translated_profile['carta_file'] = data['profile']['carta_file']
+            
+        if data['profile'].get('curriculo_titulo_pt'):
+            translated_profile['curriculo_titulo'] = data['profile']['curriculo_titulo_pt']
+        if data['profile'].get('carta_titulo_pt'):
+            translated_profile['carta_titulo'] = data['profile']['carta_titulo_pt']
+
     if lang == 'en':
         updated = False
         
@@ -153,7 +181,6 @@ def index():
             'cidade', 'estado', 'pais', 'destaque_titulo_pt', 'destaque_comp_pt', 'destaque_inst',
             'curriculo_titulo_pt', 'carta_titulo_pt'
         ]
-        translated_profile = data['profile'].copy()
         for field in profile_fields_to_translate:
             if field in translated_profile and translated_profile[field]:
                 en_field = field + '_en' if not field.endswith('_pt') else field.replace('_pt', '_en')
@@ -249,7 +276,14 @@ def index():
         
         return render_template('index.html', data=translated_data, lang=lang)
         
-    return render_template('index.html', data=data, lang=lang)
+    translated_data = {
+        "profile": translated_profile,
+        "skills": data['skills'],
+        "projects": data['projects'],
+        "formations": data['formations'],
+        "experiences": data['experiences']
+    }
+    return render_template('index.html', data=translated_data, lang=lang)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -359,6 +393,7 @@ def admin():
                 path = os.path.join('static/uploads', curriculo_file_pt.filename)
                 curriculo_file_pt.save(path)
                 data['profile']['curriculo_file_pt'] = '/' + path
+                data['profile']['curriculo_file'] = '/' + path
 
             curriculo_file_en = request.files.get('curriculo_file_en')
             if curriculo_file_en and curriculo_file_en.filename:
@@ -373,6 +408,7 @@ def admin():
                 path = os.path.join('static/uploads', carta_file_pt.filename)
                 carta_file_pt.save(path)
                 data['profile']['carta_file_pt'] = '/' + path
+                data['profile']['carta_file'] = '/' + path
 
             carta_file_en = request.files.get('carta_file_en')
             if carta_file_en and carta_file_en.filename:
