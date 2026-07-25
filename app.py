@@ -147,31 +147,17 @@ def index():
     
     translated_profile = data['profile'].copy()
 
-    # Mapeia dinamicamente os arquivos de acordo com o idioma ativo para exibição correta no site
+    # Mapeamento dinâmico e robusto dos arquivos e títulos conforme o idioma selecionado
     if lang == 'en':
-        if data['profile'].get('curriculo_file_en'):
-            translated_profile['curriculo_file'] = data['profile']['curriculo_file_en']
-        if data['profile'].get('carta_file_en'):
-            translated_profile['carta_file'] = data['profile']['carta_file_en']
-        if data['profile'].get('curriculo_titulo_en'):
-            translated_profile['curriculo_titulo'] = data['profile']['curriculo_titulo_en']
-        if data['profile'].get('carta_titulo_en'):
-            translated_profile['carta_titulo'] = data['profile']['carta_titulo_en']
+        translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_en') or data['profile'].get('curriculo_file', '')
+        translated_profile['carta_file'] = data['profile'].get('carta_file_en') or data['profile'].get('carta_file', '')
+        translated_profile['curriculo_titulo'] = data['profile'].get('curriculo_titulo_en') or data['profile'].get('curriculo_titulo_pt', 'Resume (EN)')
+        translated_profile['carta_titulo'] = data['profile'].get('carta_titulo_en') or data['profile'].get('carta_titulo_pt', 'Cover Letter (EN)')
     else:
-        if data['profile'].get('curriculo_file_pt'):
-            translated_profile['curriculo_file'] = data['profile']['curriculo_file_pt']
-        elif data['profile'].get('curriculo_file'):
-            translated_profile['curriculo_file'] = data['profile']['curriculo_file']
-            
-        if data['profile'].get('carta_file_pt'):
-            translated_profile['carta_file'] = data['profile']['carta_file_pt']
-        elif data['profile'].get('carta_file'):
-            translated_profile['carta_file'] = data['profile']['carta_file']
-            
-        if data['profile'].get('curriculo_titulo_pt'):
-            translated_profile['curriculo_titulo'] = data['profile']['curriculo_titulo_pt']
-        if data['profile'].get('carta_titulo_pt'):
-            translated_profile['carta_titulo'] = data['profile']['carta_titulo_pt']
+        translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_pt') or data['profile'].get('curriculo_file', '')
+        translated_profile['carta_file'] = data['profile'].get('carta_file_pt') or data['profile'].get('carta_file', '')
+        translated_profile['curriculo_titulo'] = data['profile'].get('curriculo_titulo_pt', 'Currículo (PT)')
+        translated_profile['carta_titulo'] = data['profile'].get('carta_titulo_pt', 'Carta de Apresentação (PT)')
 
     if lang == 'en':
         updated = False
@@ -393,7 +379,6 @@ def admin():
                 path = os.path.join('static/uploads', curriculo_file_pt.filename)
                 curriculo_file_pt.save(path)
                 data['profile']['curriculo_file_pt'] = '/' + path
-                data['profile']['curriculo_file'] = '/' + path
 
             curriculo_file_en = request.files.get('curriculo_file_en')
             if curriculo_file_en and curriculo_file_en.filename:
@@ -408,7 +393,6 @@ def admin():
                 path = os.path.join('static/uploads', carta_file_pt.filename)
                 carta_file_pt.save(path)
                 data['profile']['carta_file_pt'] = '/' + path
-                data['profile']['carta_file'] = '/' + path
 
             carta_file_en = request.files.get('carta_file_en')
             if carta_file_en and carta_file_en.filename:
