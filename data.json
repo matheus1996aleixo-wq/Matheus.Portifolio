@@ -1,10 +1,10 @@
 {
     "profile": {
         "nome": "Matheus Aleixo",
-        "titulo_pt": "None",
-        "titulo_en": "None",
-        "sobre_pt": "None",
-        "sobre_en": "None",
+        "titulo_pt": "Analista de Sistemas / Desenvolvedor",
+        "titulo_en": "Analista de Sistemas / Desenvolvedor",
+        "sobre_pt": "Busco atuar como Analista de Sistemas ou Desenvolvedor, agregando valor estratégico por meio da criação de soluções tecnológicas eficientes e escaláveis. Meu objetivo é impulsionar a produtividade da organização atuando em três pilares principais:\r\n\r\n• Engenharia de Dados e Automação: Desenvolvimento de pipelines ETL escaláveis em nuvem, automação de processos com Python, integração de APIs e extração/tratamento avançado de dados estruturados (HTML, XML e JSON).\r\n\r\n• Sistemas e Infraestrutura: Construção e manutenção de aplicações, suporte técnico especializado, gestão de infraestrutura de TI e execução de testes funcionais para garantir a estabilidade e qualidade das operações.\r\n\r\n• Governança e Processos: Gestão eficiente de versionamento de código (Git/GitHub), aplicação de boas práticas de engenharia de software e visão analítica para garantir a segurança da informação e otimizar fluxos internos.",
+        "sobre_en": "Busco atuar como Analista de Sistemas ou Desenvolvedor, agregando valor estratégico por meio da criação de soluções tecnológicas eficientes e escaláveis. Meu objetivo é impulsionar a produtividade da organização atuando em três pilares principais:\r\n\r\n• Engenharia de Dados e Automação: Desenvolvimento de pipelines ETL escaláveis em nuvem, automação de processos com Python, integração de APIs e extração/tratamento avançado de dados estruturados (HTML, XML e JSON).\r\n\r\n• Sistemas e Infraestrutura: Construção e manutenção de aplicações, suporte técnico especializado, gestão de infraestrutura de TI e execução de testes funcionais para garantir a estabilidade e qualidade das operações.\r\n\r\n• Governança e Processos: Gestão eficiente de versionamento de código (Git/GitHub), aplicação de boas práticas de engenharia de software e visão analítica para garantir a segurança da informação e otimizar fluxos internos.",
         "curriculo_file": "",
         "carta_file": "",
         "foto_perfil": "https://github.com/matheus1996aleixo-wq.png",
@@ -16,7 +16,7 @@
         "idiomas_pt": "Português: Nativo\r\nInglês: Basico / Técnico",
         "idiomas_en": "Portuguese: Native\r\nEnglish: Intermediate / Technical",
         "disponibilidade_pt": "Home Office, Híbrido e Presencial",
-        "disponibilidade_en": "Remote, Hybrid and On-site",
+        "disponibilidade_en": "Home Office, Híbrido e Presencial",
         "disponibilidade_desc_pt": "Disponível para contratação por empresas estrangeiras...",
         "disponibilidade_desc_en": "Available for hiring by foreign companies...",
         "grad_date": "20/08/2025",
