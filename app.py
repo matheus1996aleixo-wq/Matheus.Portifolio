@@ -7,6 +7,7 @@ from git import Repo
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 ADMIN_USER = os.environ.get('ADMIN_PORT', 'Matheus')
 ADMIN_PASS = os.environ.get('SENHA_PORT', '@Kayle2023')
@@ -28,7 +29,13 @@ def init_git_repo():
 
 def load_data():
     if not os.path.exists(DATA_FILE):
-        data = {"profile": {}, "skills": [], "projects": [], "formations": [], "experiences": []}
+        data = {
+            "profile": {},
+            "skills": [],
+            "projects": [],
+            "formations": [],
+            "experiences": []
+        }
     else:
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -39,6 +46,54 @@ def load_data():
     if 'projects' not in data: data['projects'] = []
     if 'formations' not in data: data['formations'] = []
     
+    novo_sobre_pt = (
+        "Busco atuar como Analista de Sistemas ou Desenvolvedor, agregando valor estratégico por meio "
+        "da criação de soluções tecnológicas eficientes e escaláveis. Meu objetivo é impulsionar a produtividade "
+        "da organização atuando em três pilares principais:\n\n"
+        "• Engenharia de Dados e Automação: Desenvolvimento de pipelines ETL escaláveis em nuvem, automação de "
+        "processos com Python, integração de APIs e extração/tratamento avançado de dados estruturados (HTML, XML e JSON).\n\n"
+        "• Sistemas e Infraestrutura: Construção e manutenção de aplicações, suporte técnico especializado, "
+        "gestão de infraestrutura de TI e execução de testes funcionais para garantir a estabilidade e qualidade das operações.\n\n"
+        "• Governança e Processos: Gestão eficiente de versionamento de código (Git/GitHub), aplicação de boas "
+        "práticas de engenharia de software e visão analítica para garantir a segurança da informação e otimizar fluxos internos."
+    )
+    novo_sobre_en = (
+        "Seeking to work as a Systems Analyst or Developer, adding strategic value through the creation of efficient and scalable technological solutions. My goal is to drive organizational productivity by acting across three main pillars:\n\n"
+        "• Data Engineering & Automation: Development of scalable cloud ETL pipelines, Python process automation, API integration, and advanced extraction/treatment of structured data (HTML, XML, and JSON).\n\n"
+        "• Systems & Infrastructure: Application construction and maintenance, specialized technical support, IT infrastructure management, and execution of functional tests to ensure operational stability and quality.\n\n"
+        "• Governance & Processes: Efficient code versioning management (Git/GitHub), application of software engineering best practices, and analytical vision to ensure information security and optimize internal workflows."
+    )
+    
+    if not data['profile'].get('sobre_pt'):
+        data['profile']['sobre_pt'] = novo_sobre_pt
+    data['profile']['sobre_en'] = novo_sobre_en
+
+    default_comp_pt = (
+        "Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), "
+        "modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, "
+        "inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos."
+    )
+    default_comp_en = (
+        "Solid foundation in algorithms and programming, data structures, object-oriented programming (OOP), "
+        "database modeling and queries (SQL/ERD), web and mobile development, server infrastructure, "
+        "artificial intelligence, information security, software engineering, and execution of practical integrative projects."
+    )
+    if not data['profile'].get('destaque_comp_pt'):
+        data['profile']['destaque_comp_pt'] = default_comp_pt
+    data['profile']['destaque_comp_en'] = default_comp_en
+
+    default_titulo_pt = "Bacharelado em Tecnologia da Informação"
+    default_titulo_en = "Bachelor's Degree in Information Technology"
+    if not data['profile'].get('destaque_titulo_pt'):
+        data['profile']['destaque_titulo_pt'] = default_titulo_pt
+    data['profile']['destaque_titulo_en'] = default_titulo_en
+
+    default_inst = "Universidade Virtual do Estado de São Paulo (UNIVESP)"
+    default_inst_en = "Virtual University of the State of São Paulo (UNIVESP)"
+    if not data['profile'].get('destaque_inst'):
+        data['profile']['destaque_inst'] = default_inst
+    data['profile']['destaque_inst_en'] = default_inst_en
+        
     return data
 
 def save_data(data):
@@ -82,63 +137,106 @@ def index():
     lang = session.get('lang', 'pt')
     
     if lang == 'en':
-        translated_data = {
-            "profile": {
-                "nome": data['profile'].get('nome', ''),
-                "foto": data['profile'].get('foto', ''),
-                "nascimento": data['profile'].get('nascimento', ''),
-                "cidade": data['profile'].get('cidade', ''),
-                "estado": data['profile'].get('estado', ''),
-                "pais": data['profile'].get('pais', ''),
-                "linkedin": data['profile'].get('linkedin', ''),
-                "github": data['profile'].get('github', ''),
-                "titulo_pt": data['profile'].get('titulo_en', data['profile'].get('titulo_pt', '')),
-                "sobre_pt": data['profile'].get('sobre_en', data['profile'].get('sobre_pt', '')),
-                "idiomas_pt": data['profile'].get('idiomas_en', data['profile'].get('idiomas_pt', '')),
-                "disponibilidade_pt": data['profile'].get('disponibilidade_en', data['profile'].get('disponibilidade_pt', '')),
-                "destaque_data": data['profile'].get('destaque_data', ''),
-                "destaque_inst": data['profile'].get('destaque_inst', ''),
-                "destaque_titulo_pt": data['profile'].get('destaque_titulo_en', data['profile'].get('destaque_titulo_pt', '')),
-                "destaque_comp_pt": data['profile'].get('destaque_comp_en', data['profile'].get('destaque_comp_pt', '')),
-                "curriculo_file": data['profile'].get('curriculo_file', ''),
-                "carta_file": data['profile'].get('carta_file', '')
-            },
-            "skills": [],
-            "projects": [],
-            "formations": [],
-            "experiences": []
-        }
+        updated = False
         
+        profile_fields_to_translate = [
+            'titulo_pt', 'sobre_pt', 'idiomas_pt', 'disponibilidade_pt',
+            'cidade', 'estado', 'pais', 'destaque_titulo_pt', 'destaque_comp_pt', 'destaque_inst'
+        ]
+        translated_profile = data['profile'].copy()
+        for field in profile_fields_to_translate:
+            if field in translated_profile and translated_profile[field]:
+                en_field = field + '_en' if not field.endswith('_pt') else field.replace('_pt', '_en')
+                if field in ['cidade', 'estado', 'pais', 'destaque_inst']:
+                    en_field = field + '_en'
+                
+                if en_field in data['profile'] and data['profile'][en_field]:
+                    translated_profile[field] = data['profile'][en_field]
+                else:
+                    tr = translate_text(str(translated_profile[field]))
+                    data['profile'][en_field] = tr
+                    translated_profile[field] = tr
+                    updated = True
+
+        # Skills translation
+        translated_skills = []
         for s in data['skills']:
             ts = s.copy()
-            if 'category' in ts: ts['category'] = translate_text(ts['category'])
-            if 'name' in ts: ts['name'] = translate_text(ts['name'])
-            if 'detalhes' in ts: ts['detalhes'] = translate_text(ts['detalhes'])
-            translated_data['skills'].append(ts)
+            for field in ['category', 'name', 'detalhes']:
+                if field in ts and ts[field]:
+                    en_field = field + '_en'
+                    if en_field in ts and ts[en_field]:
+                        ts[field] = ts[en_field]
+                    else:
+                        tr = translate_text(ts[field])
+                        ts[en_field] = tr
+                        s[en_field] = tr
+                        ts[field] = tr
+                        updated = True
+            translated_skills.append(ts)
             
+        # Projects translation
+        translated_projects = []
         for p in data['projects']:
             tp = p.copy()
-            if 'title' in tp: tp['title'] = translate_text(tp['title'])
-            if 'description' in tp: tp['description'] = translate_text(tp['description'])
-            if 'tech' in tp: tp['tech'] = translate_text(tp['tech'])
-            translated_data['projects'].append(tp)
+            for field in ['title', 'description', 'tech']:
+                if field in tp and tp[field]:
+                    en_field = field + '_en'
+                    if en_field in tp and tp[en_field]:
+                        tp[field] = tp[en_field]
+                    else:
+                        tr = translate_text(tp[field])
+                        tp[en_field] = tr
+                        p[en_field] = tr
+                        tp[field] = tr
+                        updated = True
+            translated_projects.append(tp)
             
+        # Formations translation
+        translated_formations = []
         for f in data['formations']:
             tf = f.copy()
-            if 'level' in tf: tf['level'] = translate_text(tf['level'])
-            if 'course' in tf: tf['course'] = translate_text(tf['course'])
-            if 'entity_type' in tf: tf['entity_type'] = translate_text(tf['entity_type'])
-            if 'entity_name' in tf: tf['entity_name'] = translate_text(tf['entity_name'])
-            if 'description' in tf: tf['description'] = translate_text(tf['description'])
-            translated_data['formations'].append(tf)
+            for field in ['level', 'course', 'entity_type', 'entity_name', 'description']:
+                if field in tf and tf[field]:
+                    en_field = field + '_en'
+                    if en_field in tf and tf[en_field]:
+                        tf[field] = tf[en_field]
+                    else:
+                        tr = translate_text(tf[field])
+                        tf[en_field] = tr
+                        f[en_field] = tr
+                        tf[field] = tr
+                        updated = True
+            translated_formations.append(tf)
             
+        # Experiences translation
+        translated_experiences = []
         for e in data['experiences']:
             te = e.copy()
-            if 'title' in te: te['title'] = translate_text(te['title'])
-            if 'description' in te: te['description'] = translate_text(te['description'])
-            if 'period' in te: te['period'] = translate_text(te['period'])
-            translated_data['experiences'].append(te)
+            for field in ['title', 'description', 'period']:
+                if field in te and te[field]:
+                    en_field = field + '_en'
+                    if en_field in te and te[en_field]:
+                        te[field] = te[en_field]
+                    else:
+                        tr = translate_text(te[field])
+                        te[en_field] = tr
+                        e[en_field] = tr
+                        te[field] = tr
+                        updated = True
+            translated_experiences.append(te)
             
+        if updated:
+            save_data(data)
+
+        translated_data = {
+            "profile": translated_profile,
+            "skills": translated_skills,
+            "projects": translated_projects,
+            "formations": translated_formations,
+            "experiences": translated_experiences
+        }
+        
         return render_template('index.html', data=translated_data, lang=lang)
         
     return render_template('index.html', data=data, lang=lang)
@@ -175,35 +273,57 @@ def admin():
             if 'nome' in request.form: data['profile']['nome'] = request.form.get('nome')
             if 'foto_url' in request.form: data['profile']['foto'] = request.form.get('foto_url')
             if 'nascimento' in request.form: data['profile']['nascimento'] = request.form.get('nascimento')
-            if 'cidade' in request.form: data['profile']['cidade'] = request.form.get('cidade')
-            if 'estado' in request.form: data['profile']['estado'] = request.form.get('estado')
-            if 'pais' in request.form: data['profile']['pais'] = request.form.get('pais')
+            
+            if 'cidade' in request.form: 
+                val = request.form.get('cidade')
+                data['profile']['cidade'] = val
+                data['profile']['cidade_en'] = translate_text(val)
+            if 'estado' in request.form: 
+                val = request.form.get('estado')
+                data['profile']['estado'] = val
+                data['profile']['estado_en'] = translate_text(val)
+            if 'pais' in request.form: 
+                val = request.form.get('pais')
+                data['profile']['pais'] = val
+                data['profile']['pais_en'] = translate_text(val)
+                
             if 'linkedin' in request.form: data['profile']['linkedin'] = request.form.get('linkedin')
             if 'github' in request.form: data['profile']['github'] = request.form.get('github')
 
             if 'titulo_pt' in request.form:
-                data['profile']['titulo_pt'] = request.form.get('titulo_pt')
-                data['profile']['titulo_en'] = request.form.get('titulo_en') or translate_text(request.form.get('titulo_pt'))
+                val = request.form.get('titulo_pt')
+                data['profile']['titulo_pt'] = val
+                data['profile']['titulo_en'] = translate_text(val)
+                
             if 'sobre_pt' in request.form:
-                data['profile']['sobre_pt'] = request.form.get('sobre_pt')
-                data['profile']['sobre_en'] = request.form.get('sobre_en') or translate_text(request.form.get('sobre_pt'))
+                val = request.form.get('sobre_pt')
+                data['profile']['sobre_pt'] = val
+                data['profile']['sobre_en'] = translate_text(val)
             
             idiomas = request.form.get('idiomas_pt') or request.form.get('idiomas_txt')
             if idiomas is not None:
                 data['profile']['idiomas_pt'] = idiomas
-                data['profile']['idiomas_en'] = request.form.get('idiomas_en') or translate_text(idiomas)
+                data['profile']['idiomas_en'] = translate_text(idiomas)
                 
             if 'disponibilidade_pt' in request.form:
-                data['profile']['disponibilidade_pt'] = request.form.get('disponibilidade_pt')
-                data['profile']['disponibilidade_en'] = request.form.get('disponibilidade_en') or translate_text(request.form.get('disponibilidade_pt'))
+                val = request.form.get('disponibilidade_pt')
+                data['profile']['disponibilidade_pt'] = val
+                data['profile']['disponibilidade_en'] = translate_text(val)
 
             if 'destaque_titulo_pt' in request.form:
                 data['profile']['destaque_data'] = request.form.get('destaque_data')
-                data['profile']['destaque_inst'] = request.form.get('destaque_inst')
-                data['profile']['destaque_titulo_pt'] = request.form.get('destaque_titulo_pt')
-                data['profile']['destaque_titulo_en'] = request.form.get('destaque_titulo_en') or translate_text(request.form.get('destaque_titulo_pt'))
-                data['profile']['destaque_comp_pt'] = request.form.get('destaque_comp_pt')
-                data['profile']['destaque_comp_en'] = request.form.get('destaque_comp_en') or translate_text(request.form.get('destaque_comp_pt'))
+                
+                val_inst = request.form.get('destaque_inst')
+                data['profile']['destaque_inst'] = val_inst
+                data['profile']['destaque_inst_en'] = translate_text(val_inst)
+                
+                val_tit = request.form.get('destaque_titulo_pt')
+                data['profile']['destaque_titulo_pt'] = val_tit
+                data['profile']['destaque_titulo_en'] = translate_text(val_tit)
+                
+                val_comp = request.form.get('destaque_comp_pt')
+                data['profile']['destaque_comp_pt'] = val_comp
+                data['profile']['destaque_comp_en'] = translate_text(val_comp)
 
             curriculo_file = request.files.get('curriculo_file')
             if curriculo_file and curriculo_file.filename:
@@ -231,11 +351,16 @@ def admin():
             new_formation = {
                 "id": str(uuid.uuid4()),
                 "level": request.form.get('level'),
+                "level_en": translate_text(request.form.get('level')),
                 "course": request.form.get('course'),
+                "course_en": translate_text(request.form.get('course')),
                 "entity_type": request.form.get('entity_type'),
+                "entity_type_en": translate_text(request.form.get('entity_type')),
                 "entity_name": request.form.get('entity_name'),
+                "entity_name_en": translate_text(request.form.get('entity_name')),
                 "completion_date": request.form.get('completion_date'),
-                "description": desc
+                "description": desc,
+                "description_en": translate_text(desc)
             }
             data['formations'].append(new_formation)
             
@@ -244,11 +369,17 @@ def admin():
             for f in data['formations']:
                 if f.get('id') == form_id:
                     f['level'] = request.form.get('level')
+                    f['level_en'] = translate_text(request.form.get('level'))
                     f['course'] = request.form.get('course')
+                    f['course_en'] = translate_text(request.form.get('course'))
                     f['entity_type'] = request.form.get('entity_type')
+                    f['entity_type_en'] = translate_text(request.form.get('entity_type'))
                     f['entity_name'] = request.form.get('entity_name')
+                    f['entity_name_en'] = translate_text(request.form.get('entity_name'))
                     f['completion_date'] = request.form.get('completion_date')
-                    f['description'] = request.form.get('description', '')
+                    desc = request.form.get('description', '')
+                    f['description'] = desc
+                    f['description_en'] = translate_text(desc)
 
         elif action == 'delete_formation':
             form_id = request.form.get('form_id')
@@ -288,6 +419,7 @@ def admin():
                         else:
                             novas_linhas.append(linha)
                     f['description'] = '\n'.join(novas_linhas)
+                    f['description_en'] = translate_text(f['description'])
 
         elif action == 'delete_formation_module':
             form_id = request.form.get('form_id')
@@ -297,13 +429,20 @@ def admin():
                     linhas = f['description'].split('\n')
                     novas_linhas = [l for l in linhas if not (':' in l and l.split(':', 1)[0].strip() == target_materia)]
                     f['description'] = '\n'.join(novas_linhas)
+                    f['description_en'] = translate_text(f['description'])
 
         elif action == 'add_project':
+            desc = request.form.get('description', '')
+            tech = request.form.get('tech', '')
+            title = request.form.get('title', '')
             new_project = {
                 "id": str(uuid.uuid4()),
-                "title": request.form.get('title'),
-                "description": request.form.get('description'),
-                "tech": request.form.get('tech'),
+                "title": title,
+                "title_en": translate_text(title),
+                "description": desc,
+                "description_en": translate_text(desc),
+                "tech": tech,
+                "tech_en": translate_text(tech),
                 "link_live": request.form.get('link_live', ''),
                 "link_github": request.form.get('link_github', '')
             }
@@ -313,9 +452,15 @@ def admin():
             proj_id = request.form.get('project_id')
             for p in data['projects']:
                 if p.get('id') == proj_id:
-                    p['title'] = request.form.get('title')
-                    p['description'] = request.form.get('description')
-                    p['tech'] = request.form.get('tech')
+                    title = request.form.get('title', '')
+                    desc = request.form.get('description', '')
+                    tech = request.form.get('tech', '')
+                    p['title'] = title
+                    p['title_en'] = translate_text(title)
+                    p['description'] = desc
+                    p['description_en'] = translate_text(desc)
+                    p['tech'] = tech
+                    p['tech_en'] = translate_text(tech)
                     p['link_live'] = request.form.get('link_live', '')
                     p['link_github'] = request.form.get('link_github', '')
 
@@ -332,12 +477,18 @@ def admin():
                 skill_image.save(path)
                 icon_url = '/' + path
 
+            cat = request.form.get('category', '')
+            name = request.form.get('name', '')
+            det = request.form.get('detalhes', '')
             new_skill = {
                 "id": str(uuid.uuid4()),
-                "category": request.form.get('category'),
-                "name": request.form.get('name'),
+                "category": cat,
+                "category_en": translate_text(cat),
+                "name": name,
+                "name_en": translate_text(name),
                 "icon": icon_url,
-                "detalhes": request.form.get('detalhes', '')
+                "detalhes": det,
+                "detalhes_en": translate_text(det)
             }
             data['skills'].append(new_skill)
             
@@ -345,8 +496,13 @@ def admin():
             skill_id = request.form.get('skill_id')
             for s in data['skills']:
                 if s.get('id') == skill_id:
-                    s['category'] = request.form.get('category')
-                    s['name'] = request.form.get('name')
+                    cat = request.form.get('category', '')
+                    name = request.form.get('name', '')
+                    det = request.form.get('detalhes', '')
+                    s['category'] = cat
+                    s['category_en'] = translate_text(cat)
+                    s['name'] = name
+                    s['name_en'] = translate_text(name)
                     icon_url = request.form.get('icon', '')
                     skill_image = request.files.get('skill_image')
                     if skill_image and skill_image.filename:
@@ -356,18 +512,25 @@ def admin():
                         icon_url = '/' + path
                     if icon_url:
                         s['icon'] = icon_url
-                    s['detalhes'] = request.form.get('detalhes', '')
+                    s['detalhes'] = det
+                    s['detalhes_en'] = translate_text(det)
 
         elif action == 'delete_skill':
             skill_id = request.form.get('skill_id')
             data['skills'] = [s for s in data['skills'] if s.get('id') != skill_id]
 
         elif action == 'add_experience':
+            title = request.form.get('title', '')
+            desc = request.form.get('description', '')
+            period = request.form.get('period', '')
             new_experience = {
                 "id": str(uuid.uuid4()),
-                "title": request.form.get('title'),
-                "description": request.form.get('description'),
-                "period": request.form.get('period')
+                "title": title,
+                "title_en": translate_text(title),
+                "description": desc,
+                "description_en": translate_text(desc),
+                "period": period,
+                "period_en": translate_text(period)
             }
             data['experiences'].append(new_experience)
             
@@ -375,9 +538,15 @@ def admin():
             exp_id = request.form.get('exp_id')
             for e in data['experiences']:
                 if e.get('id') == exp_id:
-                    e['title'] = request.form.get('title')
-                    e['description'] = request.form.get('description')
-                    e['period'] = request.form.get('period')
+                    title = request.form.get('title', '')
+                    desc = request.form.get('description', '')
+                    period = request.form.get('period', '')
+                    e['title'] = title
+                    e['title_en'] = translate_text(title)
+                    e['description'] = desc
+                    e['description_en'] = translate_text(desc)
+                    e['period'] = period
+                    e['period_en'] = translate_text(period)
 
         elif action == 'delete_experience':
             exp_id = request.form.get('exp_id')
