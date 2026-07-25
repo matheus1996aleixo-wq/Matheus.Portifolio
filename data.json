@@ -30,11 +30,11 @@
         "linkedin": "",
         "github": "",
         "destaque_data": "",
-        "destaque_inst": "",
-        "destaque_titulo_pt": "",
-        "destaque_titulo_en": "",
-        "destaque_comp_pt": "",
-        "destaque_comp_en": "",
+        "destaque_inst": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
+        "destaque_titulo_pt": "Bacharelado em Tecnologia da Informação",
+        "destaque_titulo_en": "Bacharelado em Tecnologia da Informação",
+        "destaque_comp_pt": "Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos.",
+        "destaque_comp_en": "Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos.",
         "nome_en": "Matheus Aleixo",
         "titulo_pt_en": "Analista de Sistemas / Desenvolvedor",
         "sobre_pt_en": "Busco atuar como Analista de Sistemas ou Desenvolvedor, agregando valor estratégico por meio da criação de soluções tecnológicas eficientes e escaláveis. Meu objetivo é impulsionar a produtividade da organização atuando em três pilares principais:\r\n\r\n• Engenharia de Dados e Automação: Desenvolvimento de pipelines ETL escaláveis em nuvem, automação de processos com Python, integração de APIs e extração/tratamento avançado de dados estruturados (HTML, XML e JSON).\r\n\r\n• Sistemas e Infraestrutura: Construção e manutenção de aplicações, suporte técnico especializado, gestão de infraestrutura de TI e execução de testes funcionais para garantir a estabilidade e qualidade das operações.\r\n\r\n• Governança e Processos: Gestão eficiente de versionamento de código (Git/GitHub), aplicação de boas práticas de engenharia de software e visão analítica para garantir a segurança da informação e otimizar fluxos internos.",
@@ -48,7 +48,7 @@
         "university_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
         "degree_pt_en": "Bacharelado em Tecnologia da Informação",
         "academic_desc_pt_en": "Base sólida em algoritmos...",
-        "destaque_inst_en": ""
+        "destaque_inst_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)"
     },
     "formations": [
         {
