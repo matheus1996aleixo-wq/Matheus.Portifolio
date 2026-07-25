@@ -12,9 +12,9 @@
         "cidade": "Várzea Paulista",
         "estado": "São Paulo (SP)",
         "pais": "Brasil",
-        "pais_en": "Brazil",
+        "pais_en": "Brasil",
         "idiomas_pt": "Português: Nativo\r\nInglês: Basico / Técnico",
-        "idiomas_en": "Portuguese: Native\r\nEnglish: Intermediate / Technical",
+        "idiomas_en": "Português: Nativo\r\nInglês: Basico / Técnico",
         "disponibilidade_pt": "Home Office, Híbrido e Presencial",
         "disponibilidade_en": "Home Office, Híbrido e Presencial",
         "disponibilidade_desc_pt": "Disponível para contratação por empresas estrangeiras...",
@@ -47,7 +47,8 @@
         "grad_date_en": "20/08/2025",
         "university_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
         "degree_pt_en": "Bacharelado em Tecnologia da Informação",
-        "academic_desc_pt_en": "Base sólida em algoritmos..."
+        "academic_desc_pt_en": "Base sólida em algoritmos...",
+        "destaque_inst_en": ""
     },
     "formations": [
         {
