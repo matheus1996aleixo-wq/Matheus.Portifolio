@@ -48,7 +48,11 @@
         "university_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
         "degree_pt_en": "Bacharelado em Tecnologia da Informação",
         "academic_desc_pt_en": "Base sólida em algoritmos...",
-        "destaque_inst_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)"
+        "destaque_inst_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
+        "curriculo_titulo_pt": "Currículo (PT)",
+        "curriculo_titulo_en": "Resume (EN)",
+        "carta_titulo_pt": "Carta de Apresentação (PT)",
+        "carta_titulo_en": "Cover Letter (EN)"
     },
     "formations": [
         {

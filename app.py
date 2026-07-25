@@ -93,6 +93,15 @@ def load_data():
     if not data['profile'].get('destaque_inst'):
         data['profile']['destaque_inst'] = default_inst
     data['profile']['destaque_inst_en'] = default_inst_en
+
+    if not data['profile'].get('curriculo_titulo_pt'):
+        data['profile']['curriculo_titulo_pt'] = "Currículo (PT)"
+    if not data['profile'].get('curriculo_titulo_en'):
+        data['profile']['curriculo_titulo_en'] = "Resume (EN)"
+    if not data['profile'].get('carta_titulo_pt'):
+        data['profile']['carta_titulo_pt'] = "Carta de Apresentação (PT)"
+    if not data['profile'].get('carta_titulo_en'):
+        data['profile']['carta_titulo_en'] = "Cover Letter (EN)"
         
     return data
 
@@ -103,7 +112,6 @@ def save_data(data):
     try:
         init_git_repo()
         repo = Repo(os.getcwd())
-        # Garante que tanto o data.json quanto arquivos novos/alterados em uploads subam para o GitHub
         repo.git.add(all=True)
         repo.index.commit("Atualização automática via Painel Admin - Matheus.Portifolio")
         
@@ -142,7 +150,8 @@ def index():
         
         profile_fields_to_translate = [
             'titulo_pt', 'sobre_pt', 'idiomas_pt', 'disponibilidade_pt',
-            'cidade', 'estado', 'pais', 'destaque_titulo_pt', 'destaque_comp_pt', 'destaque_inst'
+            'cidade', 'estado', 'pais', 'destaque_titulo_pt', 'destaque_comp_pt', 'destaque_inst',
+            'curriculo_titulo_pt', 'carta_titulo_pt'
         ]
         translated_profile = data['profile'].copy()
         for field in profile_fields_to_translate:
@@ -332,19 +341,45 @@ def admin():
                 data['profile']['destaque_comp_pt'] = val_comp_pt
                 data['profile']['destaque_comp_en'] = val_comp_en if val_comp_en else translate_text(val_comp_pt)
 
-            curriculo_file = request.files.get('curriculo_file')
-            if curriculo_file and curriculo_file.filename:
-                os.makedirs('static/uploads', exist_ok=True)
-                path = os.path.join('static/uploads', curriculo_file.filename)
-                curriculo_file.save(path)
-                data['profile']['curriculo_file'] = '/' + path
+            if 'curriculo_titulo_pt' in request.form:
+                val_pt = request.form.get('curriculo_titulo_pt')
+                val_en = request.form.get('curriculo_titulo_en')
+                data['profile']['curriculo_titulo_pt'] = val_pt
+                data['profile']['curriculo_titulo_en'] = val_en if val_en else translate_text(val_pt)
 
-            carta_file = request.files.get('carta_file')
-            if carta_file and carta_file.filename:
+            if 'carta_titulo_pt' in request.form:
+                val_pt = request.form.get('carta_titulo_pt')
+                val_en = request.form.get('carta_titulo_en')
+                data['profile']['carta_titulo_pt'] = val_pt
+                data['profile']['carta_titulo_en'] = val_en if val_en else translate_text(val_pt)
+
+            curriculo_file_pt = request.files.get('curriculo_file_pt')
+            if curriculo_file_pt and curriculo_file_pt.filename:
                 os.makedirs('static/uploads', exist_ok=True)
-                path = os.path.join('static/uploads', carta_file.filename)
-                carta_file.save(path)
-                data['profile']['carta_file'] = '/' + path
+                path = os.path.join('static/uploads', curriculo_file_pt.filename)
+                curriculo_file_pt.save(path)
+                data['profile']['curriculo_file_pt'] = '/' + path
+
+            curriculo_file_en = request.files.get('curriculo_file_en')
+            if curriculo_file_en and curriculo_file_en.filename:
+                os.makedirs('static/uploads', exist_ok=True)
+                path = os.path.join('static/uploads', curriculo_file_en.filename)
+                curriculo_file_en.save(path)
+                data['profile']['curriculo_file_en'] = '/' + path
+
+            carta_file_pt = request.files.get('carta_file_pt')
+            if carta_file_pt and carta_file_pt.filename:
+                os.makedirs('static/uploads', exist_ok=True)
+                path = os.path.join('static/uploads', carta_file_pt.filename)
+                carta_file_pt.save(path)
+                data['profile']['carta_file_pt'] = '/' + path
+
+            carta_file_en = request.files.get('carta_file_en')
+            if carta_file_en and carta_file_en.filename:
+                os.makedirs('static/uploads', exist_ok=True)
+                path = os.path.join('static/uploads', carta_file_en.filename)
+                carta_file_en.save(path)
+                data['profile']['carta_file_en'] = '/' + path
                 
             foto_file = request.files.get('foto_file')
             if foto_file and foto_file.filename:
