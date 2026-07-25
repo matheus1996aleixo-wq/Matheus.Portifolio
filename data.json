@@ -24,7 +24,17 @@
         "degree_pt": "Bacharelado em Tecnologia da Informação",
         "degree_en": "Bachelor's Degree in Information Technology",
         "academic_desc_pt": "Base sólida em algoritmos...",
-        "academic_desc_en": "Solid foundation in algorithms..."
+        "academic_desc_en": "Solid foundation in algorithms...",
+        "foto": "",
+        "nascimento": "",
+        "linkedin": "",
+        "github": "",
+        "destaque_data": "",
+        "destaque_inst": "",
+        "destaque_titulo_pt": "",
+        "destaque_titulo_en": "",
+        "destaque_comp_pt": "",
+        "destaque_comp_en": ""
     },
     "formations": [
         {
