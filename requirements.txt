@@ -1,3 +1,4 @@
 Flask==3.0.0
 GitPython==3.1.40
 gunicorn
+google-genai
