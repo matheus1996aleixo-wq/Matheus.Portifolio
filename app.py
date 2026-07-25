@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-ADMIN_USER = os.environ.get('ADMIN_PORT', 'Matheus')
-ADMIN_PASS = os.environ.get('SENHA_PORT', '@Kayle2023')
+ADMIN_USER = os.environ.get('ADMIN_PORT')
+ADMIN_PASS = os.environ.get('SENHA_PORT')
 
 DATA_FILE = 'data.json'
 REPO_URL = 'https://github.com/matheus1996aleixo-wq/Matheus.Portifolio.git'
@@ -103,7 +103,8 @@ def save_data(data):
     try:
         init_git_repo()
         repo = Repo(os.getcwd())
-        repo.git.add(DATA_FILE)
+        # Garante que tanto o data.json quanto arquivos novos/alterados em uploads subam para o GitHub
+        repo.git.add(all=True)
         repo.index.commit("Atualização automática via Painel Admin - Matheus.Portifolio")
         
         origin = repo.remote(name='origin')
@@ -250,7 +251,7 @@ def login():
         user = request.form.get('username')
         password = request.form.get('password')
         
-        if user == ADMIN_USER and password == ADMIN_PASS:
+        if ADMIN_USER and ADMIN_PASS and user == ADMIN_USER and password == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin'))
         else:
@@ -291,24 +292,28 @@ def admin():
             if 'github' in request.form: data['profile']['github'] = request.form.get('github')
 
             if 'titulo_pt' in request.form:
-                val = request.form.get('titulo_pt')
-                data['profile']['titulo_pt'] = val
-                data['profile']['titulo_en'] = translate_text(val)
+                val_pt = request.form.get('titulo_pt')
+                val_en = request.form.get('titulo_en')
+                data['profile']['titulo_pt'] = val_pt
+                data['profile']['titulo_en'] = val_en if val_en else translate_text(val_pt)
                 
             if 'sobre_pt' in request.form:
-                val = request.form.get('sobre_pt')
-                data['profile']['sobre_pt'] = val
-                data['profile']['sobre_en'] = translate_text(val)
+                val_pt = request.form.get('sobre_pt')
+                val_en = request.form.get('sobre_en')
+                data['profile']['sobre_pt'] = val_pt
+                data['profile']['sobre_en'] = val_en if val_en else translate_text(val_pt)
             
-            idiomas = request.form.get('idiomas_pt') or request.form.get('idiomas_txt')
-            if idiomas is not None:
-                data['profile']['idiomas_pt'] = idiomas
-                data['profile']['idiomas_en'] = translate_text(idiomas)
+            if 'idiomas_pt' in request.form:
+                val_pt = request.form.get('idiomas_pt')
+                val_en = request.form.get('idiomas_en')
+                data['profile']['idiomas_pt'] = val_pt
+                data['profile']['idiomas_en'] = val_en if val_en else translate_text(val_pt)
                 
             if 'disponibilidade_pt' in request.form:
-                val = request.form.get('disponibilidade_pt')
-                data['profile']['disponibilidade_pt'] = val
-                data['profile']['disponibilidade_en'] = translate_text(val)
+                val_pt = request.form.get('disponibilidade_pt')
+                val_en = request.form.get('disponibilidade_en')
+                data['profile']['disponibilidade_pt'] = val_pt
+                data['profile']['disponibilidade_en'] = val_en if val_en else translate_text(val_pt)
 
             if 'destaque_titulo_pt' in request.form:
                 data['profile']['destaque_data'] = request.form.get('destaque_data')
@@ -317,13 +322,15 @@ def admin():
                 data['profile']['destaque_inst'] = val_inst
                 data['profile']['destaque_inst_en'] = translate_text(val_inst)
                 
-                val_tit = request.form.get('destaque_titulo_pt')
-                data['profile']['destaque_titulo_pt'] = val_tit
-                data['profile']['destaque_titulo_en'] = translate_text(val_tit)
+                val_tit_pt = request.form.get('destaque_titulo_pt')
+                val_tit_en = request.form.get('destaque_titulo_en')
+                data['profile']['destaque_titulo_pt'] = val_tit_pt
+                data['profile']['destaque_titulo_en'] = val_tit_en if val_tit_en else translate_text(val_tit_pt)
                 
-                val_comp = request.form.get('destaque_comp_pt')
-                data['profile']['destaque_comp_pt'] = val_comp
-                data['profile']['destaque_comp_en'] = translate_text(val_comp)
+                val_comp_pt = request.form.get('destaque_comp_pt')
+                val_comp_en = request.form.get('destaque_comp_en')
+                data['profile']['destaque_comp_pt'] = val_comp_pt
+                data['profile']['destaque_comp_en'] = val_comp_en if val_comp_en else translate_text(val_comp_pt)
 
             curriculo_file = request.files.get('curriculo_file')
             if curriculo_file and curriculo_file.filename:
