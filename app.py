@@ -85,10 +85,21 @@ def index():
         translated_data = {
             "profile": {
                 "nome": data['profile'].get('nome', ''),
+                "foto": data['profile'].get('foto', ''),
+                "nascimento": data['profile'].get('nascimento', ''),
+                "cidade": data['profile'].get('cidade', ''),
+                "estado": data['profile'].get('estado', ''),
+                "pais": data['profile'].get('pais', ''),
+                "linkedin": data['profile'].get('linkedin', ''),
+                "github": data['profile'].get('github', ''),
                 "titulo_pt": data['profile'].get('titulo_en', data['profile'].get('titulo_pt', '')),
-                "titulo_en": data['profile'].get('titulo_en', ''),
                 "sobre_pt": data['profile'].get('sobre_en', data['profile'].get('sobre_pt', '')),
-                "sobre_en": data['profile'].get('sobre_en', ''),
+                "idiomas_pt": data['profile'].get('idiomas_en', data['profile'].get('idiomas_pt', '')),
+                "disponibilidade_pt": data['profile'].get('disponibilidade_en', data['profile'].get('disponibilidade_pt', '')),
+                "destaque_data": data['profile'].get('destaque_data', ''),
+                "destaque_inst": data['profile'].get('destaque_inst', ''),
+                "destaque_titulo_pt": data['profile'].get('destaque_titulo_en', data['profile'].get('destaque_titulo_pt', '')),
+                "destaque_comp_pt": data['profile'].get('destaque_comp_en', data['profile'].get('destaque_comp_pt', '')),
                 "curriculo_file": data['profile'].get('curriculo_file', ''),
                 "carta_file": data['profile'].get('carta_file', '')
             },
@@ -161,12 +172,39 @@ def admin():
         action = request.form.get('action')
         
         if action == 'update_profile':
-            data['profile']['nome'] = request.form.get('nome')
-            data['profile']['titulo_pt'] = request.form.get('titulo_pt')
-            data['profile']['titulo_en'] = translate_text(request.form.get('titulo_pt'))
-            data['profile']['sobre_pt'] = request.form.get('sobre_pt')
-            data['profile']['sobre_en'] = translate_text(request.form.get('sobre_pt'))
+            if 'nome' in request.form: data['profile']['nome'] = request.form.get('nome')
+            if 'foto_url' in request.form: data['profile']['foto'] = request.form.get('foto_url')
+            if 'nascimento' in request.form: data['profile']['nascimento'] = request.form.get('nascimento')
+            if 'cidade' in request.form: data['profile']['cidade'] = request.form.get('cidade')
+            if 'estado' in request.form: data['profile']['estado'] = request.form.get('estado')
+            if 'pais' in request.form: data['profile']['pais'] = request.form.get('pais')
+            if 'linkedin' in request.form: data['profile']['linkedin'] = request.form.get('linkedin')
+            if 'github' in request.form: data['profile']['github'] = request.form.get('github')
+
+            if 'titulo_pt' in request.form:
+                data['profile']['titulo_pt'] = request.form.get('titulo_pt')
+                data['profile']['titulo_en'] = request.form.get('titulo_en') or translate_text(request.form.get('titulo_pt'))
+            if 'sobre_pt' in request.form:
+                data['profile']['sobre_pt'] = request.form.get('sobre_pt')
+                data['profile']['sobre_en'] = request.form.get('sobre_en') or translate_text(request.form.get('sobre_pt'))
             
+            idiomas = request.form.get('idiomas_pt') or request.form.get('idiomas_txt')
+            if idiomas is not None:
+                data['profile']['idiomas_pt'] = idiomas
+                data['profile']['idiomas_en'] = request.form.get('idiomas_en') or translate_text(idiomas)
+                
+            if 'disponibilidade_pt' in request.form:
+                data['profile']['disponibilidade_pt'] = request.form.get('disponibilidade_pt')
+                data['profile']['disponibilidade_en'] = request.form.get('disponibilidade_en') or translate_text(request.form.get('disponibilidade_pt'))
+
+            if 'destaque_titulo_pt' in request.form:
+                data['profile']['destaque_data'] = request.form.get('destaque_data')
+                data['profile']['destaque_inst'] = request.form.get('destaque_inst')
+                data['profile']['destaque_titulo_pt'] = request.form.get('destaque_titulo_pt')
+                data['profile']['destaque_titulo_en'] = request.form.get('destaque_titulo_en') or translate_text(request.form.get('destaque_titulo_pt'))
+                data['profile']['destaque_comp_pt'] = request.form.get('destaque_comp_pt')
+                data['profile']['destaque_comp_en'] = request.form.get('destaque_comp_en') or translate_text(request.form.get('destaque_comp_pt'))
+
             curriculo_file = request.files.get('curriculo_file')
             if curriculo_file and curriculo_file.filename:
                 os.makedirs('static/uploads', exist_ok=True)
@@ -180,6 +218,13 @@ def admin():
                 path = os.path.join('static/uploads', carta_file.filename)
                 carta_file.save(path)
                 data['profile']['carta_file'] = '/' + path
+                
+            foto_file = request.files.get('foto_file')
+            if foto_file and foto_file.filename:
+                os.makedirs('static/uploads', exist_ok=True)
+                path = os.path.join('static/uploads', foto_file.filename)
+                foto_file.save(path)
+                data['profile']['foto'] = '/' + path
 
         elif action == 'add_formation':
             desc = request.form.get('description', '')
@@ -309,7 +354,8 @@ def admin():
                         path = os.path.join('static/uploads', skill_image.filename)
                         skill_image.save(path)
                         icon_url = '/' + path
-                    s['icon'] = icon_url
+                    if icon_url:
+                        s['icon'] = icon_url
                     s['detalhes'] = request.form.get('detalhes', '')
 
         elif action == 'delete_skill':

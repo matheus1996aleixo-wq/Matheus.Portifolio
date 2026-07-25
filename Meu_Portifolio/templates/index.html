@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfólio | Matheus Aleixo</title>
+    <title>Portfólio | {{ data.profile.nome or 'Matheus Aleixo' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -129,15 +129,15 @@
                     {% endif %}
 
                     <div class="w-32 h-32 mx-auto bg-gray-800 rounded-full border-4 border-cyan-400 mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,204,0.4)]">
-                        <img src="https://github.com/matheus1996aleixo-wq.png" alt="Perfil" class="w-full h-full object-cover">
+                        <img src="{{ data.profile.foto or 'https://github.com/matheus1996aleixo-wq.png' }}" alt="Perfil" class="w-full h-full object-cover">
                     </div>
-                    <h1 class="text-2xl font-bold text-white mb-2">{{ data.profile.nome }}</h1>
-                    <p class="text-xs text-gray-400 mb-6">Data de Nascimento: <strong class="text-gray-200">20/02/1996</strong></p>
+                    <h1 class="text-2xl font-bold text-white mb-2">{{ data.profile.nome or 'Matheus Aleixo' }}</h1>
+                    <p class="text-xs text-gray-400 mb-6">{% if lang == 'en' %}Date of Birth:{% else %}Data de Nascimento:{% endif %} <strong class="text-gray-200">{{ data.profile.nascimento or '20/02/1996' }}</strong></p>
                     
                     <div class="space-y-2 text-sm text-left bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
-                        <p><strong class="text-gray-300">Cidade:</strong> Várzea Paulista</p>
-                        <p><strong class="text-gray-300">Estado:</strong> São Paulo (SP)</p>
-                        <p><strong class="text-gray-300">País:</strong> Brasil / Brazil</p>
+                        <p><strong class="text-gray-300">{% if lang == 'en' %}City:{% else %}Cidade:{% endif %}</strong> {{ data.profile.cidade or 'Várzea Paulista' }}</p>
+                        <p><strong class="text-gray-300">{% if lang == 'en' %}State:{% else %}Estado:{% endif %}</strong> {{ data.profile.estado or 'São Paulo (SP)' }}</p>
+                        <p><strong class="text-gray-300">{% if lang == 'en' %}Country:{% else %}País:{% endif %}</strong> {{ data.profile.pais or 'Brasil / Brazil' }}</p>
                     </div>
 
                     <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6 relative">
@@ -148,27 +148,38 @@
                             </button>
                         </div>
                         {% endif %}
-                        <p class="font-bold text-cyan-400 flex items-center mb-2"><i class="fa-solid fa-language mr-1.5"></i> Idiomas</p>
+                        <p class="font-bold text-cyan-400 flex items-center mb-2"><i class="fa-solid fa-language mr-1.5"></i> {% if lang == 'en' %}Languages{% else %}Idiomas{% endif %}</p>
                         <div class="space-y-1">
-                            <div class="flex justify-between items-center"><span class="text-gray-300 font-medium">Português:</span> <span class="text-gray-400">Nativo</span></div>
-                            <div class="flex justify-between items-center"><span class="text-gray-300 font-medium">Inglês:</span> <span class="text-gray-400">Intermediário / Técnico</span></div>
+                            {% set idiomas_texto = data.profile.idiomas_pt or 'Português: Nativo\nInglês: Intermediário / Técnico' %}
+                            {% for linha in idiomas_texto.split('\n') %}
+                                {% if ':' in linha %}
+                                    {% set partes = linha.split(':', 1) %}
+                                    <div class="flex justify-between items-center"><span class="text-gray-300 font-medium">{{ partes[0].strip() }}:</span> <span class="text-gray-400">{{ partes[1].strip() }}</span></div>
+                                {% else %}
+                                    <div class="text-gray-400">{{ linha }}</div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
 
                     <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6">
-                        <p class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-briefcase mr-1.5"></i> Disponibilidade para Trabalhar:</p>
-                        <p class="text-gray-200 font-medium">Home Office, Híbrido e Presencial</p>
+                        <p class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-briefcase mr-1.5"></i> {% if lang == 'en' %}Availability to Work:{% else %}Disponibilidade para Trabalhar:{% endif %}</p>
+                        {% set disp_texto = data.profile.disponibilidade_pt or 'Home Office, Híbrido e Presencial\nDisponível para contratação por empresas estrangeiras, com flexibilidade para atuação remota ou alocação internacional.' %}
+                        {% set disp_lines = disp_texto.split('\n') %}
+                        <p class="text-gray-200 font-medium">{{ disp_lines[0] }}</p>
+                        {% if disp_lines|length > 1 %}
                         <p class="text-gray-400 pt-1 leading-relaxed">
-                            Disponível para contratação por empresas estrangeiras, com flexibilidade para atuação remota ou alocação internacional.
+                            {{ disp_lines[1:] | join('<br>') | safe }}
                         </p>
+                        {% endif %}
                     </div>
 
                     <div class="space-y-3">
                         {% if data.profile.curriculo_file %}
-                        <a href="{{ data.profile.curriculo_file }}" target="_blank" class="block w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-file-pdf mr-2"></i>Baixar Currículo</a>
+                        <a href="{{ data.profile.curriculo_file }}" target="_blank" class="block w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-file-pdf mr-2"></i>{% if lang == 'en' %}Download Resume{% else %}Baixar Currículo{% endif %}</a>
                         {% endif %}
                         {% if data.profile.carta_file %}
-                        <a href="{{ data.profile.carta_file }}" target="_blank" class="block w-full bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-envelope-open-text mr-2"></i>Carta de Apresentação</a>
+                        <a href="{{ data.profile.carta_file }}" target="_blank" class="block w-full bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-envelope-open-text mr-2"></i>{% if lang == 'en' %}Cover Letter{% else %}Carta de Apresentação{% endif %}</a>
                         {% endif %}
                     </div>
                 </div>
@@ -185,46 +196,46 @@
                         </div>
                         {% endif %}
 
-                        <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">Objetivos Profissionais</h2>
-                        <h3 class="text-lg font-bold text-cyan-400 mb-2">{% if lang == 'en' %}{{ data.profile.titulo_en }}{% else %}{{ data.profile.titulo_pt }}{% endif %}</h3>
-                        <p class="text-gray-300 leading-relaxed text-sm mb-4">{% if lang == 'en' %}{{ data.profile.sobre_en }}{% else %}{{ data.profile.sobre_pt }}{% endif %}</p>
+                        <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Professional Objectives{% else %}Objetivos Profissionais{% endif %}</h2>
+                        <h3 class="text-lg font-bold text-cyan-400 mb-2">{{ data.profile.titulo_pt }}</h3>
+                        <p class="text-gray-300 leading-relaxed text-sm mb-4 whitespace-pre-line">{{ data.profile.sobre_pt }}</p>
                         <div class="flex flex-wrap gap-4 pt-2">
-                            <a href="https://www.linkedin.com/in/matheus-aleixo-299a05247" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-linkedin mr-2 text-cyan-400"></i>LinkedIn</a>
-                            <a href="https://github.com/matheus1996aleixo-wq" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
+                            <a href="{{ data.profile.linkedin or 'https://www.linkedin.com/in/matheus-aleixo-299a05247' }}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-linkedin mr-2 text-cyan-400"></i>LinkedIn</a>
+                            <a href="{{ data.profile.github or 'https://github.com/matheus1996aleixo-wq' }}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
                         </div>
                     </div>
 
-                    <!-- Formação Acadêmica -->
+                    <!-- Formação Acadêmica (Destaque) -->
                     <div class="card-glass p-8 rounded-3xl glow-border relative">
                         {% if session.get('logged_in') %}
                         <div class="absolute top-6 right-6 z-10">
-                            <button onclick="openEditModal('formacao_academica')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Formação Acadêmica">
+                            <button onclick="openEditModal('formacao_academica')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Formação em Destaque">
                                 <i class="fa-solid fa-pen mr-1"></i> Editar
                             </button>
                         </div>
                         {% endif %}
 
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 pr-16">
-                            <h2 class="text-2xl font-bold text-white border-l-4 border-cyan-400 pl-4">Formação Acadêmica</h2>
+                            <h2 class="text-2xl font-bold text-white border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Academic Background{% else %}Formação Acadêmica{% endif %}</h2>
                             <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-                                <p class="text-xs text-gray-400">Data da Formação: <strong class="text-cyan-400">20/08/2025</strong></p>
+                                <p class="text-xs text-gray-400">{% if lang == 'en' %}Completion Date:{% else %}Data da Formação:{% endif %} <strong class="text-cyan-400">{{ data.profile.destaque_data or '20/08/2025' }}</strong></p>
                             </div>
                         </div>
                         <div class="text-gray-300 space-y-2 mb-6">
-                            <p class="text-base font-bold text-white">Bacharelado em Tecnologia da Informação</p>
-                            <p class="text-sm text-gray-400 mb-3">Universidade: Universidade Virtual do Estado de São Paulo (UNIVESP)</p>
+                            <p class="text-base font-bold text-white">{{ data.profile.destaque_titulo_pt or 'Bacharelado em Tecnologia da Informação' }}</p>
+                            <p class="text-sm text-gray-400 mb-3">{% if lang == 'en' %}University:{% else %}Universidade:{% endif %} {{ data.profile.destaque_inst or 'Universidade Virtual do Estado de São Paulo (UNIVESP)' }}</p>
                             
                             <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2">
-                                <p class="font-bold text-cyan-400"><i class="fa-solid fa-graduation-cap mr-1.5"></i> Competências e Habilidades Adquiridas:</p>
+                                <p class="font-bold text-cyan-400"><i class="fa-solid fa-graduation-cap mr-1.5"></i> {% if lang == 'en' %}Skills & Competencies acquired:{% else %}Competências e Habilidades Adquiridas:{% endif %}</p>
                                 <p class="leading-relaxed">
-                                    Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos.
+                                    {{ data.profile.destaque_comp_pt or 'Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos.' }}
                                 </p>
                             </div>
                         </div>
 
                         <div>
                             <button onclick="switchTab('formacao')" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-6 rounded-xl transition text-xs flex items-center shadow-md">
-                                <i class="fa-solid fa-arrow-right mr-2"></i> Mais Formações
+                                <i class="fa-solid fa-arrow-right mr-2"></i> {% if lang == 'en' %}More Formations{% else %}Mais Formações{% endif %}
                             </button>
                         </div>
                     </div>
@@ -234,7 +245,7 @@
 
         <!-- FORMAÇÕES E CURSOS -->
         <div id="formacao" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">Formações e Cursos</h2>
+            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Formations & Courses{% else %}Formações e Cursos{% endif %}</h2>
             {% for f in data.formations %}
             <div class="card-glass p-8 rounded-3xl glow-border mb-10 relative">
                 {% if session.get('logged_in') %}
@@ -252,17 +263,17 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-6 gap-4">
                     <div>
                         <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1"><i class="fa-solid fa-graduation-cap mr-2"></i>{{ f.entity_type }}: {{ f.level }}</span>
-                        <h3 class="text-2xl font-bold text-white">Curso: {{ f.course }}</h3>
-                        <p class="text-gray-400 text-sm mt-1">Instituição: {{ f.entity_name }}</p>
+                        <h3 class="text-2xl font-bold text-white">{% if lang == 'en' %}Course:{% else %}Curso:{% endif %} {{ f.course }}</h3>
+                        <p class="text-gray-400 text-sm mt-1">{% if lang == 'en' %}Institution:{% else %}Instituição:{% endif %} {{ f.entity_name }}</p>
                     </div>
                     <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800">
-                        <p class="text-xs text-gray-400">Data de Formação: <strong class="text-cyan-400">{{ f.completion_date }}</strong></p>
+                        <p class="text-xs text-gray-400">{% if lang == 'en' %}Date:{% else %}Data de Formação:{% endif %} <strong class="text-cyan-400">{{ f.completion_date }}</strong></p>
                     </div>
                 </div>
 
                 {% if f.description %}
                 <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-6 flex items-center">
-                    <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i> Matérias, Conhecimentos e Capacitações Adquiridas por Módulo:
+                    <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i> {% if lang == 'en' %}Modules, Knowledge & Skills:{% else %}Matérias, Conhecimentos e Capacitações Adquiridas por Módulo:{% endif %}
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for linha in f.description.split('\n') %}
@@ -309,7 +320,7 @@
                                             <i id="icon-mod-{{ f.id }}-{{ loop.index }}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300"></i>
                                         </div>
                                         <div id="mod-{{ f.id }}-{{ loop.index }}" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs text-gray-300 leading-relaxed">
-                                            <strong class="text-cyan-300">Capacitação:</strong> {{ desc }}
+                                            <strong class="text-cyan-300">{% if lang == 'en' %}Skills:{% else %}Capacitação:{% endif %}</strong> {{ desc }}
                                         </div>
                                     </div>
                                 </div>
@@ -324,7 +335,7 @@
 
         <!-- HABILIDADES -->
         <div id="habilidades" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Resumo de Competências Técnicas e Habilidades</h2>
+            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Skills Overview{% else %}Resumo de Competências Técnicas e Habilidades{% endif %}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for s in data.skills %}
                 <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all flex flex-col hover:border-cyan-400 relative">
@@ -358,7 +369,7 @@
                             <i id="icon-skill-{{ s.id }}" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
                         </div>
                         <div id="skill-{{ s.id }}" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-300 leading-relaxed">
-                            <p><strong class="text-cyan-400">Conhecimento Detalhado:</strong> {{ s.detalhes }}</p>
+                            <p><strong class="text-cyan-400">{% if lang == 'en' %}Detailed Knowledge:{% else %}Conhecimento Detalhado:{% endif %}</strong> {{ s.detalhes }}</p>
                         </div>
                     </div>
                 </div>
@@ -368,7 +379,7 @@
 
         <!-- EXPERIÊNCIAS -->
         <div id="experiencia" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Experiências Profissionais</h2>
+            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Professional Experiences{% else %}Experiências Profissionais{% endif %}</h2>
             <div class="max-w-4xl mx-auto border-l-2 border-gray-800 ml-4 md:ml-8 space-y-10">
                 {% for e in data.experiences %}
                 <div class="relative pl-8 md:pl-12">
@@ -406,7 +417,7 @@
 
         <!-- PROJETOS -->
         <div id="projetos" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">Projetos Desenvolvidos</h2>
+            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Developed Projects{% else %}Projetos Desenvolvidos{% endif %}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {% for p in data.projects %}
                 <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col relative">
@@ -483,16 +494,55 @@
                 <h3 class="text-lg font-bold text-white mb-2">Editar Informações Pessoais</h3>
                 <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
                     <input type="hidden" name="action" value="update_profile">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Nome Completo</label>
-                        <input type="text" name="nome" value="{{ data.profile.nome }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Nome Completo</label>
+                            <input type="text" name="nome" value="{{ data.profile.nome }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Data Nascimento</label>
+                            <input type="text" name="nascimento" value="{{ data.profile.nascimento }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
                     </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Cidade</label>
+                            <input type="text" name="cidade" value="{{ data.profile.cidade }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Estado</label>
+                            <input type="text" name="estado" value="{{ data.profile.estado }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">País</label>
+                            <input type="text" name="pais" value="{{ data.profile.pais }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Link LinkedIn</label>
+                            <input type="text" name="linkedin" value="{{ data.profile.linkedin }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Link GitHub</label>
+                            <input type="text" name="github" value="{{ data.profile.github }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Currículo (PDF)</label>
+                        <label class="block text-xs text-gray-400 mb-1">Foto URL (ou deixe vazio para padrão)</label>
+                        <input type="text" name="foto_url" value="{{ data.profile.foto }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs text-cyan-400 mb-1">Currículo (PDF)</label>
                         <input type="file" name="curriculo_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Carta de Apresentação (PDF)</label>
+                        <label class="block text-xs text-cyan-400 mb-1">Carta de Apresentação (PDF)</label>
                         <input type="file" name="carta_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
@@ -507,11 +557,9 @@
                 <h3 class="text-lg font-bold text-white mb-2">Editar e Incluir Idiomas</h3>
                 <form method="POST" action="/admin" class="space-y-4">
                     <input type="hidden" name="action" value="update_profile">
-                    <input type="hidden" name="nome" value="{{ data.profile.nome }}">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Caixa de Edição de Idiomas (Digite um por linha: Idioma: Nível)</label>
-                        <textarea name="idiomas_txt" rows="4" placeholder="Português: Nativo&#10;Inglês: Intermediário / Técnico" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">Português: Nativo
-Inglês: Intermediário / Técnico</textarea>
+                        <textarea name="idiomas_txt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.idiomas_pt or 'Português: Nativo\nInglês: Intermediário / Técnico' }}</textarea>
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
                         <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
@@ -525,14 +573,17 @@ Inglês: Intermediário / Técnico</textarea>
                 <h3 class="text-lg font-bold text-white mb-2">Editar Objetivo Profissional</h3>
                 <form method="POST" action="/admin" class="space-y-4">
                     <input type="hidden" name="action" value="update_profile">
-                    <input type="hidden" name="nome" value="{{ data.profile.nome }}">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição do Título / Cargo</label>
+                        <label class="block text-xs text-gray-400 mb-1">Título / Cargo</label>
                         <input type="text" name="titulo_pt" value="{{ data.profile.titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição da Descrição / Sobre</label>
+                        <label class="block text-xs text-gray-400 mb-1">Descrição / Sobre</label>
                         <textarea name="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.sobre_pt }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Disponibilidade de Trabalho</label>
+                        <textarea name="disponibilidade_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.disponibilidade_pt }}</textarea>
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
                         <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
@@ -541,22 +592,30 @@ Inglês: Intermediário / Técnico</textarea>
                 </form>
             </div>
 
-            <!-- Painel: Formação Acadêmica -->
+            <!-- Painel: Formação Acadêmica (Destaque) -->
             <div id="modal-panel-formacao_academica" class="edit-modal-panel hidden space-y-4">
-                <h3 class="text-lg font-bold text-white mb-2">Editar Formação Acadêmica</h3>
+                <h3 class="text-lg font-bold text-white mb-2">Editar Formação em Destaque</h3>
                 <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="add_formation">
+                    <input type="hidden" name="action" value="update_profile">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição do Nome do Curso</label>
-                        <input type="text" name="course" placeholder="Tecnologia da Informação" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                        <label class="block text-xs text-gray-400 mb-1">Nome do Curso / Título</label>
+                        <input type="text" name="destaque_titulo_pt" value="{{ data.profile.destaque_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição da Instituição</label>
-                        <input type="text" name="entity_name" placeholder="UNIVESP" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                        <label class="block text-xs text-gray-400 mb-1">Instituição</label>
+                        <input type="text" name="destaque_inst" value="{{ data.profile.destaque_inst }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Data de Formação</label>
+                        <input type="text" name="destaque_data" value="{{ data.profile.destaque_data }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Competências Adquiridas</label>
+                        <textarea name="destaque_comp_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.destaque_comp_pt }}</textarea>
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
                         <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
-                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Adicionar/Salvar</button>
+                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar Alterações</button>
                     </div>
                 </form>
             </div>
