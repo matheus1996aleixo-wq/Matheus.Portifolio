@@ -52,7 +52,8 @@
         "curriculo_titulo_pt": "Currículo (PT)",
         "curriculo_titulo_en": "Resume (EN)",
         "carta_titulo_pt": "Carta de Apresentação (PT)",
-        "carta_titulo_en": "Cover Letter (EN)"
+        "carta_titulo_en": "Cover Letter (EN)",
+        "curriculo_file_pt": "/static/uploads/CV.Matheus.Aleixo.pdf"
     },
     "formations": [
         {

@@ -191,15 +191,31 @@
                         </div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Arquivos de Apresentação</h3>
+                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Arquivos de Apresentação e Currículos</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs text-cyan-400 mb-1">Atualizar Currículo (PDF)</label>
-                            <input type="file" name="curriculo_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
+                            <label class="block text-xs text-gray-400 mb-1">Título Botão Currículo (PT)</label>
+                            <input type="text" name="curriculo_titulo_pt" value="{{ data.profile.curriculo_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
+                            <label class="block text-xs text-cyan-400 mb-1">Anexar Currículo (PDF - PT)</label>
+                            <input type="file" name="curriculo_file_pt" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
                         </div>
                         <div>
-                            <label class="block text-xs text-cyan-400 mb-1">Atualizar Carta (PDF)</label>
-                            <input type="file" name="carta_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
+                            <label class="block text-xs text-gray-400 mb-1">Título Botão Currículo (EN)</label>
+                            <input type="text" name="curriculo_titulo_en" value="{{ data.profile.curriculo_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
+                            <label class="block text-xs text-cyan-400 mb-1">Anexar Currículo (PDF - EN)</label>
+                            <input type="file" name="curriculo_file_en" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Título Botão Carta (PT)</label>
+                            <input type="text" name="carta_titulo_pt" value="{{ data.profile.carta_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
+                            <label class="block text-xs text-cyan-400 mb-1">Anexar Carta de Apresentação (PDF - PT)</label>
+                            <input type="file" name="carta_file_pt" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Título Botão Carta (EN)</label>
+                            <input type="text" name="carta_titulo_en" value="{{ data.profile.carta_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
+                            <label class="block text-xs text-cyan-400 mb-1">Anexar Carta de Apresentação (PDF - EN)</label>
+                            <input type="file" name="carta_file_en" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
                         </div>
                     </div>
 
