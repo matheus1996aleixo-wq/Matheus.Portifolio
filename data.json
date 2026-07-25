@@ -34,7 +34,20 @@
         "destaque_titulo_pt": "",
         "destaque_titulo_en": "",
         "destaque_comp_pt": "",
-        "destaque_comp_en": ""
+        "destaque_comp_en": "",
+        "nome_en": "Matheus Aleixo",
+        "titulo_pt_en": "Analista de Sistemas / Desenvolvedor",
+        "sobre_pt_en": "Busco atuar como Analista de Sistemas ou Desenvolvedor, agregando valor estratégico por meio da criação de soluções tecnológicas eficientes e escaláveis. Meu objetivo é impulsionar a produtividade da organização atuando em três pilares principais:\r\n\r\n• Engenharia de Dados e Automação: Desenvolvimento de pipelines ETL escaláveis em nuvem, automação de processos com Python, integração de APIs e extração/tratamento avançado de dados estruturados (HTML, XML e JSON).\r\n\r\n• Sistemas e Infraestrutura: Construção e manutenção de aplicações, suporte técnico especializado, gestão de infraestrutura de TI e execução de testes funcionais para garantir a estabilidade e qualidade das operações.\r\n\r\n• Governança e Processos: Gestão eficiente de versionamento de código (Git/GitHub), aplicação de boas práticas de engenharia de software e visão analítica para garantir a segurança da informação e otimizar fluxos internos.",
+        "data_nascimento_en": "20/02/1996",
+        "cidade_en": "Várzea Paulista",
+        "estado_en": "São Paulo (SP)",
+        "idiomas_pt_en": "Português: Nativo\r\nInglês: Basico / Técnico",
+        "disponibilidade_pt_en": "Home Office, Híbrido e Presencial",
+        "disponibilidade_desc_pt_en": "Disponível para contratação por empresas estrangeiras...",
+        "grad_date_en": "20/08/2025",
+        "university_en": "Universidade Virtual do Estado de São Paulo (UNIVESP)",
+        "degree_pt_en": "Bacharelado em Tecnologia da Informação",
+        "academic_desc_pt_en": "Base sólida em algoritmos..."
     },
     "formations": [
         {
