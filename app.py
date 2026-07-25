@@ -147,17 +147,17 @@ def index():
     
     translated_profile = data['profile'].copy()
 
-    # Mapeamento dinâmico e robusto dos arquivos e títulos conforme o idioma selecionado
+    # Seleção estrita do arquivo e título de acordo com o idioma ativo
     if lang == 'en':
-        translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_en') or data['profile'].get('curriculo_file_pt') or data['profile'].get('curriculo_file', '')
-        translated_profile['carta_file'] = data['profile'].get('carta_file_en') or data['profile'].get('carta_file_pt') or data['profile'].get('carta_file', '')
-        translated_profile['curriculo_titulo'] = data['profile'].get('curriculo_titulo_en') or "Download CV.Matheus: Englês"
-        translated_profile['carta_titulo'] = data['profile'].get('carta_titulo_en') or "Cover Letter (EN)"
+        translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_en', '')
+        translated_profile['carta_file'] = data['profile'].get('carta_file_en', '')
+        translated_profile['curriculo_titulo'] = data['profile'].get('curriculo_titulo_en', 'Download CV.Matheus: Englês')
+        translated_profile['carta_titulo'] = data['profile'].get('carta_titulo_en', 'Cover Letter (EN)')
     else:
-        translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_pt') or data['profile'].get('curriculo_file', '')
-        translated_profile['carta_file'] = data['profile'].get('carta_file_pt') or data['profile'].get('carta_file', '')
-        translated_profile['curriculo_titulo'] = data['profile'].get('curriculo_titulo_pt') or "Download CV.Matheus : Portugues"
-        translated_profile['carta_titulo'] = data['profile'].get('carta_titulo_pt') or "Carta de Apresentação (PT)"
+        translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_pt', '')
+        translated_profile['carta_file'] = data['profile'].get('carta_file_pt', '')
+        translated_profile['curriculo_titulo'] = data['profile'].get('curriculo_titulo_pt', 'Download CV.Matheus : Portugues')
+        translated_profile['carta_titulo'] = data['profile'].get('carta_titulo_pt', 'Carta de Apresentação (PT)')
 
     if lang == 'en':
         updated = False
@@ -181,7 +181,6 @@ def index():
                     translated_profile[field] = tr
                     updated = True
 
-        # Skills translation
         translated_skills = []
         for s in data['skills']:
             ts = s.copy()
@@ -198,7 +197,6 @@ def index():
                         updated = True
             translated_skills.append(ts)
             
-        # Projects translation
         translated_projects = []
         for p in data['projects']:
             tp = p.copy()
@@ -215,7 +213,6 @@ def index():
                         updated = True
             translated_projects.append(tp)
             
-        # Formations translation
         translated_formations = []
         for f in data['formations']:
             tf = f.copy()
@@ -232,7 +229,6 @@ def index():
                         updated = True
             translated_formations.append(tf)
             
-        # Experiences translation
         translated_experiences = []
         for e in data['experiences']:
             te = e.copy()
@@ -379,7 +375,6 @@ def admin():
                 path = os.path.join('static/uploads', curriculo_file_pt.filename)
                 curriculo_file_pt.save(path)
                 data['profile']['curriculo_file_pt'] = '/' + path
-                data['profile']['curriculo_file'] = '/' + path
 
             curriculo_file_en = request.files.get('curriculo_file_en')
             if curriculo_file_en and curriculo_file_en.filename:
@@ -394,7 +389,6 @@ def admin():
                 path = os.path.join('static/uploads', carta_file_pt.filename)
                 carta_file_pt.save(path)
                 data['profile']['carta_file_pt'] = '/' + path
-                data['profile']['carta_file'] = '/' + path
 
             carta_file_en = request.files.get('carta_file_en')
             if carta_file_en and carta_file_en.filename:
