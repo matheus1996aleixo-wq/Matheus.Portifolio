@@ -147,7 +147,6 @@ def index():
     
     translated_profile = data['profile'].copy()
 
-    # Seleção estrita do arquivo e título de acordo com o idioma ativo
     if lang == 'en':
         translated_profile['curriculo_file'] = data['profile'].get('curriculo_file_en', '')
         translated_profile['carta_file'] = data['profile'].get('carta_file_en', '')
@@ -622,4 +621,4 @@ def logout():
 
 if __name__ == '__main__':
     init_git_repo()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)
