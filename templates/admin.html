@@ -33,6 +33,14 @@
                 form.classList.add('hidden');
             }
         }
+
+        function appendIconToDesc(textareaId) {
+            const url = prompt("Cole o link da imagem/ícone para esta matéria:");
+            if (url) {
+                const ta = document.getElementById(textareaId);
+                ta.value += ` [icon: ${url}]`;
+            }
+        }
     </script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white pb-20">
@@ -59,6 +67,7 @@
             <button id="btn-projetos" onclick="switchTab('projetos')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Projetos</button>
         </div>
 
+        <!-- INFORMAÇÕES PESSOAIS -->
         <div id="perfil" class="tab-content active">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Editar Toda Página Inicial</h2>
@@ -217,6 +226,7 @@
             </div>
         </div>
 
+        <!-- FORMAÇÕES -->
         <div id="formacao" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Formação</h2>
@@ -230,8 +240,11 @@
                         <input type="text" name="completion_date" placeholder="Data de Conclusão (ex: 20/08/2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">Matérias e Capacitações (Use [icon: URL_DA_IMAGEM] ao final da linha se desejar)</label>
-                        <textarea name="description" rows="5" placeholder="Matéria: Capacitação [icon: URL]" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs text-gray-400">Matérias e Capacitações (Use [icon: URL_DA_IMAGEM] ao final da linha se desejar)</label>
+                            <button type="button" onclick="appendIconToDesc('desc-add-form')" class="text-xs bg-gray-800 text-cyan-400 px-2 py-1 rounded border border-gray-700 hover:bg-gray-700"><i class="fa-solid fa-image mr-1"></i>Adicionar Ícone por Link</button>
+                        </div>
+                        <textarea id="desc-add-form" name="description" rows="5" placeholder="Matéria: Capacitação [icon: URL]" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
                     </div>
                     <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Formação</button>
                 </form>
@@ -264,7 +277,13 @@
                                 <input type="text" name="entity_name" value="{{ f.entity_name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
                                 <input type="text" name="completion_date" value="{{ f.completion_date }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
                             </div>
-                            <textarea name="description" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">{{ f.description }}</textarea>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs text-gray-400">Editar Matérias e Ícones [icon: URL]</label>
+                                    <button type="button" onclick="appendIconToDesc('desc-edit-form-{{ f.id }}')" class="text-xs bg-gray-800 text-cyan-400 px-2 py-0.5 rounded border border-gray-700 hover:bg-gray-700"><i class="fa-solid fa-image mr-1"></i>Adicionar Ícone</button>
+                                </div>
+                                <textarea id="desc-edit-form-{{ f.id }}" name="description" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">{{ f.description }}</textarea>
+                            </div>
                             <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
                         </form>
                     </div>
@@ -273,6 +292,7 @@
             </div>
         </div>
 
+        <!-- HABILIDADES -->
         <div id="habilidades" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Habilidade</h2>
@@ -336,6 +356,7 @@
             </div>
         </div>
 
+        <!-- EXPERIÊNCIAS -->
         <div id="experiencias" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Experiência</h2>
@@ -383,6 +404,7 @@
             </div>
         </div>
 
+        <!-- PROJETOS -->
         <div id="projetos" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Projeto</h2>
@@ -433,11 +455,7 @@
                 {% endfor %}
             </div>
         </div>
+
     </main>
-
-  <footer class="w-full text-center pb-6 mt-12">
-    <a href="https://streamlit.io/privacy-policy" target="_blank" class="text-gray-500 hover:text-cyan-400 text-xs transition">Política de Privacidade</a>
-</footer>
-
 </body>
 </html>
