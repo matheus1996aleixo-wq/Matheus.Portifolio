@@ -1,34 +1,17 @@
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_from_directory
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+app = Flask(__name__)
 app.secret_key = 'sua_chave_secreta_aqui'
-
-UPLOAD_FOLDER = os.path.join('static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 DATA_FILE = 'data.json'
 
 def load_data():
-    if not os.path.exists(DATA_FILE):
-        default_data = {
-            "profile": {},
-            "formations": [],
-            "skills": [],
-            "experiences": [],
-            "projects": []
-        }
-        save_data(default_data)
-        return default_data
-    try:
+    if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
-    except Exception as e:
-        print(f"Erro ao carregar {DATA_FILE}: {e}")
-        return {"profile": {}, "formations": [], "skills": [], "experiences": [], "projects": []}
+    return {"profile": {}, "formations": [], "skills": [], "experiences": [], "projects": []}
 
 def save_data(data):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
@@ -36,188 +19,184 @@ def save_data(data):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory('.', 'index.html')
 
 @app.route('/data.json')
-def get_data():
-    data = load_data()
-    return jsonify(data)
+def get_data_json():
+    return send_from_directory('.', 'data.json')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    erro = None
     if request.method == 'POST':
-        username = request.form.get('username')
         password = request.form.get('password')
-        
-        if username == 'admin' and password == '1234':
+        if password == 'admin123':
             session['logged_in'] = True
             return redirect(url_for('admin'))
-        else:
-            erro = "Usuário ou senha inválidos."
-            
-    return render_template('login.html', erro=erro)
+        return render_template('login.html', error='Senha incorreta')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-        
-    data = load_data()
     
+    data = load_data()
+
     if request.method == 'POST':
         action = request.form.get('action')
         
+        # 1. Atualizar Perfil e Destaque
         if action == 'update_profile':
-            for key in request.form:
-                if key != 'action':
-                    data['profile'][key] = request.form[key]
-            
-            for file_key in ['foto_file', 'curriculo_file_pt', 'curriculo_file_en', 'carta_file_pt', 'carta_file_en']:
-                if file_key in request.files:
-                    file = request.files[file_key]
-                    if file and file.filename != '':
-                        filename = secure_filename(file.filename)
-                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                        file.save(filepath)
-                        data['profile'][file_key.replace('_file', '')] = f'/static/uploads/{filename}'
-            
-            save_data(data)
-            return redirect(url_for('admin') + '#tab-perfil')
-            
-        elif action in ['update_formations', 'add_formation', 'delete_formation']:
-            if action == 'update_formations':
-                for i, f in enumerate(data.get('formations', [])):
-                    prefix = f"formation_{i}_"
-                    if f"{prefix}course" in request.form:
-                        f['course'] = request.form.get(f"{prefix}course", f.get('course'))
-                        f['course_en'] = request.form.get(f"{prefix}course_en", f.get('course_en'))
-                        f['entity_name'] = request.form.get(f"{prefix}entity_name", f.get('entity_name'))
-                        f['entity_name_en'] = request.form.get(f"{prefix}entity_name_en", f.get('entity_name_en'))
-                        f['completion_date'] = request.form.get(f"{prefix}completion_date", f.get('completion_date'))
-                        f['description'] = request.form.get(f"{prefix}description", f.get('description'))
-                        f['description_en'] = request.form.get(f"{prefix}description_en", f.get('description_en'))
-            elif action == 'add_formation':
-                new_id = str(len(data.get('formations', [])) + 1)
-                new_item = {
-                    "id": new_id,
-                    "course": "Novo Curso",
-                    "course_en": "New Course",
-                    "entity_name": "Instituição",
-                    "entity_name_en": "Institution",
-                    "completion_date": "2026",
-                    "description": "",
-                    "description_en": "",
-                    "entity_type": "Universidade",
-                    "entity_type_en": "University",
-                    "level": "Graduação",
-                    "level_en": "Bachelor's"
-                }
-                data.setdefault('formations', []).append(new_item)
-            elif action == 'delete_formation':
-                idx = int(request.form.get('index', -1))
-                if 0 <= idx < len(data.get('formations', [])):
-                    data['formations'].pop(idx)
-            save_data(data)
-            return redirect(url_for('admin') + '#tab-formacoes')
-
-        elif action in ['update_skills', 'add_skill', 'delete_skill']:
-            if action == 'update_skills':
-                for i, s in enumerate(data.get('skills', [])):
-                    prefix = f"skill_{i}_"
-                    if f"{prefix}category" in request.form:
-                        s['category'] = request.form.get(f"{prefix}category", s.get('category'))
-                        s['category_en'] = request.form.get(f"{prefix}category_en", s.get('category_en'))
-                        s['detalhes'] = request.form.get(f"{prefix}detalhes", s.get('detalhes'))
-                        s['detalhes_en'] = request.form.get(f"{prefix}detalhes_en", s.get('detalhes_en'))
-            elif action == 'add_skill':
-                new_id = str(len(data.get('skills', [])) + 1)
-                new_item = {
-                    "id": new_id,
-                    "category": "Nova Habilidade",
-                    "category_en": "New Skill",
-                    "name": "Ferramenta",
-                    "name_en": "Tool",
-                    "detalhes": "",
-                    "detalhes_en": "",
-                    "icon": ""
-                }
-                data.setdefault('skills', []).append(new_item)
-            elif action == 'delete_skill':
-                idx = int(request.form.get('index', -1))
-                if 0 <= idx < len(data.get('skills', [])):
-                    data['skills'].pop(idx)
-            save_data(data)
-            return redirect(url_for('admin') + '#tab-habilidades')
-
-        elif action in ['update_experiences', 'add_experience', 'delete_experience']:
-            if action == 'update_experiences':
-                for i, e in enumerate(data.get('experiences', [])):
-                    prefix = f"exp_{i}_"
-                    if f"{prefix}title" in request.form:
-                        e['title'] = request.form.get(f"{prefix}title", e.get('title'))
-                        e['title_en'] = request.form.get(f"{prefix}title_en", e.get('title_en'))
-                        e['period'] = request.form.get(f"{prefix}period", e.get('period'))
-                        e['period_en'] = request.form.get(f"{prefix}period_en", e.get('period_en'))
-                        e['description'] = request.form.get(f"{prefix}description", e.get('description'))
-                        e['description_en'] = request.form.get(f"{prefix}description_en", e.get('description_en'))
-            elif action == 'add_experience':
-                new_id = str(len(data.get('experiences', [])) + 1)
-                new_item = {
-                    "id": new_id,
-                    "title": "Cargo - Empresa",
-                    "title_en": "Position - Company",
-                    "period": "2026 - Presente",
-                    "period_en": "2026 - Present",
-                    "description": "",
-                    "description_en": ""
-                }
-                data.setdefault('experiences', []).append(new_item)
-            elif action == 'delete_experience':
-                idx = int(request.form.get('index', -1))
-                if 0 <= idx < len(data.get('experiences', [])):
-                    data['experiences'].pop(idx)
-            save_data(data)
-            return redirect(url_for('admin') + '#tab-experiencias')
-
-        elif action in ['update_projects', 'add_project', 'delete_project']:
-            if action == 'update_projects':
-                for i, p in enumerate(data.get('projects', [])):
-                    prefix = f"proj_{i}_"
-                    if f"{prefix}title" in request.form:
-                        p['title'] = request.form.get(f"{prefix}title", p.get('title'))
-                        p['title_en'] = request.form.get(f"{prefix}title_en", p.get('title_en'))
-                        p['description'] = request.form.get(f"{prefix}description", p.get('description'))
-                        p['description_en'] = request.form.get(f"{prefix}description_en", p.get('description_en'))
-                        p['tech'] = request.form.get(f"{prefix}tech", p.get('tech'))
-            elif action == 'add_project':
-                new_id = str(len(data.get('projects', [])) + 1)
-                new_item = {
-                    "id": new_id,
-                    "title": "Novo Projeto",
-                    "title_en": "New Project",
-                    "description": "",
-                    "description_en": "",
-                    "tech": "Python, Flask",
-                    "link_github": "",
-                    "link_live": ""
-                }
-                data.setdefault('projects', []).append(new_item)
-            elif action == 'delete_project':
-                idx = int(request.form.get('index', -1))
-                if 0 <= idx < len(data.get('projects', [])):
-                    data['projects'].pop(idx)
-            save_data(data)
-            return redirect(url_for('admin') + '#tab-projetos')
-            
-        return redirect(url_for('admin'))
+            data['profile']['nome'] = request.form.get('nome', '')
+            data['profile']['nascimento'] = request.form.get('nascimento', '')
+            data['profile']['cidade'] = request.form.get('cidade', '')
+            data['profile']['estado'] = request.form.get('estado', '')
+            data['profile']['pais'] = request.form.get('pais', '')
+            data['profile']['titulo_pt'] = request.form.get('titulo_pt', '')
+            data['profile']['titulo_en'] = request.form.get('titulo_en', '')
+            data['profile']['sobre_pt'] = request.form.get('sobre_pt', '')
+            data['profile']['sobre_en'] = request.form.get('sobre_en', '')
+            data['profile']['destaque_data'] = request.form.get('destaque_data', '')
+            data['profile']['destaque_titulo_pt'] = request.form.get('destaque_titulo_pt', '')
+            data['profile']['destaque_titulo_en'] = request.form.get('destaque_titulo_en', '')
+            data['profile']['destaque_inst'] = request.form.get('destaque_inst', '')
+            data['profile']['destaque_inst_en'] = request.form.get('destaque_inst_en', '')
+            data['profile']['destaque_comp_pt'] = request.form.get('destaque_comp_pt', '')
+            data['profile']['destaque_comp_en'] = request.form.get('destaque_comp_en', '')
+            data['profile']['idiomas_pt'] = request.form.get('idiomas_pt', '')
+            data['profile']['idiomas_en'] = request.form.get('idiomas_en', '')
+            data['profile']['disponibilidade_pt'] = request.form.get('disponibilidade_pt', '')
+            data['profile']['disponibilidade_en'] = request.form.get('disponibilidade_en', '')
+            data['profile']['linkedin'] = request.form.get('linkedin', '')
+            data['profile']['github'] = request.form.get('github', '')
         
-    return render_template('admin.html', data=data)
+        # 2. Atualizar Formações
+        elif action == 'update_formations':
+            for i, f in enumerate(data.get('formations', [])):
+                f['entity_type'] = request.form.get(f'formation_{i}_entity_type', 'Universidade')
+                f['completion_date'] = request.form.get(f'formation_{i}_completion_date', '')
+                f['course'] = request.form.get(f'formation_{i}_course', '')
+                f['course_en'] = request.form.get(f'formation_{i}_course_en', '')
+                f['entity_name'] = request.form.get(f'formation_{i}_entity_name', '')
+                f['entity_name_en'] = request.form.get(f'formation_{i}_entity_name_en', '')
+                f['description'] = request.form.get(f'formation_{i}_description', '')
+                f['description_en'] = request.form.get(f'formation_{i}_description_en', '')
+        
+        elif action == 'add_formation':
+            if 'formations' not in data:
+                data['formations'] = []
+            data['formations'].append({
+                "id": int(os.urandom(4).hex(), 16),
+                "entity_type": "Universidade",
+                "completion_date": "2026",
+                "course": "Novo Curso",
+                "course_en": "New Course",
+                "entity_name": "Instituição",
+                "entity_name_en": "Institution",
+                "description": "",
+                "description_en": ""
+            })
+        
+        elif action == 'delete_formation':
+            idx = request.form.get('index')
+            if idx is not None and idx.isdigit():
+                idx = int(idx)
+                if 'formations' in data and 0 <= idx < len(data['formations']):
+                    data['formations'].pop(idx)
 
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('index'))
+        # 3. Atualizar Habilidades
+        elif action == 'update_skills':
+            for i, s in enumerate(data.get('skills', [])):
+                s['category'] = request.form.get(f'skill_{i}_category', '')
+                s['category_en'] = request.form.get(f'skill_{i}_category_en', '')
+                s['detalhes'] = request.form.get(f'skill_{i}_detalhes', '')
+                s['detalhes_en'] = request.form.get(f'skill_{i}_detalhes_en', '')
+
+        elif action == 'add_skill':
+            if 'skills' not in data:
+                data['skills'] = []
+            data['skills'].append({
+                "id": int(os.urandom(4).hex(), 16),
+                "category": "Nova Habilidade",
+                "category_en": "New Skill",
+                "detalhes": "",
+                "detalhes_en": ""
+            })
+
+        elif action == 'delete_skill':
+            idx = request.form.get('index')
+            if idx is not None and idx.isdigit():
+                idx = int(idx)
+                if 'skills' in data and 0 <= idx < len(data['skills']):
+                    data['skills'].pop(idx)
+
+        # 4. Atualizar Experiências
+        elif action == 'update_experiences':
+            for i, e in enumerate(data.get('experiences', [])):
+                e['title'] = request.form.get(f'exp_{i}_title', '')
+                e['title_en'] = request.form.get(f'exp_{i}_title_en', '')
+                e['period'] = request.form.get(f'exp_{i}_period', '')
+                e['period_en'] = request.form.get(f'exp_{i}_period_en', '')
+                e['description'] = request.form.get(f'exp_{i}_description', '')
+                e['description_en'] = request.form.get(f'exp_{i}_description_en', '')
+
+        elif action == 'add_experience':
+            if 'experiences' not in data:
+                data['experiences'] = []
+            data['experiences'].append({
+                "id": int(os.urandom(4).hex(), 16),
+                "title": "Novo Cargo - Empresa",
+                "title_en": "New Role - Company",
+                "period": "2026",
+                "period_en": "2026",
+                "description": "",
+                "description_en": ""
+            })
+
+        elif action == 'delete_experience':
+            idx = request.form.get('index')
+            if idx is not None and idx.isdigit():
+                idx = int(idx)
+                if 'experiences' in data and 0 <= idx < len(data['experiences']):
+                    data['experiences'].pop(idx)
+
+        # 5. Atualizar Projetos
+        elif action == 'update_projects':
+            for i, p in enumerate(data.get('projects', [])):
+                p['title'] = request.form.get(f'proj_{i}_title', '')
+                p['title_en'] = request.form.get(f'proj_{i}_title_en', '')
+                p['description'] = request.form.get(f'proj_{i}_description', '')
+                p['description_en'] = request.form.get(f'proj_{i}_description_en', '')
+                p['tech'] = request.form.get(f'proj_{i}_tech', '')
+
+        elif action == 'add_project':
+            if 'projects' not in data:
+                data['projects'] = []
+            data['projects'].append({
+                "id": int(os.urandom(4).hex(), 16),
+                "title": "Novo Projeto",
+                "title_en": "New Project",
+                "description": "",
+                "description_en": "",
+                "tech": "Python, Flask"
+            })
+
+        elif action == 'delete_project':
+            idx = request.form.get('index')
+            if idx is not None and idx.isdigit():
+                idx = int(idx)
+                if 'projects' in data and 0 <= idx < len(data['projects']):
+                    data['projects'].pop(idx)
+
+        save_data(data)
+        return redirect(url_for('admin'))
+
+    return render_template('admin.html', data=data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

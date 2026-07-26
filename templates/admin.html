@@ -85,7 +85,7 @@
             </button>
         </div>
 
-        <!-- ABA 1: PERFIL & DESTAQUE ACADÊMICO (PT / EN) -->
+        <!-- ABA 1: PERFIL & DESTAQUE ACADÊMICO -->
         <div id="tab-perfil" class="tab-content active">
             <div class="card-glass p-8 rounded-3xl">
                 <h2 class="text-xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Gerenciar Informações Pessoais e Destaque Acadêmico (PT / EN)</h2>
@@ -206,11 +206,11 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-800 pt-6">
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 mb-1">LinkedIn URL</label>
+                            <label class="block text-xs font-bold text-cyan-400 mb-1">LinkedIn URL</label>
                             <input type="text" name="linkedin" value="{{ data.profile.linkedin }}" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 mb-1">GitHub URL</label>
+                            <label class="block text-xs font-bold text-cyan-400 mb-1">GitHub URL</label>
                             <input type="text" name="github" value="{{ data.profile.github }}" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none">
                         </div>
                     </div>
@@ -224,7 +224,7 @@
             </div>
         </div>
 
-        <!-- ABA 2: FORMAÇÕES (PT / EN) EDITÁVEL + ADICIONAR / EXCLUIR -->
+        <!-- ABA 2: FORMAÇÕES -->
         <div id="tab-formacoes" class="tab-content">
             <div class="card-glass p-8 rounded-3xl space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -243,15 +243,23 @@
                     {% for f in data.formations %}
                     <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-4 relative">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                            <span class="text-xs font-bold text-cyan-400">Formação #{{ loop.index }}</span>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xs font-bold text-cyan-400">Formação #{{ loop.index }}</span>
+                                <select name="formation_{{ loop.index0 }}_entity_type" class="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1 text-xs text-cyan-300 font-bold focus:border-cyan-400 focus:outline-none">
+                                    <option value="Universidade" {% if f.entity_type == 'Universidade' %}selected{% endif %}>Universidade</option>
+                                    <option value="Curso Técnico" {% if f.entity_type == 'Curso Técnico' %}selected{% endif %}>Curso Técnico</option>
+                                    <option value="Curso" {% if f.entity_type == 'Curso' %}selected{% endif %}>Curso</option>
+                                    <option value="Certificações" {% if f.entity_type == 'Certificações' %}selected{% endif %}>Certificações</option>
+                                    <option value="Pós Graduação" {% if f.entity_type == 'Pós Graduação' %}selected{% endif %}>Pós Graduação</option>
+                                    <option value="Doutorado" {% if f.entity_type == 'Doutorado' %}selected{% endif %}>Doutorado</option>
+                                    <option value="Pós Doutorado" {% if f.entity_type == 'Pós Doutorado' %}selected{% endif %}>Pós Doutorado</option>
+                                </select>
+                            </div>
                             <div class="flex items-center space-x-4">
                                 <div>
                                     <label class="text-xs text-gray-400 mr-2">Conclusão:</label>
                                     <input type="text" name="formation_{{ loop.index0 }}_completion_date" value="{{ f.completion_date }}" class="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1 text-xs text-cyan-400 font-bold w-28">
                                 </div>
-                                <button type="submit" formaction="/admin" formmethod="POST" name="action" value="delete_formation" onclick="this.form.elements['action'].value='delete_formation'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-3 py-1.5 rounded-xl text-xs font-bold transition">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
                             </div>
                         </div>
 
@@ -287,6 +295,13 @@
                                 <textarea name="formation_{{ loop.index0 }}_description_en" rows="4" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-xs text-gray-300 focus:border-cyan-400 focus:outline-none">{{ f.description_en }}</textarea>
                             </div>
                         </div>
+
+                        <!-- Botão de Exclusão Individual e Seguro -->
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" formaction="/admin" formmethod="POST" name="action" value="delete_formation" onclick="this.form.elements['action'].value='delete_formation'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-4 py-2 rounded-xl text-xs font-bold transition">
+                                <i class="fa-solid fa-trash mr-1"></i> Excluir esta Formação
+                            </button>
+                        </div>
                     </div>
                     {% endfor %}
 
@@ -299,7 +314,7 @@
             </div>
         </div>
 
-        <!-- ABA 3: HABILIDADES (PT / EN) EDITÁVEL + ADICIONAR / EXCLUIR -->
+        <!-- ABA 3: HABILIDADES -->
         <div id="tab-habilidades" class="tab-content">
             <div class="card-glass p-8 rounded-3xl space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -326,9 +341,6 @@
                                         <input type="text" name="skill_{{ loop.index0 }}_category_en" value="{{ s.category_en }}" class="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1 text-xs text-cyan-400" placeholder="Category (EN)">
                                     </div>
                                 </div>
-                                <button type="submit" formaction="/admin" formmethod="POST" onclick="this.form.elements['action'].value='delete_skill'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-3 py-1 rounded-lg text-xs font-bold transition">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 mb-1">Detalhes (PT)</label>
@@ -337,6 +349,11 @@
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 mb-1">Details (EN)</label>
                                 <textarea name="skill_{{ loop.index0 }}_detalhes_en" rows="2" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-300 focus:border-cyan-400 focus:outline-none">{{ s.detalhes_en }}</textarea>
+                            </div>
+                            <div class="flex justify-end pt-2">
+                                <button type="submit" formaction="/admin" formmethod="POST" onclick="this.form.elements['action'].value='delete_skill'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                    <i class="fa-solid fa-trash mr-1"></i> Excluir Habilidade
+                                </button>
                             </div>
                         </div>
                         {% endfor %}
@@ -351,7 +368,7 @@
             </div>
         </div>
 
-        <!-- ABA 4: EXPERIÊNCIAS (PT / EN) EDITÁVEL + ADICIONAR / EXCLUIR -->
+        <!-- ABA 4: EXPERIÊNCIAS -->
         <div id="tab-experiencias" class="tab-content">
             <div class="card-glass p-8 rounded-3xl space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -369,11 +386,6 @@
 
                     {% for e in data.experiences %}
                     <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-4 relative">
-                        <div class="flex justify-end">
-                            <button type="submit" formaction="/admin" formmethod="POST" onclick="this.form.elements['action'].value='delete_experience'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-3 py-1 rounded-lg text-xs font-bold transition">
-                                <i class="fa-solid fa-trash mr-1"></i> Excluir Experiência
-                            </button>
-                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-cyan-400 mb-1">Cargo & Empresa (PT)</label>
@@ -404,6 +416,11 @@
                                 <textarea name="exp_{{ loop.index0 }}_description_en" rows="3" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-xs text-gray-300 focus:border-cyan-400 focus:outline-none">{{ e.description_en }}</textarea>
                             </div>
                         </div>
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" formaction="/admin" formmethod="POST" onclick="this.form.elements['action'].value='delete_experience'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-4 py-2 rounded-xl text-xs font-bold transition">
+                                <i class="fa-solid fa-trash mr-1"></i> Excluir Experiência
+                            </button>
+                        </div>
                     </div>
                     {% endfor %}
 
@@ -416,7 +433,7 @@
             </div>
         </div>
 
-        <!-- ABA 5: PROJETOS (PT / EN) EDITÁVEL + ADICIONAR / EXCLUIR -->
+        <!-- ABA 5: PROJETOS -->
         <div id="tab-projetos" class="tab-content">
             <div class="card-glass p-8 rounded-3xl space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -435,11 +452,6 @@
                     <div class="space-y-6">
                         {% for p in data.projects %}
                         <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-4 relative">
-                            <div class="flex justify-end">
-                                <button type="submit" formaction="/admin" formmethod="POST" onclick="this.form.elements['action'].value='delete_project'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-3 py-1 rounded-lg text-xs font-bold transition">
-                                    <i class="fa-solid fa-trash mr-1"></i> Excluir Projeto
-                                </button>
-                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-cyan-400 mb-1">Título do Projeto (PT)</label>
@@ -463,6 +475,11 @@
                             <div>
                                 <label class="block text-xs font-bold text-cyan-400 mb-1">Tecnologias (separadas por vírgula)</label>
                                 <input type="text" name="proj_{{ loop.index0 }}_tech" value="{{ p.tech }}" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-xs text-cyan-300 focus:border-cyan-400 focus:outline-none">
+                            </div>
+                            <div class="flex justify-end pt-2">
+                                <button type="submit" formaction="/admin" formmethod="POST" onclick="this.form.elements['action'].value='delete_project'; this.form.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'index\' value=\'{{ loop.index0 }}\'>');" class="bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-900 px-4 py-2 rounded-xl text-xs font-bold transition">
+                                    <i class="fa-solid fa-trash mr-1"></i> Excluir Projeto
+                                </button>
                             </div>
                         </div>
                         {% endfor %}
