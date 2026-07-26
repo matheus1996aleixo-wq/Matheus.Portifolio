@@ -1,36 +1,39 @@
 <!DOCTYPE html>
-<html lang="{{ session.get('lang', 'pt') }}">
+<html lang="pt-BR" class="h-full bg-gray-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-950 text-gray-200 flex items-center justify-center h-screen">
-    <div class="bg-gray-900 border border-gray-800 p-8 rounded-3xl w-full max-w-md shadow-2xl">
+<body class="h-full flex items-center justify-center bg-[#0b0f19] text-gray-300 font-sans">
+    <div class="max-w-md w-full mx-4 bg-[#111827] border border-gray-800 p-8 rounded-3xl shadow-2xl">
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-white">Painel Administrativo</h1>
-            <p class="text-sm text-gray-400 mt-1">Faça login para gerenciar seu portfólio</p>
+            <h1 class="text-2xl font-bold text-white mb-2">Painel Administrativo</h1>
+            <p class="text-xs text-gray-400">Faça login para gerenciar seu portfólio</p>
         </div>
-        
+
         {% if erro %}
-        <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3 rounded-xl mb-6 text-center">
+        <div class="mb-4 p-3 bg-red-950/50 border border-red-800 text-red-400 text-xs rounded-xl text-center">
             {{ erro }}
         </div>
         {% endif %}
-        
-        <form action="/login" method="POST" class="space-y-4">
+
+        <form method="POST" class="space-y-4">
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Usuário</label>
-                <input type="text" name="username" required class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-cyan-400 focus:outline-none">
+                <label class="block text-xs font-bold text-gray-400 mb-1">Usuário</label>
+                <input type="text" name="username" required class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none transition">
             </div>
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Senha</label>
-                <input type="password" name="password" required class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-cyan-400 focus:outline-none">
+                <label class="block text-xs font-bold text-gray-400 mb-1">Senha</label>
+                <input type="password" name="password" required class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none transition">
             </div>
-            <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 rounded-xl transition text-sm mt-2">Entrar</button>
+            <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 rounded-xl text-sm transition shadow-md">
+                Entrar
+            </button>
         </form>
-        
+
         <div class="text-center mt-6">
             <a href="/" class="text-xs text-cyan-400 hover:underline">Voltar para o site</a>
         </div>
