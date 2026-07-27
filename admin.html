@@ -137,6 +137,10 @@
 
         function saveProfile(e) {
             e.preventDefault();
+            
+            // Garantia de que o objeto profile existe
+            if (!siteData.profile) siteData.profile = {};
+
             siteData.profile.nome = document.getElementById('nome').value;
             siteData.profile.nascimento = document.getElementById('nascimento').value;
             siteData.profile.foto = document.getElementById('foto_url').value;

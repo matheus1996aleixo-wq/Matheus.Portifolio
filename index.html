@@ -20,6 +20,14 @@
         let currentLang = localStorage.getItem('site_lang') || 'pt';
         let siteData = {};
 
+        // Sincroniza abas abertas em tempo real (Se salvar no Admin, o Index atualiza sozinho)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'site_data' && e.newValue) {
+                siteData = JSON.parse(e.newValue);
+                renderPortfolio();
+            }
+        });
+
         async function loadPortfolioData() {
             try {
                 const saved = localStorage.getItem('site_data');
@@ -95,7 +103,6 @@
             }
         }
 
-        // --- MODAL DE IMAGEM GENÉRICO ---
         function openImageModal(targetType, index, currentUrl) {
             document.getElementById('img_target_type').value = targetType;
             document.getElementById('img_target_idx').value = index;
@@ -125,8 +132,9 @@
         }
 
         function applyNewImage(type, idx, newSrc) {
+            if (!siteData.profile) siteData.profile = {};
             if (type === 'profile') {
-                if(siteData.profile) siteData.profile.foto = newSrc;
+                siteData.profile.foto = newSrc;
             } else if (type === 'skill') {
                 if(siteData.skills && siteData.skills[idx]) siteData.skills[idx].icon = newSrc;
             } else if (type === 'project') {
@@ -156,7 +164,6 @@
             closeImageModal();
         }
 
-        // --- MODAL DE TEXTO GENÉRICO ---
         function openTextModal(targetType, index) {
             document.getElementById('txt_target_type').value = targetType;
             document.getElementById('txt_target_idx').value = index;
@@ -219,6 +226,8 @@
             const newTitle = document.getElementById('txt_input_title').value;
             const newDesc = document.getElementById('txt_input_desc').value;
 
+            if (!siteData.profile) siteData.profile = {};
+
             if (type === 'profile_obj') {
                 siteData.profile.titulo_pt = newTitle;
                 siteData.profile.sobre_pt = newDesc;
@@ -254,7 +263,6 @@
             closeTextModal();
         }
 
-        // --- EXCLUSÃO GENÉRICA ---
         function deleteItem(targetType, index) {
             if (confirm('Deseja realmente excluir este item?')) {
                 if (targetType === 'skill') {
@@ -277,8 +285,9 @@
         }
 
         function renderPortfolio() {
-            if (!siteData.profile) return;
+            if (!siteData.profile) siteData.profile = {}; 
             const p = siteData.profile;
+            
             const isEn = (currentLang === 'en');
             const isAdmin = localStorage.getItem('admin_logged') === 'true';
 
@@ -328,22 +337,23 @@
             document.getElementById('lbl-disp').innerHTML = `<i class="fa-solid fa-briefcase mr-1.5"></i> ${isEn ? 'Availability to Work:' : 'Disponibilidade para Trabalhar:'}`;
             const dispTexto = isEn ? (p.disponibilidade_en || p.disponibilidade_pt) : (p.disponibilidade_pt || 'Home Office, Híbrido e Presencial');
             const dispLines = dispTexto.split('\n');
-            document.getElementById('disp-main').innerText = dispLines[0];
+            document.getElementById('disp-main').innerText = dispLines[0] || '';
             document.getElementById('disp-sub').innerHTML = dispLines.slice(1).join('<br>');
 
-            // Renderização dinâmica dos botões de Currículo e Carta de Apresentação baseada no idioma selecionado
             const cvLink = isEn ? (p.curriculo_en || '') : (p.curriculo_pt || '');
             const clLink = isEn ? (p.carta_en || '') : (p.carta_pt || '');
             const cvLabel = isEn ? 'Download Resume' : 'Baixar Currículo';
             const clLabel = isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação';
 
             let filesHtml = '';
-            if (cvLink) {
-                filesHtml += `<a href="${cvLink}" target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>${cvLabel}</a>`;
-            }
+            
+            // AQUI ESTÁ A ÚNICA MUDANÇA: O botão agora renderiza independentemente de já haver um link, sendo exibido como "sempre disponível".
+            filesHtml += `<a href="${cvLink || '#'}" ${cvLink ? 'target="_blank"' : ''} class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>${cvLabel}</a>`;
+            
             if (clLink) {
                 filesHtml += `<a href="${clLink}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-envelope-open-text mr-2"></i>${clLabel}</a>`;
             }
+            
             const docsSection = document.getElementById('profile-documents-section');
             if (docsSection) {
                 docsSection.innerHTML = filesHtml;
@@ -399,13 +409,13 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-6 gap-4">
                             <div>
                                 <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1">
-                                    <i class="fa-solid fa-graduation-cap mr-2"></i>${entityType}: ${level}
+                                    <i class="fa-solid fa-graduation-cap mr-2"></i>${entityType || ''}: ${level || ''}
                                 </span>
-                                <h3 class="text-2xl font-bold text-white">${isEn ? 'Course:' : 'Curso:'} ${course}</h3>
-                                <p class="text-gray-400 text-sm mt-1">${isEn ? 'Institution:' : 'Instituição:'} ${entityName}</p>
+                                <h3 class="text-2xl font-bold text-white">${isEn ? 'Course:' : 'Curso:'} ${course || ''}</h3>
+                                <p class="text-gray-400 text-sm mt-1">${isEn ? 'Institution:' : 'Instituição:'} ${entityName || ''}</p>
                             </div>
                             <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800">
-                                <p class="text-xs text-gray-400">${isEn ? 'Date:' : 'Data de Formação:'} <strong class="text-cyan-400">${completionDate}</strong></p>
+                                <p class="text-xs text-gray-400">${isEn ? 'Date:' : 'Data de Formação:'} <strong class="text-cyan-400">${completionDate || ''}</strong></p>
                             </div>
                         </div>`;
 
@@ -670,7 +680,6 @@
                         <p id="disp-sub" class="text-gray-400 pt-1 leading-relaxed"></p>
                     </div>
 
-                    <!-- Seção de Documentos (Currículo e Carta de Apresentação dinâmicos por idioma) -->
                     <div id="profile-documents-section" class="flex flex-col gap-3"></div>
                 </div>
                 
