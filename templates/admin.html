@@ -41,6 +41,56 @@
                 ta.value += ` [icon: ${url}]`;
             }
         }
+
+        // --- SISTEMA MÁGICO DE TRADUÇÃO AUTOMÁTICA EM TEMPO REAL ---
+        function handleAutoTranslate(e) {
+            let ptName = e.target.name;
+            // Só ativa se for um campo PT (ou não terminar em _en) e não for um campo neutro como foto ou link
+            if(!ptName || ptName.endsWith('_en') || ptName === 'nome' || ptName === 'nascimento' || ptName.includes('foto') || ptName === 'linkedin' || ptName === 'github' || ptName.includes('file')) return;
+            
+            let enName = ptName.endsWith('_pt') ? ptName.replace('_pt', '_en') : ptName + '_en';
+            let form = e.target.closest('form');
+            if(form) {
+                let enField = form.querySelector(`[name="${enName}"]`);
+                // Se o campo em Inglês estiver VAZIO e o campo PT não estiver
+                if(enField && (!enField.value || enField.value.trim() === '') && e.target.value.trim() !== '') {
+                    let oldPlaceholder = enField.placeholder;
+                    enField.placeholder = "Traduzindo automaticamente...";
+                    
+                    fetch('/api/translate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: e.target.value})
+                    }).then(r => r.json()).then(data => {
+                        if(data.translated && (!enField.value || enField.value.trim() === '')) {
+                            // Preenche o espaço
+                            if(enField.tagName === 'SELECT') {
+                                let exists = Array.from(enField.options).some(opt => opt.value === data.translated);
+                                if(!exists) enField.add(new Option(data.translated, data.translated));
+                            }
+                            enField.value = data.translated;
+                        }
+                        enField.placeholder = oldPlaceholder;
+                    }).catch(err => {
+                        console.error("Erro na tradução", err);
+                        enField.placeholder = oldPlaceholder;
+                    });
+                }
+            }
+        }
+
+        // Ativa ao sair do campo de texto (clicar fora)
+        document.addEventListener('focusout', function(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                handleAutoTranslate(e);
+            }
+        });
+        // Ativa ao trocar opções no select
+        document.addEventListener('change', function(e) {
+            if(e.target.tagName === 'SELECT') {
+                handleAutoTranslate(e);
+            }
+        });
     </script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white pb-20">
@@ -97,18 +147,31 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Campos Duplos (PT/EN) - REMOVIDO REQUIRED DOS "EN" E ADICIONADO PLACEHOLDER -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Cidade</label>
+                            <label class="block text-xs text-gray-400 mb-1">Cidade (PT)</label>
                             <input type="text" name="cidade" value="{{ data.profile.cidade }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Estado</label>
+                            <label class="block text-xs text-gray-400 mb-1">Cidade (EN)</label>
+                            <input type="text" name="cidade_en" value="{{ data.profile.cidade_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Estado (PT)</label>
                             <input type="text" name="estado" value="{{ data.profile.estado }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">País</label>
+                            <label class="block text-xs text-gray-400 mb-1">Estado (EN)</label>
+                            <input type="text" name="estado_en" value="{{ data.profile.estado_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">País (PT)</label>
                             <input type="text" name="pais" value="{{ data.profile.pais }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">País (EN)</label>
+                            <input type="text" name="pais_en" value="{{ data.profile.pais_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
                         </div>
                     </div>
 
@@ -131,7 +194,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Título Profissional (EN)</label>
-                            <input type="text" name="titulo_en" value="{{ data.profile.titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                            <input type="text" name="titulo_en" value="{{ data.profile.titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Sobre (PT)</label>
@@ -139,7 +202,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Sobre (EN)</label>
-                            <textarea name="sobre_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.sobre_en }}</textarea>
+                            <textarea name="sobre_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">{{ data.profile.sobre_en }}</textarea>
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Disponibilidade de Trabalho (PT)</label>
@@ -147,7 +210,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Disponibilidade de Trabalho (EN)</label>
-                            <textarea name="disponibilidade_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.disponibilidade_en }}</textarea>
+                            <textarea name="disponibilidade_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">{{ data.profile.disponibilidade_en }}</textarea>
                         </div>
                     </div>
 
@@ -159,19 +222,27 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Idiomas (EN)</label>
-                            <textarea name="idiomas_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.idiomas_en }}</textarea>
+                            <textarea name="idiomas_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">{{ data.profile.idiomas_en }}</textarea>
                         </div>
                     </div>
 
                     <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Formação em Destaque (Aparece na primeira página)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Data Conclusão</label>
+                            <label class="block text-xs text-gray-400 mb-1">Data Conclusão (PT)</label>
                             <input type="text" name="destaque_data" value="{{ data.profile.destaque_data }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Instituição</label>
+                            <label class="block text-xs text-gray-400 mb-1">Data Conclusão (EN)</label>
+                            <input type="text" name="destaque_data_en" value="{{ data.profile.destaque_data_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Instituição (PT)</label>
                             <input type="text" name="destaque_inst" value="{{ data.profile.destaque_inst }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Instituição (EN)</label>
+                            <input type="text" name="destaque_inst_en" value="{{ data.profile.destaque_inst_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Título Formação (PT)</label>
@@ -179,7 +250,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Título Formação (EN)</label>
-                            <input type="text" name="destaque_titulo_en" value="{{ data.profile.destaque_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                            <input type="text" name="destaque_titulo_en" value="{{ data.profile.destaque_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Competências Adquiridas (PT)</label>
@@ -187,7 +258,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Competências Adquiridas (EN)</label>
-                            <textarea name="destaque_comp_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.destaque_comp_en }}</textarea>
+                            <textarea name="destaque_comp_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="(Deixe vazio para auto-traduzir)">{{ data.profile.destaque_comp_en }}</textarea>
                         </div>
                     </div>
 
@@ -201,7 +272,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Título Botão Currículo (EN)</label>
-                            <input type="text" name="curriculo_titulo_en" value="{{ data.profile.curriculo_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
+                            <input type="text" name="curriculo_titulo_en" value="{{ data.profile.curriculo_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2" placeholder="(Auto Traduzir Se Vazio)">
                             <label class="block text-xs text-cyan-400 mb-1">Anexar Currículo (PDF - EN)</label>
                             <input type="file" name="curriculo_file_en" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
                         </div>
@@ -213,7 +284,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Título Botão Carta (EN)</label>
-                            <input type="text" name="carta_titulo_en" value="{{ data.profile.carta_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
+                            <input type="text" name="carta_titulo_en" value="{{ data.profile.carta_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2" placeholder="(Auto Traduzir Se Vazio)">
                             <label class="block text-xs text-cyan-400 mb-1">Anexar Carta de Apresentação (PDF - EN)</label>
                             <input type="file" name="carta_file_en" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
                         </div>
@@ -233,27 +304,40 @@
                 <form method="POST" action="/admin" class="space-y-4">
                     <input type="hidden" name="action" value="add_formation">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="level" placeholder="Nível (ex: Bacharelado)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="course" placeholder="Curso (ex: Tecnologia da Informação)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="level" placeholder="Nível PT (ex: Bacharelado)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="level_en" placeholder="Nível EN (Deixe vazio p/ auto-traduzir)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         
-                        <!-- CAMPO ALTERADO: Agora é um Select com as 4 opções! -->
+                        <input type="text" name="course" placeholder="Curso PT (ex: Tecnologia da Informação)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="course_en" placeholder="Curso EN (Deixe vazio p/ auto-traduzir)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        
                         <select name="entity_type" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                            <option value="" disabled selected>Selecione o Tipo de Formação</option>
+                            <option value="" disabled selected>Tipo de Formação (PT)</option>
                             <option value="Instituição Universitária">Instituição Universitária</option>
                             <option value="Curso">Curso</option>
                             <option value="Certificações">Certificações</option>
                             <option value="Cursos Técnicos">Cursos Técnicos</option>
                         </select>
+                        <select name="entity_type_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                            <option value="" selected>Tipo Formação EN (Auto-traduzir)</option>
+                            <option value="University Institution">University Institution</option>
+                            <option value="Course">Course</option>
+                            <option value="Certifications">Certifications</option>
+                            <option value="Technical Courses">Technical Courses</option>
+                        </select>
                         
-                        <input type="text" name="entity_name" placeholder="Nome da Instituição (ex: UNIVESP)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="completion_date" placeholder="Data de Conclusão (ex: 20/08/2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="entity_name" placeholder="Instituição PT (ex: UNIVESP)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="entity_name_en" placeholder="Instituição EN (Deixe vazio p/ auto-traduzir)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        
+                        <input type="text" name="completion_date" placeholder="Data Conclusão PT (ex: 20/08/2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="completion_date_en" placeholder="Data Conclusão EN (Deixe vazio p/ auto-traduzir)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="text-xs text-gray-400">Matérias e Capacitações (Use [icon: URL_DA_IMAGEM] ao final da linha se desejar)</label>
                             <button type="button" onclick="appendIconToDesc('desc-add-form')" class="text-xs bg-gray-800 text-cyan-400 px-2 py-1 rounded border border-gray-700 hover:bg-gray-700"><i class="fa-solid fa-image mr-1"></i>Adicionar Ícone por Link</button>
                         </div>
-                        <textarea id="desc-add-form" name="description" rows="5" placeholder="Matéria: Capacitação [icon: URL]" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                        <textarea id="desc-add-form" name="description" rows="3" placeholder="Matérias / Descrição (PT)..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-3"></textarea>
+                        <textarea id="desc-add-form-en" name="description_en" rows="3" placeholder="Matérias / Descrição (EN)... Deixe vazio para tradução automática." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
                     </div>
                     <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Formação</button>
                 </form>
@@ -280,26 +364,49 @@
                             <input type="hidden" name="action" value="edit_formation">
                             <input type="hidden" name="form_id" value="{{ f.id }}">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <input type="text" name="level" value="{{ f.level }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="course" value="{{ f.course }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                
-                                <!-- CAMPO ALTERADO: Para modo Edição também vira um Select -->
-                                <select name="entity_type" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                    <option value="Instituição Universitária" {% if f.entity_type == 'Instituição Universitária' %}selected{% endif %}>Instituição Universitária</option>
-                                    <option value="Curso" {% if f.entity_type == 'Curso' %}selected{% endif %}>Curso</option>
-                                    <option value="Certificações" {% if f.entity_type == 'Certificações' %}selected{% endif %}>Certificações</option>
-                                    <option value="Cursos Técnicos" {% if f.entity_type == 'Cursos Técnicos' %}selected{% endif %}>Cursos Técnicos</option>
-                                </select>
-                                
-                                <input type="text" name="entity_name" value="{{ f.entity_name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="completion_date" value="{{ f.completion_date }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Nível (PT/EN)</label>
+                                    <input type="text" name="level" value="{{ f.level }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="level_en" value="{{ f.level_en }}" placeholder="Vazio = Auto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Curso (PT/EN)</label>
+                                    <input type="text" name="course" value="{{ f.course }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="course_en" value="{{ f.course_en }}" placeholder="Vazio = Auto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Tipo de Formação (PT/EN)</label>
+                                    <select name="entity_type" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                        <option value="Instituição Universitária" {% if f.entity_type == 'Instituição Universitária' %}selected{% endif %}>Instituição Universitária</option>
+                                        <option value="Curso" {% if f.entity_type == 'Curso' %}selected{% endif %}>Curso</option>
+                                        <option value="Certificações" {% if f.entity_type == 'Certificações' %}selected{% endif %}>Certificações</option>
+                                        <option value="Cursos Técnicos" {% if f.entity_type == 'Cursos Técnicos' %}selected{% endif %}>Cursos Técnicos</option>
+                                    </select>
+                                    <select name="entity_type_en" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
+                                        <option value="University Institution" {% if f.entity_type_en == 'University Institution' %}selected{% endif %}>University Institution</option>
+                                        <option value="Course" {% if f.entity_type_en == 'Course' %}selected{% endif %}>Course</option>
+                                        <option value="Certifications" {% if f.entity_type_en == 'Certifications' %}selected{% endif %}>Certifications</option>
+                                        <option value="Technical Courses" {% if f.entity_type_en == 'Technical Courses' %}selected{% endif %}>Technical Courses</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Instituição (PT/EN)</label>
+                                    <input type="text" name="entity_name" value="{{ f.entity_name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="entity_name_en" value="{{ f.entity_name_en }}" placeholder="Vazio = Auto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Data (PT/EN)</label>
+                                    <input type="text" name="completion_date" value="{{ f.completion_date }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="completion_date_en" value="{{ f.completion_date_en }}" placeholder="Vazio = Auto" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
+                                </div>
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="text-xs text-gray-400">Editar Matérias e Ícones [icon: URL]</label>
+                                    <label class="text-xs text-gray-400">Editar Matérias e Ícones (PT) e (EN)</label>
                                     <button type="button" onclick="appendIconToDesc('desc-edit-form-{{ f.id }}')" class="text-xs bg-gray-800 text-cyan-400 px-2 py-0.5 rounded border border-gray-700 hover:bg-gray-700"><i class="fa-solid fa-image mr-1"></i>Adicionar Ícone</button>
                                 </div>
-                                <textarea id="desc-edit-form-{{ f.id }}" name="description" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">{{ f.description }}</textarea>
+                                <textarea id="desc-edit-form-{{ f.id }}" name="description" rows="3" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs mb-2" required>{{ f.description }}</textarea>
+                                <textarea name="description_en" rows="3" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto">{{ f.description_en }}</textarea>
                             </div>
                             <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
                         </form>
@@ -316,8 +423,10 @@
                 <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
                     <input type="hidden" name="action" value="add_skill">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="category" placeholder="Categoria (ex: Python)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="name" placeholder="Título Resumido" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="category" placeholder="Categoria PT (ex: Linguagens)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="category_en" placeholder="Categoria EN (Opcional - Auto Tradução)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="name" placeholder="Título Resumido PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="name_en" placeholder="Título Resumido EN (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" name="icon" placeholder="Link da Imagem/Símbolo (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
@@ -326,7 +435,8 @@
                             <input type="file" name="skill_image" accept="image/*" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
                         </div>
                     </div>
-                    <textarea name="detalhes" rows="3" placeholder="Descrição da Habilidade e conhecimentos..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <textarea name="detalhes" rows="2" placeholder="Descrição da Habilidade PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <textarea name="detalhes_en" rows="2" placeholder="Descrição da Habilidade EN (Opcional)..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
                     <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Habilidade</button>
                 </form>
             </div>
@@ -357,14 +467,23 @@
                             <input type="hidden" name="action" value="edit_skill">
                             <input type="hidden" name="skill_id" value="{{ s.id }}">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <input type="text" name="category" value="{{ s.category }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="name" value="{{ s.name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Categoria (PT/EN)</label>
+                                    <input type="text" name="category" value="{{ s.category }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="category_en" value="{{ s.category_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Título (PT/EN)</label>
+                                    <input type="text" name="name" value="{{ s.name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="name_en" value="{{ s.name_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto">
+                                </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <input type="text" name="icon" value="{{ s.icon }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Link da Imagem">
                                 <input type="file" name="skill_image" accept="image/*" class="bg-gray-800 border border-gray-700 rounded-lg p-1.5 text-white text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded file:text-xs">
                             </div>
-                            <textarea name="detalhes" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">{{ s.detalhes }}</textarea>
+                            <textarea name="detalhes" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" required>{{ s.detalhes }}</textarea>
+                            <textarea name="detalhes_en" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto">{{ s.detalhes_en }}</textarea>
                             <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
                         </form>
                     </div>
@@ -380,10 +499,13 @@
                 <form method="POST" action="/admin" class="space-y-4">
                     <input type="hidden" name="action" value="add_experience">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="title" placeholder="Cargo e Empresa" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="period" placeholder="Período" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="title" placeholder="Cargo e Empresa PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="title_en" placeholder="Cargo e Empresa EN (Deixe Vazio p/ Auto)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="period" placeholder="Período PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="period_en" placeholder="Período EN (Deixe Vazio p/ Auto)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                     </div>
-                    <textarea name="description" rows="3" placeholder="Descrição..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <textarea name="description" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <textarea name="description_en" rows="3" placeholder="Descrição EN (Deixe Vazio p/ Auto)..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
                     <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar</button>
                 </form>
             </div>
@@ -409,10 +531,19 @@
                             <input type="hidden" name="action" value="edit_experience">
                             <input type="hidden" name="exp_id" value="{{ e.id }}">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <input type="text" name="title" value="{{ e.title }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="period" value="{{ e.period }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Título (PT/EN)</label>
+                                    <input type="text" name="title" value="{{ e.title }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="title_en" value="{{ e.title_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Período (PT/EN)</label>
+                                    <input type="text" name="period" value="{{ e.period }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="period_en" value="{{ e.period_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto">
+                                </div>
                             </div>
-                            <textarea name="description" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">{{ e.description }}</textarea>
+                            <textarea name="description" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs mb-2" required>{{ e.description }}</textarea>
+                            <textarea name="description_en" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto">{{ e.description_en }}</textarea>
                             <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
                         </form>
                     </div>
@@ -428,12 +559,17 @@
                 <form method="POST" action="/admin" class="space-y-4">
                     <input type="hidden" name="action" value="add_project">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="title" placeholder="Título do Projeto" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="tech" placeholder="Tecnologias" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="title" placeholder="Título do Projeto PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="title_en" placeholder="Título do Projeto EN (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        
+                        <input type="text" name="tech" placeholder="Tecnologias PT (ex: Python, Flask)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" name="tech_en" placeholder="Tecnologias EN (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        
                         <input type="text" name="link_github" placeholder="Link GitHub (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         <input type="text" name="link_live" placeholder="Link Online (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                     </div>
-                    <textarea name="description" rows="3" placeholder="Descrição técnica..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <textarea name="description" rows="3" placeholder="Descrição técnica PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
+                    <textarea name="description_en" rows="3" placeholder="Descrição técnica EN (Deixe vazio p/ auto-traduzir)..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
                     <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Projeto</button>
                 </form>
             </div>
@@ -459,12 +595,21 @@
                             <input type="hidden" name="action" value="edit_project">
                             <input type="hidden" name="project_id" value="{{ p.id }}">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <input type="text" name="title" value="{{ p.title }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="tech" value="{{ p.tech }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="link_github" value="{{ p.link_github }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="link_live" value="{{ p.link_live }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Título (PT/EN)</label>
+                                    <input type="text" name="title" value="{{ p.title }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="title_en" value="{{ p.title_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 block mb-1">Tecnologias (PT/EN)</label>
+                                    <input type="text" name="tech" value="{{ p.tech }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
+                                    <input type="text" name="tech_en" value="{{ p.tech_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto">
+                                </div>
+                                <input type="text" name="link_github" value="{{ p.link_github }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Link GitHub">
+                                <input type="text" name="link_live" value="{{ p.link_live }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Link Online">
                             </div>
-                            <textarea name="description" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">{{ p.description }}</textarea>
+                            <textarea name="description" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs mb-2" required>{{ p.description }}</textarea>
+                            <textarea name="description_en" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto">{{ p.description_en }}</textarea>
                             <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
                         </form>
                     </div>

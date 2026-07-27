@@ -1,7 +1,7 @@
 import os
 import json
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from google import genai
 from git import Repo
 
@@ -9,7 +9,6 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-# ACESSO HABILITADO: Caso as variáveis de ambiente não existam, o login padrão será admin / admin123
 ADMIN_USER = os.environ.get('ADMIN_PORT', 'admin')
 ADMIN_PASS = os.environ.get('SENHA_PORT', 'admin123')
 
@@ -216,13 +215,13 @@ def index():
         translated_formations = []
         for f in data['formations']:
             tf = f.copy()
-            for field in ['level', 'course', 'entity_type', 'entity_name', 'description']:
+            for field in ['level', 'course', 'entity_type', 'entity_name', 'description', 'completion_date']:
                 if field in tf and tf[field]:
                     en_field = field + '_en'
                     if en_field in tf and tf[en_field]:
                         tf[field] = tf[en_field]
                     else:
-                        tr = translate_text(tf[field])
+                        tr = translate_text(tf[field]) if field != 'completion_date' else tf[field]
                         tf[en_field] = tr
                         f[en_field] = tr
                         tf[field] = tr
@@ -285,6 +284,17 @@ def login():
             
     return render_template('login.html')
 
+# NOVA ROTA: Tradução Automática na Tela do Admin
+@app.route('/api/translate', methods=['POST'])
+def api_translate():
+    if not session.get('logged_in'):
+        return jsonify({"translated": ""})
+    data = request.get_json()
+    text = data.get('text', '') if data else ''
+    if not text:
+        return jsonify({"translated": ""})
+    return jsonify({"translated": translate_text(text)})
+
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if not session.get('logged_in'):
@@ -302,16 +312,19 @@ def admin():
             
             if 'cidade' in request.form: 
                 val = request.form.get('cidade')
+                val_en = request.form.get('cidade_en')
                 data['profile']['cidade'] = val
-                data['profile']['cidade_en'] = translate_text(val)
+                data['profile']['cidade_en'] = val_en if val_en else translate_text(val)
             if 'estado' in request.form: 
                 val = request.form.get('estado')
+                val_en = request.form.get('estado_en')
                 data['profile']['estado'] = val
-                data['profile']['estado_en'] = translate_text(val)
+                data['profile']['estado_en'] = val_en if val_en else translate_text(val)
             if 'pais' in request.form: 
                 val = request.form.get('pais')
+                val_en = request.form.get('pais_en')
                 data['profile']['pais'] = val
-                data['profile']['pais_en'] = translate_text(val)
+                data['profile']['pais_en'] = val_en if val_en else translate_text(val)
                 
             if 'linkedin' in request.form: data['profile']['linkedin'] = request.form.get('linkedin')
             if 'github' in request.form: data['profile']['github'] = request.form.get('github')
@@ -342,10 +355,13 @@ def admin():
 
             if 'destaque_titulo_pt' in request.form:
                 data['profile']['destaque_data'] = request.form.get('destaque_data')
+                val_data_en = request.form.get('destaque_data_en')
+                data['profile']['destaque_data_en'] = val_data_en if val_data_en else request.form.get('destaque_data')
                 
                 val_inst = request.form.get('destaque_inst')
+                val_inst_en = request.form.get('destaque_inst_en')
                 data['profile']['destaque_inst'] = val_inst
-                data['profile']['destaque_inst_en'] = translate_text(val_inst)
+                data['profile']['destaque_inst_en'] = val_inst_en if val_inst_en else translate_text(val_inst)
                 
                 val_tit_pt = request.form.get('destaque_titulo_pt')
                 val_tit_en = request.form.get('destaque_titulo_en')
@@ -406,19 +422,32 @@ def admin():
 
         elif action == 'add_formation':
             desc = request.form.get('description', '')
+            desc_en = request.form.get('description_en', '')
+            level = request.form.get('level')
+            level_en = request.form.get('level_en')
+            course = request.form.get('course')
+            course_en = request.form.get('course_en')
+            ent_type = request.form.get('entity_type')
+            ent_type_en = request.form.get('entity_type_en')
+            ent_name = request.form.get('entity_name')
+            ent_name_en = request.form.get('entity_name_en')
+            comp_date = request.form.get('completion_date')
+            comp_date_en = request.form.get('completion_date_en')
+
             new_formation = {
                 "id": str(uuid.uuid4()),
-                "level": request.form.get('level'),
-                "level_en": translate_text(request.form.get('level')),
-                "course": request.form.get('course'),
-                "course_en": translate_text(request.form.get('course')),
-                "entity_type": request.form.get('entity_type'),
-                "entity_type_en": translate_text(request.form.get('entity_type')),
-                "entity_name": request.form.get('entity_name'),
-                "entity_name_en": translate_text(request.form.get('entity_name')),
-                "completion_date": request.form.get('completion_date'),
+                "level": level,
+                "level_en": level_en if level_en else translate_text(level),
+                "course": course,
+                "course_en": course_en if course_en else translate_text(course),
+                "entity_type": ent_type,
+                "entity_type_en": ent_type_en if ent_type_en else translate_text(ent_type),
+                "entity_name": ent_name,
+                "entity_name_en": ent_name_en if ent_name_en else translate_text(ent_name),
+                "completion_date": comp_date,
+                "completion_date_en": comp_date_en if comp_date_en else comp_date,
                 "description": desc,
-                "description_en": translate_text(desc)
+                "description_en": desc_en if desc_en else translate_text(desc)
             }
             data['formations'].append(new_formation)
             
@@ -427,17 +456,29 @@ def admin():
             for f in data['formations']:
                 if f.get('id') == form_id:
                     f['level'] = request.form.get('level')
-                    f['level_en'] = translate_text(request.form.get('level'))
+                    level_en = request.form.get('level_en')
+                    f['level_en'] = level_en if level_en else translate_text(f['level'])
+                    
                     f['course'] = request.form.get('course')
-                    f['course_en'] = translate_text(request.form.get('course'))
+                    course_en = request.form.get('course_en')
+                    f['course_en'] = course_en if course_en else translate_text(f['course'])
+                    
                     f['entity_type'] = request.form.get('entity_type')
-                    f['entity_type_en'] = translate_text(request.form.get('entity_type'))
+                    ent_type_en = request.form.get('entity_type_en')
+                    f['entity_type_en'] = ent_type_en if ent_type_en else translate_text(f['entity_type'])
+                    
                     f['entity_name'] = request.form.get('entity_name')
-                    f['entity_name_en'] = translate_text(request.form.get('entity_name'))
+                    ent_name_en = request.form.get('entity_name_en')
+                    f['entity_name_en'] = ent_name_en if ent_name_en else translate_text(f['entity_name'])
+                    
                     f['completion_date'] = request.form.get('completion_date')
+                    comp_date_en = request.form.get('completion_date_en')
+                    f['completion_date_en'] = comp_date_en if comp_date_en else f['completion_date']
+                    
                     desc = request.form.get('description', '')
+                    desc_en = request.form.get('description_en', '')
                     f['description'] = desc
-                    f['description_en'] = translate_text(desc)
+                    f['description_en'] = desc_en if desc_en else translate_text(desc)
 
         elif action == 'delete_formation':
             form_id = request.form.get('form_id')
@@ -491,16 +532,20 @@ def admin():
 
         elif action == 'add_project':
             desc = request.form.get('description', '')
+            desc_en = request.form.get('description_en', '')
             tech = request.form.get('tech', '')
+            tech_en = request.form.get('tech_en', '')
             title = request.form.get('title', '')
+            title_en = request.form.get('title_en', '')
+            
             new_project = {
                 "id": str(uuid.uuid4()),
                 "title": title,
-                "title_en": translate_text(title),
+                "title_en": title_en if title_en else translate_text(title),
                 "description": desc,
-                "description_en": translate_text(desc),
+                "description_en": desc_en if desc_en else translate_text(desc),
                 "tech": tech,
-                "tech_en": translate_text(tech),
+                "tech_en": tech_en if tech_en else translate_text(tech),
                 "link_live": request.form.get('link_live', ''),
                 "link_github": request.form.get('link_github', '')
             }
@@ -511,14 +556,18 @@ def admin():
             for p in data['projects']:
                 if p.get('id') == proj_id:
                     title = request.form.get('title', '')
+                    title_en = request.form.get('title_en', '')
                     desc = request.form.get('description', '')
+                    desc_en = request.form.get('description_en', '')
                     tech = request.form.get('tech', '')
+                    tech_en = request.form.get('tech_en', '')
+                    
                     p['title'] = title
-                    p['title_en'] = translate_text(title)
+                    p['title_en'] = title_en if title_en else translate_text(title)
                     p['description'] = desc
-                    p['description_en'] = translate_text(desc)
+                    p['description_en'] = desc_en if desc_en else translate_text(desc)
                     p['tech'] = tech
-                    p['tech_en'] = translate_text(tech)
+                    p['tech_en'] = tech_en if tech_en else translate_text(tech)
                     p['link_live'] = request.form.get('link_live', '')
                     p['link_github'] = request.form.get('link_github', '')
 
@@ -536,17 +585,21 @@ def admin():
                 icon_url = '/' + path
 
             cat = request.form.get('category', '')
+            cat_en = request.form.get('category_en', '')
             name = request.form.get('name', '')
+            name_en = request.form.get('name_en', '')
             det = request.form.get('detalhes', '')
+            det_en = request.form.get('detalhes_en', '')
+            
             new_skill = {
                 "id": str(uuid.uuid4()),
                 "category": cat,
-                "category_en": translate_text(cat),
+                "category_en": cat_en if cat_en else translate_text(cat),
                 "name": name,
-                "name_en": translate_text(name),
+                "name_en": name_en if name_en else translate_text(name),
                 "icon": icon_url,
                 "detalhes": det,
-                "detalhes_en": translate_text(det)
+                "detalhes_en": det_en if det_en else translate_text(det)
             }
             data['skills'].append(new_skill)
             
@@ -555,12 +608,19 @@ def admin():
             for s in data['skills']:
                 if s.get('id') == skill_id:
                     cat = request.form.get('category', '')
+                    cat_en = request.form.get('category_en', '')
                     name = request.form.get('name', '')
+                    name_en = request.form.get('name_en', '')
                     det = request.form.get('detalhes', '')
+                    det_en = request.form.get('detalhes_en', '')
+                    
                     s['category'] = cat
-                    s['category_en'] = translate_text(cat)
+                    s['category_en'] = cat_en if cat_en else translate_text(cat)
                     s['name'] = name
-                    s['name_en'] = translate_text(name)
+                    s['name_en'] = name_en if name_en else translate_text(name)
+                    s['detalhes'] = det
+                    s['detalhes_en'] = det_en if det_en else translate_text(det)
+                    
                     icon_url = request.form.get('icon', '')
                     skill_image = request.files.get('skill_image')
                     if skill_image and skill_image.filename:
@@ -570,8 +630,6 @@ def admin():
                         icon_url = '/' + path
                     if icon_url:
                         s['icon'] = icon_url
-                    s['detalhes'] = det
-                    s['detalhes_en'] = translate_text(det)
 
         elif action == 'delete_skill':
             skill_id = request.form.get('skill_id')
@@ -579,16 +637,20 @@ def admin():
 
         elif action == 'add_experience':
             title = request.form.get('title', '')
+            title_en = request.form.get('title_en', '')
             desc = request.form.get('description', '')
+            desc_en = request.form.get('description_en', '')
             period = request.form.get('period', '')
+            period_en = request.form.get('period_en', '')
+            
             new_experience = {
                 "id": str(uuid.uuid4()),
                 "title": title,
-                "title_en": translate_text(title),
+                "title_en": title_en if title_en else translate_text(title),
                 "description": desc,
-                "description_en": translate_text(desc),
+                "description_en": desc_en if desc_en else translate_text(desc),
                 "period": period,
-                "period_en": translate_text(period)
+                "period_en": period_en if period_en else translate_text(period)
             }
             data['experiences'].append(new_experience)
             
@@ -597,14 +659,18 @@ def admin():
             for e in data['experiences']:
                 if e.get('id') == exp_id:
                     title = request.form.get('title', '')
+                    title_en = request.form.get('title_en', '')
                     desc = request.form.get('description', '')
+                    desc_en = request.form.get('description_en', '')
                     period = request.form.get('period', '')
+                    period_en = request.form.get('period_en', '')
+                    
                     e['title'] = title
-                    e['title_en'] = translate_text(title)
+                    e['title_en'] = title_en if title_en else translate_text(title)
                     e['description'] = desc
-                    e['description_en'] = translate_text(desc)
+                    e['description_en'] = desc_en if desc_en else translate_text(desc)
                     e['period'] = period
-                    e['period_en'] = translate_text(period)
+                    e['period_en'] = period_en if period_en else translate_text(period)
 
         elif action == 'delete_experience':
             exp_id = request.form.get('exp_id')
