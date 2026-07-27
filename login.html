@@ -42,9 +42,14 @@
             const errorDiv = document.getElementById('error-container');
 
             const USUARIO_CORRETO = "Matheus";
-            const SENHA_CORRETA = "@Kayle2023";
+            
+            
+            const SENHA_HASH_CORRETA = "QEtheWxlMjAyMw==";
+            
+            // Codifica o que o usuário digitou para comparar com a hash protegida
+            const passEncoded = btoa(pass);
 
-            if (user === USUARIO_CORRETO && pass === SENHA_CORRETA) {
+            if (user === USUARIO_CORRETO && passEncoded === SENHA_HASH_CORRETA) {
                 localStorage.setItem('admin_logged', 'true');
                 window.location.href = 'admin.html';
             } else {
