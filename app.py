@@ -284,7 +284,6 @@ def login():
             
     return render_template('login.html')
 
-# NOVA ROTA: Tradução Automática na Tela do Admin
 @app.route('/api/translate', methods=['POST'])
 def api_translate():
     if not session.get('logged_in'):
@@ -354,9 +353,10 @@ def admin():
                 data['profile']['disponibilidade_en'] = val_en if val_en else translate_text(val_pt)
 
             if 'destaque_titulo_pt' in request.form:
-                data['profile']['destaque_data'] = request.form.get('destaque_data')
+                val_data = request.form.get('destaque_data')
                 val_data_en = request.form.get('destaque_data_en')
-                data['profile']['destaque_data_en'] = val_data_en if val_data_en else request.form.get('destaque_data')
+                data['profile']['destaque_data'] = val_data
+                data['profile']['destaque_data_en'] = val_data_en if val_data_en else val_data
                 
                 val_inst = request.form.get('destaque_inst')
                 val_inst_en = request.form.get('destaque_inst_en')
@@ -455,25 +455,30 @@ def admin():
             form_id = request.form.get('form_id')
             for f in data['formations']:
                 if f.get('id') == form_id:
-                    f['level'] = request.form.get('level')
+                    level = request.form.get('level')
                     level_en = request.form.get('level_en')
-                    f['level_en'] = level_en if level_en else translate_text(f['level'])
+                    f['level'] = level
+                    f['level_en'] = level_en if level_en else translate_text(level)
                     
-                    f['course'] = request.form.get('course')
+                    course = request.form.get('course')
                     course_en = request.form.get('course_en')
-                    f['course_en'] = course_en if course_en else translate_text(f['course'])
+                    f['course'] = course
+                    f['course_en'] = course_en if course_en else translate_text(course)
                     
-                    f['entity_type'] = request.form.get('entity_type')
+                    ent_type = request.form.get('entity_type')
                     ent_type_en = request.form.get('entity_type_en')
-                    f['entity_type_en'] = ent_type_en if ent_type_en else translate_text(f['entity_type'])
+                    f['entity_type'] = ent_type
+                    f['entity_type_en'] = ent_type_en if ent_type_en else translate_text(ent_type)
                     
-                    f['entity_name'] = request.form.get('entity_name')
+                    ent_name = request.form.get('entity_name')
                     ent_name_en = request.form.get('entity_name_en')
-                    f['entity_name_en'] = ent_name_en if ent_name_en else translate_text(f['entity_name'])
+                    f['entity_name'] = ent_name
+                    f['entity_name_en'] = ent_name_en if ent_name_en else translate_text(ent_name)
                     
-                    f['completion_date'] = request.form.get('completion_date')
+                    comp_date = request.form.get('completion_date')
                     comp_date_en = request.form.get('completion_date_en')
-                    f['completion_date_en'] = comp_date_en if comp_date_en else f['completion_date']
+                    f['completion_date'] = comp_date
+                    f['completion_date_en'] = comp_date_en if comp_date_en else comp_date
                     
                     desc = request.form.get('description', '')
                     desc_en = request.form.get('description_en', '')
