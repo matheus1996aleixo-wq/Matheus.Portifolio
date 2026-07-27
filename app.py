@@ -9,8 +9,9 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_local_123')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-ADMIN_USER = os.environ.get('ADMIN_PORT')
-ADMIN_PASS = os.environ.get('SENHA_PORT')
+# ACESSO HABILITADO: Caso as variáveis de ambiente não existam, o login padrão será admin / admin123
+ADMIN_USER = os.environ.get('ADMIN_PORT', 'admin')
+ADMIN_PASS = os.environ.get('SENHA_PORT', 'admin123')
 
 DATA_FILE = 'data.json'
 REPO_URL = 'https://github.com/matheus1996aleixo-wq/Matheus.Portifolio.git'

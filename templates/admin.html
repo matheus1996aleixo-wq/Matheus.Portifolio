@@ -235,7 +235,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" name="level" placeholder="Nível (ex: Bacharelado)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         <input type="text" name="course" placeholder="Curso (ex: Tecnologia da Informação)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="entity_type" placeholder="Tipo Instituição (ex: Universidade)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        
+                        <!-- CAMPO ALTERADO: Agora é um Select com as 4 opções! -->
+                        <select name="entity_type" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                            <option value="" disabled selected>Selecione o Tipo de Formação</option>
+                            <option value="Instituição Universitária">Instituição Universitária</option>
+                            <option value="Curso">Curso</option>
+                            <option value="Certificações">Certificações</option>
+                            <option value="Cursos Técnicos">Cursos Técnicos</option>
+                        </select>
+                        
                         <input type="text" name="entity_name" placeholder="Nome da Instituição (ex: UNIVESP)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                         <input type="text" name="completion_date" placeholder="Data de Conclusão (ex: 20/08/2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
                     </div>
@@ -273,7 +282,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <input type="text" name="level" value="{{ f.level }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
                                 <input type="text" name="course" value="{{ f.course }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
-                                <input type="text" name="entity_type" value="{{ f.entity_type }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                                
+                                <!-- CAMPO ALTERADO: Para modo Edição também vira um Select -->
+                                <select name="entity_type" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                                    <option value="Instituição Universitária" {% if f.entity_type == 'Instituição Universitária' %}selected{% endif %}>Instituição Universitária</option>
+                                    <option value="Curso" {% if f.entity_type == 'Curso' %}selected{% endif %}>Curso</option>
+                                    <option value="Certificações" {% if f.entity_type == 'Certificações' %}selected{% endif %}>Certificações</option>
+                                    <option value="Cursos Técnicos" {% if f.entity_type == 'Cursos Técnicos' %}selected{% endif %}>Cursos Técnicos</option>
+                                </select>
+                                
                                 <input type="text" name="entity_name" value="{{ f.entity_name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
                                 <input type="text" name="completion_date" value="{{ f.completion_date }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs">
                             </div>
