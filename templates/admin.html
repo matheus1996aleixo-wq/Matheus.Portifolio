@@ -14,6 +14,246 @@
         .tab-content.active { display: block; }
     </style>
     <script>
+        if(localStorage.getItem('admin_logged') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        let siteData = {};
+
+        async function loadAdminData() {
+            try {
+                const response = await fetch('data.json');
+                siteData = await response.json();
+                populateAll();
+            } catch (e) {
+                alert("Erro ao carregar o data.json. Certifique-se de que o arquivo está na mesma pasta.");
+            }
+        }
+
+        function populateAll() {
+            if (!siteData.profile) return;
+            const p = siteData.profile;
+
+            // Perfil
+            document.getElementById('nome').value = p.nome || '';
+            document.getElementById('nascimento').value = p.nascimento || '';
+            document.getElementById('foto_url').value = p.foto || '';
+            document.getElementById('cidade').value = p.cidade || '';
+            document.getElementById('cidade_en').value = p.cidade_en || '';
+            document.getElementById('estado').value = p.estado || '';
+            document.getElementById('estado_en').value = p.estado_en || '';
+            document.getElementById('pais').value = p.pais || '';
+            document.getElementById('pais_en').value = p.pais_en || '';
+            document.getElementById('linkedin').value = p.linkedin || '';
+            document.getElementById('github').value = p.github || '';
+            document.getElementById('titulo_pt').value = p.titulo_pt || '';
+            document.getElementById('titulo_en').value = p.titulo_en || '';
+            document.getElementById('sobre_pt').value = p.sobre_pt || '';
+            document.getElementById('sobre_en').value = p.sobre_en || '';
+            document.getElementById('disponibilidade_pt').value = p.disponibilidade_pt || '';
+            document.getElementById('disponibilidade_en').value = p.disponibilidade_en || '';
+            document.getElementById('idiomas_pt').value = p.idiomas_pt || '';
+            document.getElementById('idiomas_en').value = p.idiomas_en || '';
+            document.getElementById('destaque_data').value = p.destaque_data || '';
+            document.getElementById('destaque_data_en').value = p.destaque_data_en || '';
+            document.getElementById('destaque_inst').value = p.destaque_inst || '';
+            document.getElementById('destaque_inst_en').value = p.destaque_inst_en || '';
+            document.getElementById('destaque_titulo_pt').value = p.destaque_titulo_pt || '';
+            document.getElementById('destaque_titulo_en').value = p.destaque_titulo_en || '';
+            document.getElementById('destaque_comp_pt').value = p.destaque_comp_pt || '';
+            document.getElementById('destaque_comp_en').value = p.destaque_comp_en || '';
+
+            renderFormations();
+            renderSkills();
+            renderExperiences();
+            renderProjects();
+        }
+
+        function downloadJson() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(siteData, null, 4));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            alert("data.json atualizado gerado com sucesso! Substitua-o na raiz do seu projeto.");
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+            siteData.profile.nome = document.getElementById('nome').value;
+            siteData.profile.nascimento = document.getElementById('nascimento').value;
+            siteData.profile.foto = document.getElementById('foto_url').value;
+            siteData.profile.cidade = document.getElementById('cidade').value;
+            siteData.profile.cidade_en = document.getElementById('cidade_en').value;
+            siteData.profile.estado = document.getElementById('estado').value;
+            siteData.profile.estado_en = document.getElementById('estado_en').value;
+            siteData.profile.pais = document.getElementById('pais').value;
+            siteData.profile.pais_en = document.getElementById('pais_en').value;
+            siteData.profile.linkedin = document.getElementById('linkedin').value;
+            siteData.profile.github = document.getElementById('github').value;
+            siteData.profile.titulo_pt = document.getElementById('titulo_pt').value;
+            siteData.profile.titulo_en = document.getElementById('titulo_en').value;
+            siteData.profile.sobre_pt = document.getElementById('sobre_pt').value;
+            siteData.profile.sobre_en = document.getElementById('sobre_en').value;
+            siteData.profile.disponibilidade_pt = document.getElementById('disponibilidade_pt').value;
+            siteData.profile.disponibilidade_en = document.getElementById('disponibilidade_en').value;
+            siteData.profile.idiomas_pt = document.getElementById('idiomas_pt').value;
+            siteData.profile.idiomas_en = document.getElementById('idiomas_en').value;
+            siteData.profile.destaque_data = document.getElementById('destaque_data').value;
+            siteData.profile.destaque_data_en = document.getElementById('destaque_data_en').value;
+            siteData.profile.destaque_inst = document.getElementById('destaque_inst').value;
+            siteData.profile.destaque_inst_en = document.getElementById('destaque_inst_en').value;
+            siteData.profile.destaque_titulo_pt = document.getElementById('destaque_titulo_pt').value;
+            siteData.profile.destaque_titulo_en = document.getElementById('destaque_titulo_en').value;
+            siteData.profile.destaque_comp_pt = document.getElementById('destaque_comp_pt').value;
+            siteData.profile.destaque_comp_en = document.getElementById('destaque_comp_en').value;
+            downloadJson();
+        }
+
+        // Renderizadores de Listas (Formações, Habilidades, Experiências, Projetos)
+        function renderFormations() {
+            const container = document.getElementById('formations-list');
+            container.innerHTML = '';
+            (siteData.formations || []).forEach((f, idx) => {
+                container.innerHTML += `
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h4 class="text-white font-bold">${f.course}</h4>
+                            <p class="text-xs text-gray-400">${f.entity_name} - ${f.completion_date}</p>
+                        </div>
+                        <button onclick="deleteItem('formations', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+        }
+
+        function addFormation(e) {
+            e.preventDefault();
+            if(!siteData.formations) siteData.formations = [];
+            siteData.formations.push({
+                id: Date.now().toString(),
+                level: document.getElementById('f_level').value,
+                level_en: document.getElementById('f_level_en').value,
+                course: document.getElementById('f_course').value,
+                course_en: document.getElementById('f_course_en').value,
+                entity_type: document.getElementById('f_type').value,
+                entity_type_en: document.getElementById('f_type_en').value,
+                entity_name: document.getElementById('f_name').value,
+                entity_name_en: document.getElementById('f_name_en').value,
+                completion_date: document.getElementById('f_date').value,
+                completion_date_en: document.getElementById('f_date_en').value,
+                description: document.getElementById('f_desc').value,
+                description_en: document.getElementById('f_desc_en').value
+            });
+            downloadJson();
+            populateAll();
+        }
+
+        function renderSkills() {
+            const container = document.getElementById('skills-list');
+            container.innerHTML = '';
+            (siteData.skills || []).forEach((s, idx) => {
+                container.innerHTML += `
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h4 class="text-white font-bold">${s.category}</h4>
+                            <p class="text-xs text-gray-400">${s.name}</p>
+                        </div>
+                        <button onclick="deleteItem('skills', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+        }
+
+        function addSkill(e) {
+            e.preventDefault();
+            if(!siteData.skills) siteData.skills = [];
+            siteData.skills.push({
+                id: Date.now().toString(),
+                category: document.getElementById('s_cat').value,
+                category_en: document.getElementById('s_cat_en').value,
+                name: document.getElementById('s_name').value,
+                name_en: document.getElementById('s_name_en').value,
+                icon: document.getElementById('s_icon').value,
+                detalhes: document.getElementById('s_det').value,
+                detalhes_en: document.getElementById('s_det_en').value
+            });
+            downloadJson();
+            populateAll();
+        }
+
+        function renderExperiences() {
+            const container = document.getElementById('experiences-list');
+            container.innerHTML = '';
+            (siteData.experiences || []).forEach((ex, idx) => {
+                container.innerHTML += `
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h4 class="text-white font-bold">${ex.title}</h4>
+                            <p class="text-xs text-gray-400">${ex.period}</p>
+                        </div>
+                        <button onclick="deleteItem('experiences', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+        }
+
+        function addExperience(e) {
+            e.preventDefault();
+            if(!siteData.experiences) siteData.experiences = [];
+            siteData.experiences.push({
+                id: Date.now().toString(),
+                title: document.getElementById('ex_title').value,
+                title_en: document.getElementById('ex_title_en').value,
+                period: document.getElementById('ex_period').value,
+                period_en: document.getElementById('ex_period_en').value,
+                description: document.getElementById('ex_desc').value,
+                description_en: document.getElementById('ex_desc_en').value
+            });
+            downloadJson();
+            populateAll();
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-list');
+            container.innerHTML = '';
+            (siteData.projects || []).forEach((pr, idx) => {
+                container.innerHTML += `
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h4 class="text-white font-bold">${pr.title}</h4>
+                            <p class="text-xs text-cyan-400">${pr.tech}</p>
+                        </div>
+                        <button onclick="deleteItem('projects', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+        }
+
+        function addProject(e) {
+            e.preventDefault();
+            if(!siteData.projects) siteData.projects = [];
+            siteData.projects.push({
+                id: Date.now().toString(),
+                title: document.getElementById('pr_title').value,
+                title_en: document.getElementById('pr_title_en').value,
+                tech: document.getElementById('pr_tech').value,
+                tech_en: document.getElementById('pr_tech_en').value,
+                link_github: document.getElementById('pr_github').value,
+                link_live: document.getElementById('pr_live').value,
+                description: document.getElementById('pr_desc').value,
+                description_en: document.getElementById('pr_desc_en').value
+            });
+            downloadJson();
+            populateAll();
+        }
+
+        function deleteItem(arrayName, index) {
+            if(confirm("Deseja realmente remover este item?")) {
+                siteData[arrayName].splice(index, 1);
+                downloadJson();
+                populateAll();
+            }
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(link => {
@@ -25,67 +265,12 @@
             document.getElementById('btn-' + tabId).classList.add('bg-cyan-500', 'text-gray-950');
         }
 
-        function toggleEditForm(id) {
-            const form = document.getElementById(id);
-            if (form.classList.contains('hidden')) {
-                form.classList.remove('hidden');
-            } else {
-                form.classList.add('hidden');
-            }
+        function logout() {
+            localStorage.removeItem('admin_logged');
+            window.location.href = 'index.html';
         }
 
-        function appendIconToDesc(textareaId) {
-            const url = prompt("Cole o link da imagem/ícone para esta matéria:");
-            if (url) {
-                const ta = document.getElementById(textareaId);
-                ta.value += ` [icon: ${url}]`;
-            }
-        }
-
-        // SISTEMA DE TRADUÇÃO AUTOMÁTICA EM TEMPO REAL OU MANUAL
-        function handleAutoTranslate(e) {
-            let ptName = e.target.name;
-            if(!ptName || ptName.endsWith('_en') || ptName === 'nome' || ptName === 'nascimento' || ptName.includes('foto') || ptName === 'linkedin' || ptName === 'github' || ptName.includes('file')) return;
-            
-            let enName = ptName.endsWith('_pt') ? ptName.replace('_pt', '_en') : ptName + '_en';
-            let form = e.target.closest('form');
-            if(form) {
-                let enField = form.querySelector(`[name="${enName}"]`);
-                if(enField && (!enField.value || enField.value.trim() === '') && e.target.value.trim() !== '') {
-                    let oldPlaceholder = enField.placeholder;
-                    enField.placeholder = "Traduzindo automaticamente pelo Gemini...";
-                    
-                    fetch('/api/translate', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({text: e.target.value})
-                    }).then(r => r.json()).then(data => {
-                        if(data.translated && (!enField.value || enField.value.trim() === '')) {
-                            if(enField.tagName === 'SELECT') {
-                                let exists = Array.from(enField.options).some(opt => opt.value === data.translated);
-                                if(!exists) enField.add(new Option(data.translated, data.translated));
-                            }
-                            enField.value = data.translated;
-                        }
-                        enField.placeholder = oldPlaceholder;
-                    }).catch(err => {
-                        console.error("Erro na tradução", err);
-                        enField.placeholder = oldPlaceholder;
-                    });
-                }
-            }
-        }
-
-        document.addEventListener('focusout', function(e) {
-            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                handleAutoTranslate(e);
-            }
-        });
-        document.addEventListener('change', function(e) {
-            if(e.target.tagName === 'SELECT') {
-                handleAutoTranslate(e);
-            }
-        });
+        document.addEventListener('DOMContentLoaded', loadAdminData);
     </script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white pb-20">
@@ -97,8 +282,8 @@
                 <span class="text-xl font-bold text-white tracking-wider">PAINEL ADMIN</span>
             </div>
             <div class="space-x-4 flex items-center">
-                <a href="/" class="text-cyan-400 text-sm font-bold hover:underline"><i class="fa-solid fa-eye mr-2"></i>Ver Site</a>
-                <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition"><i class="fa-solid fa-power-off mr-2"></i>Sair</a>
+                <a href="index.html" class="text-cyan-400 text-sm font-bold hover:underline"><i class="fa-solid fa-eye mr-2"></i>Ver Site</a>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition"><i class="fa-solid fa-power-off mr-2"></i>Sair</button>
             </div>
         </div>
     </header>
@@ -112,181 +297,61 @@
             <button id="btn-projetos" onclick="switchTab('projetos')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Projetos</button>
         </div>
 
-        <!-- INFORMAÇÕES PESSOAIS -->
+        <!-- PERFIL -->
         <div id="perfil" class="tab-content active">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Editar Toda Página Inicial</h2>
-                <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
-                    <input type="hidden" name="action" value="update_profile">
-                    
+                <form onsubmit="saveProfile(event)" class="space-y-4">
                     <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-6">Dados Pessoais</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Nome Completo</label>
-                            <input type="text" name="nome" value="{{ data.profile.nome }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Data Nascimento</label>
-                            <input type="text" name="nascimento" value="{{ data.profile.nascimento }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Nome Completo</label><input type="text" id="nome" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Data Nascimento</label><input type="text" id="nascimento" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">URL Foto Perfil</label>
-                            <input type="text" name="foto_url" value="{{ data.profile.foto }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-cyan-400 mb-1">Ou Anexar Nova Foto</label>
-                            <input type="file" name="foto_file" accept="image/*" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">URL Foto Perfil</label><input type="text" id="foto_url" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Cidade (PT)</label>
-                            <input type="text" name="cidade" value="{{ data.profile.cidade }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Cidade (EN - Auto Gemini ou Mão)</label>
-                            <input type="text" name="cidade_en" value="{{ data.profile.cidade_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Estado (PT)</label>
-                            <input type="text" name="estado" value="{{ data.profile.estado }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Estado (EN - Auto Gemini ou Mão)</label>
-                            <input type="text" name="estado_en" value="{{ data.profile.estado_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">País (PT)</label>
-                            <input type="text" name="pais" value="{{ data.profile.pais }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">País (EN - Auto Gemini ou Mão)</label>
-                            <input type="text" name="pais_en" value="{{ data.profile.pais_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Cidade (PT)</label><input type="text" id="cidade" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Cidade (EN)</label><input type="text" id="cidade_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Estado (PT)</label><input type="text" id="estado" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Estado (EN)</label><input type="text" id="estado_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">País (PT)</label><input type="text" id="pais" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">País (EN)</label><input type="text" id="pais_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">URL LinkedIn</label>
-                            <input type="text" name="linkedin" value="{{ data.profile.linkedin }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">URL GitHub</label>
-                            <input type="text" name="github" value="{{ data.profile.github }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">URL LinkedIn</label><input type="text" id="linkedin" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">URL GitHub</label><input type="text" id="github" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
                     </div>
 
                     <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Resumo Profissional</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Profissional (PT)</label>
-                            <input type="text" name="titulo_pt" value="{{ data.profile.titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Profissional (EN - Auto ou Mão)</label>
-                            <input type="text" name="titulo_en" value="{{ data.profile.titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Sobre (PT)</label>
-                            <textarea name="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.sobre_pt }}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Sobre (EN - Auto ou Mão)</label>
-                            <textarea name="sobre_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">{{ data.profile.sobre_en }}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Disponibilidade de Trabalho (PT)</label>
-                            <textarea name="disponibilidade_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.disponibilidade_pt }}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Disponibilidade de Trabalho (EN - Auto ou Mão)</label>
-                            <textarea name="disponibilidade_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">{{ data.profile.disponibilidade_en }}</textarea>
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Título (PT)</label><input type="text" id="titulo_pt" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Título (EN)</label><input type="text" id="titulo_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Sobre (PT)</label><textarea id="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Sobre (EN)</label><textarea id="sobre_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Disponibilidade (PT)</label><textarea id="disponibilidade_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Disponibilidade (EN)</label><textarea id="disponibilidade_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Idiomas (Um por linha Ex: Inglês: Avançado)</h3>
+                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Idiomas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Idiomas (PT)</label>
-                            <textarea name="idiomas_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.idiomas_pt }}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Idiomas (EN - Auto ou Mão)</label>
-                            <textarea name="idiomas_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">{{ data.profile.idiomas_en }}</textarea>
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Idiomas (PT)</label><textarea id="idiomas_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Idiomas (EN)</label><textarea id="idiomas_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Formação em Destaque (Aparece na primeira página)</h3>
+                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Formação em Destaque</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Data Conclusão (PT)</label>
-                            <input type="text" name="destaque_data" value="{{ data.profile.destaque_data }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Data Conclusão (EN - Auto ou Mão)</label>
-                            <input type="text" name="destaque_data_en" value="{{ data.profile.destaque_data_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Instituição (PT)</label>
-                            <input type="text" name="destaque_inst" value="{{ data.profile.destaque_inst }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Instituição (EN - Auto ou Mão)</label>
-                            <input type="text" name="destaque_inst_en" value="{{ data.profile.destaque_inst_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Formação (PT)</label>
-                            <input type="text" name="destaque_titulo_pt" value="{{ data.profile.destaque_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Formação (EN - Auto ou Mão)</label>
-                            <input type="text" name="destaque_titulo_en" value="{{ data.profile.destaque_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Competências Adquiridas (PT)</label>
-                            <textarea name="destaque_comp_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">{{ data.profile.destaque_comp_pt }}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Competências Adquiridas (EN - Auto ou Mão)</label>
-                            <textarea name="destaque_comp_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">{{ data.profile.destaque_comp_en }}</textarea>
-                        </div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Data Conclusão (PT)</label><input type="text" id="destaque_data" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Data Conclusão (EN)</label><input type="text" id="destaque_data_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Instituição (PT)</label><input type="text" id="destaque_inst" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Instituição (EN)</label><input type="text" id="destaque_inst_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Título Formação (PT)</label><input type="text" id="destaque_titulo_pt" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Título Formação (EN)</label><input type="text" id="destaque_titulo_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Competências (PT)</label><textarea id="destaque_comp_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">Competências (EN)</label><textarea id="destaque_comp_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Arquivos de Apresentação e Currículos</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Botão Currículo (PT)</label>
-                            <input type="text" name="curriculo_titulo_pt" value="{{ data.profile.curriculo_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
-                            <label class="block text-xs text-cyan-400 mb-1">Anexar Currículo (PDF - PT)</label>
-                            <input type="file" name="curriculo_file_pt" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Botão Currículo (EN - Auto ou Mão)</label>
-                            <input type="text" name="curriculo_titulo_en" value="{{ data.profile.curriculo_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                            <label class="block text-xs text-cyan-400 mb-1">Anexar Currículo (PDF - EN)</label>
-                            <input type="file" name="curriculo_file_en" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Botão Carta (PT)</label>
-                            <input type="text" name="carta_titulo_pt" value="{{ data.profile.carta_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2">
-                            <label class="block text-xs text-cyan-400 mb-1">Anexar Carta de Apresentação (PDF - PT)</label>
-                            <input type="file" name="carta_file_pt" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Título Botão Carta (EN - Auto ou Mão)</label>
-                            <input type="text" name="carta_titulo_en" value="{{ data.profile.carta_titulo_en }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-2" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">
-                            <label class="block text-xs text-cyan-400 mb-1">Anexar Carta de Apresentação (PDF - EN)</label>
-                            <input type="file" name="carta_file_en" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
-                        </div>
-                    </div>
-
-                    <div class="pt-6">
-                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-4 px-6 rounded-xl transition text-sm text-center">Salvar Todas as Informações</button>
-                    </div>
+                    <div class="pt-6"><button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-4 px-6 rounded-xl transition text-sm text-center">Salvar Informações</button></div>
                 </form>
             </div>
         </div>
@@ -295,321 +360,85 @@
         <div id="formacao" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Formação</h2>
-                <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="add_formation">
+                <form onsubmit="addFormation(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="level" placeholder="Nível PT (ex: Bacharelado)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="level_en" placeholder="Nível EN (Vazio = Auto Gemini / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        
-                        <input type="text" name="course" placeholder="Curso PT (ex: Tecnologia da Informação)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="course_en" placeholder="Curso EN (Vazio = Auto Gemini / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        
-                        <select name="entity_type" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                            <option value="" disabled selected>Tipo de Formação (PT)</option>
-                            <option value="Instituição Universitária">Instituição Universitária</option>
-                            <option value="Curso">Curso</option>
-                            <option value="Certificações">Certificações</option>
-                            <option value="Cursos Técnicos">Cursos Técnicos</option>
-                        </select>
-                        <select name="entity_type_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                            <option value="" selected>Tipo Formação EN (Auto ou Escolha Mão)</option>
-                            <option value="University Institution">University Institution</option>
-                            <option value="Course">Course</option>
-                            <option value="Certifications">Certifications</option>
-                            <option value="Technical Courses">Technical Courses</option>
-                        </select>
-                        
-                        <input type="text" name="entity_name" placeholder="Instituição PT (ex: UNIVESP)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="entity_name_en" placeholder="Instituição EN (Vazio = Auto Gemini / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        
-                        <input type="text" name="completion_date" placeholder="Data Conclusão PT (ex: 20/08/2025)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="completion_date_en" placeholder="Data Conclusão EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" id="f_level" placeholder="Nível PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_level_en" placeholder="Nível EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_course" placeholder="Curso PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_course_en" placeholder="Curso EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_type" placeholder="Tipo PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_type_en" placeholder="Tipo EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_name" placeholder="Instituição PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_name_en" placeholder="Instituição EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_date" placeholder="Data PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_date_en" placeholder="Data EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
                     </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs text-gray-400">Matérias e Capacitações (Use [icon: URL_DA_IMAGEM] ao final da linha se desejar)</label>
-                            <button type="button" onclick="appendIconToDesc('desc-add-form')" class="text-xs bg-gray-800 text-cyan-400 px-2 py-1 rounded border border-gray-700 hover:bg-gray-700"><i class="fa-solid fa-image mr-1"></i>Adicionar Ícone por Link</button>
-                        </div>
-                        <textarea id="desc-add-form" name="description" rows="3" placeholder="Matérias / Descrição (PT)..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none mb-3"></textarea>
-                        <textarea id="desc-add-form-en" name="description_en" rows="3" placeholder="Matérias / Descrição (EN)... Vazio = Auto Gemini / Preencha p/ Mão" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    </div>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Formação</button>
+                    <textarea id="f_desc" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <textarea id="f_desc_en" rows="3" placeholder="Descrição EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Formação</button>
                 </form>
             </div>
-            <div class="space-y-4">
-                {% for f in data.formations %}
-                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">{{ f.course }}</h4>
-                            <p class="text-xs text-gray-400">{{ f.entity_name }} - {{ f.completion_date }}</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="toggleEditForm('edit-form-f-{{ f.id }}')" class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-500 hover:text-gray-950 transition"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
-                            <form method="POST" action="/admin">
-                                <input type="hidden" name="action" value="delete_formation">
-                                <input type="hidden" name="form_id" value="{{ f.id }}">
-                                <button type="submit" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                    <div id="edit-form-f-{{ f.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
-                        <form method="POST" action="/admin" class="space-y-3">
-                            <input type="hidden" name="action" value="edit_formation">
-                            <input type="hidden" name="form_id" value="{{ f.id }}">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Nível (PT/EN)</label>
-                                    <input type="text" name="level" value="{{ f.level }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="level_en" value="{{ f.level_en }}" placeholder="Vazio = Auto / Mão" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Curso (PT/EN)</label>
-                                    <input type="text" name="course" value="{{ f.course }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="course_en" value="{{ f.course_en }}" placeholder="Vazio = Auto / Mão" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Tipo de Formação (PT/EN)</label>
-                                    <select name="entity_type" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                        <option value="Instituição Universitária" {% if f.entity_type == 'Instituição Universitária' %}selected{% endif %}>Instituição Universitária</option>
-                                        <option value="Curso" {% if f.entity_type == 'Curso' %}selected{% endif %}>Curso</option>
-                                        <option value="Certificações" {% if f.entity_type == 'Certificações' %}selected{% endif %}>Certificações</option>
-                                        <option value="Cursos Técnicos" {% if f.entity_type == 'Cursos Técnicos' %}selected{% endif %}>Cursos Técnicos</option>
-                                    </select>
-                                    <select name="entity_type_en" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
-                                        <option value="University Institution" {% if f.entity_type_en == 'University Institution' %}selected{% endif %}>University Institution</option>
-                                        <option value="Course" {% if f.entity_type_en == 'Course' %}selected{% endif %}>Course</option>
-                                        <option value="Certifications" {% if f.entity_type_en == 'Certifications' %}selected{% endif %}>Certifications</option>
-                                        <option value="Technical Courses" {% if f.entity_type_en == 'Technical Courses' %}selected{% endif %}>Technical Courses</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Instituição (PT/EN)</label>
-                                    <input type="text" name="entity_name" value="{{ f.entity_name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="entity_name_en" value="{{ f.entity_name_en }}" placeholder="Vazio = Auto / Mão" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Data (PT/EN)</label>
-                                    <input type="text" name="completion_date" value="{{ f.completion_date }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="completion_date_en" value="{{ f.completion_date_en }}" placeholder="Vazio = Auto / Mão" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full">
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-xs text-gray-400">Editar Matérias e Ícones (PT) e (EN)</label>
-                                    <button type="button" onclick="appendIconToDesc('desc-edit-form-{{ f.id }}')" class="text-xs bg-gray-800 text-cyan-400 px-2 py-0.5 rounded border border-gray-700 hover:bg-gray-700"><i class="fa-solid fa-image mr-1"></i>Adicionar Ícone</button>
-                                </div>
-                                <textarea id="desc-edit-form-{{ f.id }}" name="description" rows="3" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs mb-2" required>{{ f.description }}</textarea>
-                                <textarea name="description_en" rows="3" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto Gemini / Preencha p/ Mão">{{ f.description_en }}</textarea>
-                            </div>
-                            <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="formations-list" class="space-y-4"></div>
         </div>
 
         <!-- HABILIDADES -->
         <div id="habilidades" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Habilidade</h2>
-                <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
-                    <input type="hidden" name="action" value="add_skill">
+                <form onsubmit="addSkill(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="category" placeholder="Categoria PT (ex: Linguagens)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="category_en" placeholder="Categoria EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="name" placeholder="Título Resumido PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="name_en" placeholder="Título Resumido EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" id="s_cat" placeholder="Categoria PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="s_cat_en" placeholder="Categoria EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="s_name" placeholder="Título PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="s_name_en" placeholder="Título EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="icon" placeholder="Link da Imagem/Símbolo (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <div>
-                            <label class="block text-xs text-cyan-400 mb-1">Ou Anexar Imagem/Símbolo do Computador</label>
-                            <input type="file" name="skill_image" accept="image/*" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-gray-950 hover:file:bg-cyan-600">
-                        </div>
-                    </div>
-                    <textarea name="detalhes" rows="2" placeholder="Descrição da Habilidade PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    <textarea name="detalhes_en" rows="2" placeholder="Descrição da Habilidade EN (Vazio = Auto / Mão)..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Habilidade</button>
+                    <input type="text" id="s_icon" placeholder="Link da Imagem/Ícone (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                    <textarea id="s_det" rows="2" placeholder="Detalhes PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <textarea id="s_det_en" rows="2" placeholder="Detalhes EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Habilidade</button>
                 </form>
             </div>
-            <div class="space-y-4">
-                {% for s in data.skills %}
-                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-3">
-                            {% if s.icon %}
-                            <img src="{{ s.icon }}" class="w-8 h-8 object-contain">
-                            {% endif %}
-                            <div>
-                                <h4 class="text-white font-bold">{{ s.category }}</h4>
-                                <p class="text-xs text-gray-400">{{ s.name }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="toggleEditForm('edit-form-s-{{ s.id }}')" class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-500 hover:text-gray-950 transition"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
-                            <form method="POST" action="/admin">
-                                <input type="hidden" name="action" value="delete_skill">
-                                <input type="hidden" name="skill_id" value="{{ s.id }}">
-                                <button type="submit" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                    <div id="edit-form-s-{{ s.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
-                        <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-3">
-                            <input type="hidden" name="action" value="edit_skill">
-                            <input type="hidden" name="skill_id" value="{{ s.id }}">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Categoria (PT/EN)</label>
-                                    <input type="text" name="category" value="{{ s.category }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="category_en" value="{{ s.category_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto / Mão">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Título (PT/EN)</label>
-                                    <input type="text" name="name" value="{{ s.name }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="name_en" value="{{ s.name_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto / Mão">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <input type="text" name="icon" value="{{ s.icon }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Link da Imagem">
-                                <input type="file" name="skill_image" accept="image/*" class="bg-gray-800 border border-gray-700 rounded-lg p-1.5 text-white text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded file:text-xs">
-                            </div>
-                            <textarea name="detalhes" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" required>{{ s.detalhes }}</textarea>
-                            <textarea name="detalhes_en" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto / Mão">{{ s.detalhes_en }}</textarea>
-                            <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="skills-list" class="space-y-4"></div>
         </div>
 
         <!-- EXPERIÊNCIAS -->
         <div id="experiencias" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Experiência</h2>
-                <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="add_experience">
+                <form onsubmit="addExperience(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="title" placeholder="Cargo e Empresa PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="title_en" placeholder="Cargo e Empresa EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="period" placeholder="Período PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="period_en" placeholder="Período EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" id="ex_title" placeholder="Cargo e Empresa PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="ex_title_en" placeholder="Cargo e Empresa EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="ex_period" placeholder="Período PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="ex_period_en" placeholder="Período EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
                     </div>
-                    <textarea name="description" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    <textarea name="description_en" rows="3" placeholder="Descrição EN (Vazio = Auto / Mão)..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar</button>
+                    <textarea id="ex_desc" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <textarea id="ex_desc_en" rows="3" placeholder="Descrição EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Experiência</button>
                 </form>
             </div>
-            <div class="space-y-4">
-                {% for e in data.experiences %}
-                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">{{ e.title }}</h4>
-                            <p class="text-xs text-gray-400">{{ e.period }}</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="toggleEditForm('edit-form-e-{{ e.id }}')" class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-500 hover:text-gray-950 transition"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
-                            <form method="POST" action="/admin">
-                                <input type="hidden" name="action" value="delete_experience">
-                                <input type="hidden" name="exp_id" value="{{ e.id }}">
-                                <button type="submit" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                    <div id="edit-form-e-{{ e.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
-                        <form method="POST" action="/admin" class="space-y-3">
-                            <input type="hidden" name="action" value="edit_experience">
-                            <input type="hidden" name="exp_id" value="{{ e.id }}">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Título (PT/EN)</label>
-                                    <input type="text" name="title" value="{{ e.title }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="title_en" value="{{ e.title_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto / Mão">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Período (PT/EN)</label>
-                                    <input type="text" name="period" value="{{ e.period }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="period_en" value="{{ e.period_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto / Mão">
-                                </div>
-                            </div>
-                            <textarea name="description" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs mb-2" required>{{ e.description }}</textarea>
-                            <textarea name="description_en" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto / Mão">{{ e.description_en }}</textarea>
-                            <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="experiences-list" class="space-y-4"></div>
         </div>
 
         <!-- PROJETOS -->
         <div id="projetos" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
                 <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Projeto</h2>
-                <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="add_project">
+                <form onsubmit="addProject(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="title" placeholder="Título do Projeto PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="title_en" placeholder="Título do Projeto EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        
-                        <input type="text" name="tech" placeholder="Tecnologias PT (ex: Python, Flask)" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="tech_en" placeholder="Tecnologias EN (Vazio = Auto / Mão)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        
-                        <input type="text" name="link_github" placeholder="Link GitHub (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
-                        <input type="text" name="link_live" placeholder="Link Online (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none">
+                        <input type="text" id="pr_title" placeholder="Título PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="pr_title_en" placeholder="Título EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="pr_tech" placeholder="Tecnologias PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="pr_tech_en" placeholder="Tecnologias EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="pr_github" placeholder="Link GitHub" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="pr_live" placeholder="Link Online" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
                     </div>
-                    <textarea name="description" rows="3" placeholder="Descrição técnica PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    <textarea name="description_en" rows="3" placeholder="Descrição técnica EN (Vazio = Auto / Mão)..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Adicionar Projeto</button>
+                    <textarea id="pr_desc" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <textarea id="pr_desc_en" rows="3" placeholder="Descrição EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Projeto</button>
                 </form>
             </div>
-            <div class="space-y-4">
-                {% for p in data.projects %}
-                <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">{{ p.title }}</h4>
-                            <p class="text-xs text-cyan-400">{{ p.tech }}</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="toggleEditForm('edit-form-p-{{ p.id }}')" class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-500 hover:text-gray-950 transition"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
-                            <form method="POST" action="/admin">
-                                <input type="hidden" name="action" value="delete_project">
-                                <input type="hidden" name="project_id" value="{{ p.id }}">
-                                <button type="submit" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                    <div id="edit-form-p-{{ p.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
-                        <form method="POST" action="/admin" class="space-y-3">
-                            <input type="hidden" name="action" value="edit_project">
-                            <input type="hidden" name="project_id" value="{{ p.id }}">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Título (PT/EN)</label>
-                                    <input type="text" name="title" value="{{ p.title }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="title_en" value="{{ p.title_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto / Mão">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Tecnologias (PT/EN)</label>
-                                    <input type="text" name="tech" value="{{ p.tech }}" required class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full mb-2">
-                                    <input type="text" name="tech_en" value="{{ p.tech_en }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs w-full" placeholder="Vazio = Auto / Mão">
-                                </div>
-                                <input type="text" name="link_github" value="{{ p.link_github }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Link GitHub">
-                                <input type="text" name="link_live" value="{{ p.link_live }}" class="bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Link Online">
-                            </div>
-                            <textarea name="description" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs mb-2" required>{{ p.description }}</textarea>
-                            <textarea name="description_en" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white text-xs" placeholder="Vazio = Auto / Mão">{{ p.description_en }}</textarea>
-                            <button type="submit" class="bg-cyan-500 text-gray-950 font-bold px-4 py-2 rounded-lg text-xs">Salvar Alterações</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="projects-list" class="space-y-4"></div>
         </div>
 
     </main>

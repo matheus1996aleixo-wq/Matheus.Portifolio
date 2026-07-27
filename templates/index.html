@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}" class="scroll-smooth">
+<html lang="pt" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfólio | {{ data.profile.nome or 'Matheus Aleixo' }}</title>
+    <title id="page-title">Portfólio | Matheus Aleixo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -17,6 +17,19 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
     <script>
+        let currentLang = localStorage.getItem('site_lang') || 'pt';
+        let siteData = {};
+
+        async function loadPortfolioData() {
+            try {
+                const response = await fetch('data.json');
+                siteData = await response.json();
+                renderPortfolio();
+            } catch (e) {
+                console.error("Erro ao carregar o data.json:", e);
+            }
+        }
+
         function switchTab(tabId) {
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
@@ -38,6 +51,29 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('site_lang', lang);
+            
+            // Atualiza botões de idioma
+            document.querySelectorAll('.lang-btn-pt').forEach(btn => {
+                if(lang === 'pt') {
+                    btn.className = "px-3 py-1.5 rounded-full transition bg-cyan-500 text-gray-950 shadow-md lang-btn-pt";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-full transition text-gray-400 hover:text-white lang-btn-pt";
+                }
+            });
+            document.querySelectorAll('.lang-btn-en').forEach(btn => {
+                if(lang === 'en') {
+                    btn.className = "px-3 py-1.5 rounded-full transition bg-cyan-500 text-gray-950 shadow-md lang-btn-en";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-full transition text-gray-400 hover:text-white lang-btn-en";
+                }
+            });
+
+            renderPortfolio();
+        }
+
         function toggleAccordion(elementId, iconId) {
             const content = document.getElementById(elementId);
             const icon = document.getElementById(iconId);
@@ -50,32 +86,194 @@
             }
         }
 
-        function openModuleModal(formId, materiaName, currentIcon) {
-            document.getElementById('modal_form_id').value = formId;
-            document.getElementById('modal_materia_nome').value = materiaName;
-            document.getElementById('modal_materia_titulo').innerText = "Editar Ícone: " + materiaName;
-            document.getElementById('modal_icon_url').value = currentIcon.startsWith('http') || currentIcon.startsWith('/') ? currentIcon : '';
-            document.getElementById('moduleModal').classList.remove('hidden');
-        }
+        function renderPortfolio() {
+            if (!siteData.profile) return;
+            const p = siteData.profile;
 
-        function closeModuleModal() {
-            document.getElementById('moduleModal').classList.add('hidden');
-        }
-
-        function openEditModal(sectionType) {
-            const panels = document.querySelectorAll('.edit-modal-panel');
-            panels.forEach(p => p.classList.add('hidden'));
+            // Textos fixos e Tradução básica
+            const isEn = (currentLang === 'en');
+            document.getElementById('page-title').innerText = `Portfólio | ${p.nome || 'Matheus Aleixo'}`;
             
-            const panel = document.getElementById('modal-panel-' + sectionType);
-            if (panel) {
-                panel.classList.remove('hidden');
-                document.getElementById('globalEditModal').classList.remove('hidden');
-            }
+            // Navbar Links
+            document.getElementById('nav-sobre').innerText = isEn ? 'Personal Info' : 'Informações Pessoais';
+            document.getElementById('nav-formacao').innerText = isEn ? 'Formations & Courses' : 'Formações e Cursos';
+            document.getElementById('nav-habilidades').innerText = isEn ? 'Skills' : 'Habilidades';
+            document.getElementById('nav-experiencia').innerText = isEn ? 'Experiences' : 'Experiências';
+            document.getElementById('nav-projetos').innerText = isEn ? 'Projects' : 'Projetos';
+
+            // Perfil Esquerda
+            document.getElementById('profile-img').src = p.foto || 'https://github.com/matheus1996aleixo-wq.png';
+            document.getElementById('profile-name').innerText = p.nome || 'Matheus Aleixo';
+            document.getElementById('lbl-nascimento').innerText = isEn ? 'Date of Birth:' : 'Data de Nascimento:';
+            document.getElementById('profile-nascimento').innerText = p.nascimento || '20/02/1996';
+            
+            document.getElementById('lbl-cidade').innerText = isEn ? 'City:' : 'Cidade:';
+            document.getElementById('profile-cidade').innerText = isEn ? (p.cidade_en || p.cidade) : (p.cidade || 'Várzea Paulista');
+            document.getElementById('lbl-estado').innerText = isEn ? 'State:' : 'Estado:';
+            document.getElementById('profile-estado').innerText = isEn ? (p.estado_en || p.estado) : (p.estado || 'São Paulo (SP)');
+            document.getElementById('lbl-pais').innerText = isEn ? 'Country:' : 'País:';
+            document.getElementById('profile-pais').innerText = isEn ? (p.pais_en || p.pais) : (p.pais || 'Brasil');
+
+            // Idiomas
+            document.getElementById('lbl-idiomas').innerHTML = `<i class="fa-solid fa-language mr-1.5"></i> ${isEn ? 'Languages' : 'Idiomas'}`;
+            const idiomasTexto = isEn ? (p.idiomas_en || p.idiomas_pt) : (p.idiomas_pt || 'Português: Nativo\nInglês: Intermediário / Técnico');
+            let idiomasHtml = '';
+            idiomasTexto.split('\n').forEach(linha => {
+                if(linha.includes(':')) {
+                    const partes = linha.split(':');
+                    idiomasHtml += `<div class="flex justify-between items-center"><span class="text-gray-300 font-medium">${partes[0].trim()}:</span> <span class="text-gray-400">${partes[1].trim()}</span></div>`;
+                } else {
+                    idiomasHtml += `<div class="text-gray-400">${linha}</div>`;
+                }
+            });
+            document.getElementById('idiomas-container').innerHTML = idiomasHtml;
+
+            // Disponibilidade
+            document.getElementById('lbl-disp').innerHTML = `<i class="fa-solid fa-briefcase mr-1.5"></i> ${isEn ? 'Availability to Work:' : 'Disponibilidade para Trabalhar:'}`;
+            const dispTexto = isEn ? (p.disponibilidade_en || p.disponibilidade_pt) : (p.disponibilidade_pt || 'Home Office, Híbrido e Presencial');
+            const dispLines = dispTexto.split('\n');
+            document.getElementById('disp-main').innerText = dispLines[0];
+            document.getElementById('disp-sub').innerHTML = dispLines.slice(1).join('<br>');
+
+            // Objetivo Profissional
+            document.getElementById('lbl-objetivo').innerText = isEn ? 'Professional Objectives' : 'Objetivos Profissionais';
+            document.getElementById('profile-titulo').innerText = isEn ? (p.titulo_en || p.titulo_pt) : (p.titulo_pt || '');
+            document.getElementById('profile-sobre').innerText = isEn ? (p.sobre_en || p.sobre_pt) : (p.sobre_pt || '');
+            
+            document.getElementById('btn-linkedin').href = p.linkedin || '#';
+            document.getElementById('btn-github').href = p.github || '#';
+
+            // Acadêmico Destaque
+            document.getElementById('lbl-academico').innerText = isEn ? 'Academic Background' : 'Formação Acadêmica';
+            document.getElementById('lbl-conclusao').innerText = isEn ? 'Completion Date:' : 'Data da Formação:';
+            document.getElementById('profile-destaque-data').innerText = isEn ? (p.destaque_data_en || p.destaque_data) : (p.destaque_data || '');
+            document.getElementById('profile-destaque-titulo').innerText = isEn ? (p.destaque_titulo_en || p.destaque_titulo_pt) : (p.destaque_titulo_pt || '');
+            document.getElementById('lbl-universidade').innerText = isEn ? 'University:' : 'Universidade:';
+            document.getElementById('profile-destaque-inst').innerText = isEn ? (p.destaque_inst_en || p.destaque_inst) : (p.destaque_inst || '');
+            document.getElementById('lbl-competencias').innerHTML = `<i class="fa-solid fa-graduation-cap mr-1.5"></i> ${isEn ? 'Skills & Competencies acquired:' : 'Competências e Habilidades Adquiridas:'}`;
+            document.getElementById('profile-destaque-comp').innerText = isEn ? (p.destaque_comp_en || p.destaque_comp_pt) : (p.destaque_comp_pt || '');
+            document.getElementById('btn-mais-formacoes').innerHTML = `<i class="fa-solid fa-arrow-right mr-2"></i> ${isEn ? 'More Formations' : 'Mais Formações'}`;
+
+            // Renderizar Formações
+            renderFormationsList();
+            // Renderizar Habilidades
+            renderSkillsList();
+            // Renderizar Experiências
+            renderExperiencesList();
+            // Renderizar Projetos
+            renderProjectsList();
         }
 
-        function closeEditModal() {
-            document.getElementById('globalEditModal').classList.add('hidden');
+        function renderFormationsList() {
+            const container = document.getElementById('formations-section');
+            container.innerHTML = `<h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">${currentLang === 'en' ? 'Formations & Courses' : 'Formações e Cursos'}</h2>`;
+            
+            (siteData.formations || []).forEach(f => {
+                const isEn = (currentLang === 'en');
+                container.innerHTML += `
+                    <div class="card-glass p-8 rounded-3xl glow-border mb-10 relative">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-6 gap-4">
+                            <div>
+                                <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1"><i class="fa-solid fa-graduation-cap mr-2"></i>${isEn ? (f.entity_type_en || f.entity_type) : f.entity_type}: ${isEn ? (f.level_en || f.level) : f.level}</span>
+                                <h3 class="text-2xl font-bold text-white">${isEn ? 'Course:' : 'Curso:'} ${isEn ? (f.course_en || f.course) : f.course}</h3>
+                                <p class="text-gray-400 text-sm mt-1">${isEn ? 'Institution:' : 'Instituição:'} ${isEn ? (f.entity_name_en || f.entity_name) : f.entity_name}</p>
+                            </div>
+                            <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800">
+                                <p class="text-xs text-gray-400">${isEn ? 'Date:' : 'Data de Formação:'} <strong class="text-cyan-400">${isEn ? (f.completion_date_en || f.completion_date) : f.completion_date}</strong></p>
+                            </div>
+                        </div>
+                    </div>`;
+            });
         }
+
+        function renderSkillsList() {
+            const container = document.getElementById('skills-section');
+            container.innerHTML = `<h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">${currentLang === 'en' ? 'Skills Overview' : 'Resumo de Competências Técnicas e Habilidades'}</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="skills-grid"></div>`;
+            
+            const grid = document.getElementById('skills-grid');
+            (siteData.skills || []).forEach((s, idx) => {
+                const isEn = (currentLang === 'en');
+                grid.innerHTML += `
+                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all flex flex-col hover:border-cyan-400 relative" onclick="toggleAccordion('skill-${idx}', 'icon-skill-${idx}')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
+                                    ${s.icon ? `<img src="${s.icon}" class="w-10 h-10 object-contain">` : `<i class="fa-solid fa-bolt text-cyan-400 text-2xl"></i>`}
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">${isEn ? (s.category_en || s.category) : s.category}</h3>
+                                    <p class="text-xs text-cyan-400 mt-1">${isEn ? (s.name_en || s.name) : s.name}</p>
+                                </div>
+                            </div>
+                            <i id="icon-skill-${idx}" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                        </div>
+                        <div id="skill-${idx}" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-300 leading-relaxed">
+                            <p><strong class="text-cyan-400">${isEn ? 'Detailed Knowledge:' : 'Conhecimento Detalhado:'}</strong> ${isEn ? (s.detalhes_en || s.detalhes) : s.detalhes}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderExperiencesList() {
+            const container = document.getElementById('experiences-section');
+            container.innerHTML = `<h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">${currentLang === 'en' ? 'Professional Experiences' : 'Experiências Profissionais'}</h2><div class="max-w-4xl mx-auto border-l-2 border-gray-800 ml-4 md:ml-8 space-y-10" id="exp-timeline"></div>`;
+            
+            const timeline = document.getElementById('exp-timeline');
+            (siteData.experiences || []).forEach((e, idx) => {
+                const isEn = (currentLang === 'en');
+                timeline.innerHTML += `
+                    <div class="relative pl-8 md:pl-12">
+                        <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
+                        <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50 relative" onclick="toggleAccordion('exp-${idx}', 'icon-exp-${idx}')">
+                            <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2">
+                                <div><h3 class="text-xl font-bold text-white">${isEn ? (e.title_en || e.title) : e.title}</h3></div>
+                                <div class="flex items-center gap-4">
+                                    <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> ${isEn ? (e.period_en || e.period) : e.period}</span>
+                                    <i id="icon-exp-${idx}" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                            <div id="exp-${idx}" class="hidden mt-4 pt-4 border-t border-gray-800">
+                                <p class="text-sm text-gray-300 leading-relaxed">${isEn ? (e.description_en || e.description) : e.description}</p>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderProjectsList() {
+            const container = document.getElementById('projects-section');
+            container.innerHTML = `<h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">${currentLang === 'en' ? 'Developed Projects' : 'Projetos Desenvolvidos'}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="projects-grid"></div>`;
+            
+            const grid = document.getElementById('projects-grid');
+            (siteData.projects || []).forEach(p => {
+                const isEn = (currentLang === 'en');
+                const techs = isEn ? (p.tech_en || p.tech) : p.tech;
+                let tagsHtml = '';
+                if(techs) {
+                    techs.split(',').forEach(t => { tagsHtml += `<span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">${t.trim()}</span>`; });
+                }
+                
+                grid.innerHTML += `
+                    <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col relative">
+                        <div class="h-40 bg-gray-900 flex items-center justify-center border-b border-gray-800 relative">
+                            <i class="fa-solid fa-rocket text-4xl text-cyan-400"></i>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-white mb-2">${isEn ? (p.title_en || p.title) : p.title}</h3>
+                            <p class="text-sm text-gray-400 mb-4 leading-relaxed whitespace-pre-line">${isEn ? (p.description_en || p.description) : p.description}</p>
+                            <div class="flex flex-wrap gap-2 mb-6">${tagsHtml}</div>
+                            <div class="flex gap-4 mt-auto">
+                                ${p.link_github ? `<a href="${p.link_github}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm border border-gray-700 transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>` : ''}
+                                ${p.link_live ? `<a href="${p.link_live}" target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition"><i class="fa-solid fa-globe mr-2"></i>Online</a>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPortfolioData();
+        });
     </script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white">
@@ -89,26 +287,26 @@
                 </div>
                 <div class="flex md:hidden items-center space-x-3">
                     <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
-                        <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
-                        <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
+                        <button onclick="setLang('pt')" class="px-3 py-1.5 rounded-full transition bg-cyan-500 text-gray-950 shadow-md lang-btn-pt">PT</button>
+                        <button onclick="setLang('en')" class="px-3 py-1.5 rounded-full transition text-gray-400 hover:text-white lang-btn-en">EN</button>
                     </div>
                 </div>
             </div>
             
             <nav class="flex items-center space-x-6 md:space-x-8 text-sm font-semibold overflow-x-auto w-full md:w-auto scrollbar-hide pb-2 md:pb-0">
-                <button onclick="switchTab('sobre')" id="link-sobre" class="nav-link whitespace-nowrap text-cyan-400 border-b-2 border-cyan-400 pb-1 transition">{% if lang == 'en' %}Personal Info{% else %}Informações Pessoais{% endif %}</button>
-                <button onclick="switchTab('formacao')" id="link-formacao" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Formations & Courses{% else %}Formações e Cursos{% endif %}</button>
-                <button onclick="switchTab('habilidades')" id="link-habilidades" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Skills{% else %}Habilidades{% endif %}</button>
-                <button onclick="switchTab('experiencia')" id="link-experiencia" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Experiences{% else %}Experiências{% endif %}</button>
-                <button onclick="switchTab('projetos')" id="link-projetos" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition">{% if lang == 'en' %}Projects{% else %}Projetos{% endif %}</button>
+                <button onclick="switchTab('sobre')" id="link-sobre" class="nav-link whitespace-nowrap text-cyan-400 border-b-2 border-cyan-400 pb-1 transition"><span id="nav-sobre">Informações Pessoais</span></button>
+                <button onclick="switchTab('formacao')" id="link-formacao" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition"><span id="nav-formacao">Formações e Cursos</span></button>
+                <button onclick="switchTab('habilidades')" id="link-habilidades" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition"><span id="nav-habilidades">Habilidades</span></button>
+                <button onclick="switchTab('experiencia')" id="link-experiencia" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition"><span id="nav-experiencia">Experiências</span></button>
+                <button onclick="switchTab('projetos')" id="link-projetos" class="nav-link whitespace-nowrap text-gray-400 hover:text-cyan-400 pb-1 transition"><span id="nav-projetos">Projetos</span></button>
             </nav>
 
             <div class="hidden md:flex items-center space-x-4">
                 <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1 text-xs font-bold shadow-inner">
-                    <a href="/lang/pt" class="px-3 py-1.5 rounded-full transition {% if lang == 'pt' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">PT</a>
-                    <a href="/lang/en" class="px-3 py-1.5 rounded-full transition {% if lang == 'en' %}bg-cyan-500 text-gray-950 shadow-md{% else %}text-gray-400 hover:text-white{% endif %}">EN</a>
+                    <button onclick="setLang('pt')" class="px-3 py-1.5 rounded-full transition bg-cyan-500 text-gray-950 shadow-md lang-btn-pt">PT</button>
+                    <button onclick="setLang('en')" class="px-3 py-1.5 rounded-full transition text-gray-400 hover:text-white lang-btn-en">EN</button>
                 </div>
-                <a href="/admin" class="border border-cyan-400 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN</a>
+                <a href="login.html" class="border border-cyan-400 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-400 hover:text-gray-900 transition text-sm font-bold shadow-[0_0_10px_rgba(0,255,204,0.3)]">ADMIN</a>
             </div>
         </div>
     </header>
@@ -120,67 +318,27 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-16">
                 <!-- Coluna Esquerda: Informações Pessoais -->
                 <div class="card-glass p-8 rounded-3xl glow-border text-center relative">
-                    {% if session.get('logged_in') %}
-                    <div class="absolute top-4 right-4 z-10">
-                        <button onclick="openEditModal('perfil')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Informações Pessoais">
-                            <i class="fa-solid fa-pen mr-1"></i> Editar
-                        </button>
-                    </div>
-                    {% endif %}
-
                     <div class="w-32 h-32 mx-auto bg-gray-800 rounded-full border-4 border-cyan-400 mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,204,0.4)]">
-                        <img src="{{ data.profile.foto or 'https://github.com/matheus1996aleixo-wq.png' }}" alt="Perfil" class="w-full h-full object-cover">
+                        <img id="profile-img" src="" alt="Perfil" class="w-full h-full object-cover">
                     </div>
-                    <h1 class="text-2xl font-bold text-white mb-2">{{ data.profile.nome or 'Matheus Aleixo' }}</h1>
-                    <p class="text-xs text-gray-400 mb-6">{% if lang == 'en' %}Date of Birth:{% else %}Data de Nascimento:{% endif %} <strong class="text-gray-200">{{ data.profile.nascimento or '20/02/1996' }}</strong></p>
+                    <h1 id="profile-name" class="text-2xl font-bold text-white mb-2"></h1>
+                    <p class="text-xs text-gray-400 mb-6"><span id="lbl-nascimento">Data de Nascimento:</span> <strong id="profile-nascimento" class="text-gray-200"></strong></p>
                     
                     <div class="space-y-2 text-sm text-left bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6">
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}City:{% else %}Cidade:{% endif %}</strong> {{ data.profile.cidade or 'Várzea Paulista' }}</p>
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}State:{% else %}Estado:{% endif %}</strong> {{ data.profile.estado or 'São Paulo (SP)' }}</p>
-                        <p><strong class="text-gray-300">{% if lang == 'en' %}Country:{% else %}País:{% endif %}</strong> {{ data.profile.pais or 'Brasil / Brazil' }}</p>
-                    </div>
-
-                    <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6 relative">
-                        {% if session.get('logged_in') %}
-                        <div class="absolute top-3 right-3 z-10">
-                            <button onclick="openEditModal('idioma')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2 py-0.5 rounded text-xs font-bold transition" title="Editar Idiomas">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                        </div>
-                        {% endif %}
-                        <p class="font-bold text-cyan-400 flex items-center mb-2"><i class="fa-solid fa-language mr-1.5"></i> {% if lang == 'en' %}Languages{% else %}Idiomas{% endif %}</p>
-                        <div class="space-y-1">
-                            {% set idiomas_texto = data.profile.idiomas_pt or 'Português: Nativo\nInglês: Intermediário / Técnico' %}
-                            {% for linha in idiomas_texto.split('\n') %}
-                                {% if ':' in linha %}
-                                    {% set partes = linha.split(':', 1) %}
-                                    <div class="flex justify-between items-center"><span class="text-gray-300 font-medium">{{ partes[0].strip() }}:</span> <span class="text-gray-400">{{ partes[1].strip() }}</span></div>
-                                {% else %}
-                                    <div class="text-gray-400">{{ linha }}</div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                        <p><strong id="lbl-cidade" class="text-gray-300">Cidade:</strong> <span id="profile-cidade"></span></p>
+                        <p><strong id="lbl-estado" class="text-gray-300">Estado:</strong> <span id="profile-estado"></span></p>
+                        <p><strong id="lbl-pais" class="text-gray-300">País:</strong> <span id="profile-pais"></span></p>
                     </div>
 
                     <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6">
-                        <p class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-briefcase mr-1.5"></i> {% if lang == 'en' %}Availability to Work:{% else %}Disponibilidade para Trabalhar:{% endif %}</p>
-                        {% set disp_texto = data.profile.disponibilidade_pt or 'Home Office, Híbrido e Presencial\nDisponível para contratação por empresas estrangeiras, com flexibilidade para atuação remota ou alocação internacional.' %}
-                        {% set disp_lines = disp_texto.split('\n') %}
-                        <p class="text-gray-200 font-medium">{{ disp_lines[0] }}</p>
-                        {% if disp_lines|length > 1 %}
-                        <p class="text-gray-400 pt-1 leading-relaxed">
-                            {{ disp_lines[1:] | join('<br>') | safe }}
-                        </p>
-                        {% endif %}
+                        <p id="lbl-idiomas" class="font-bold text-cyan-400 flex items-center mb-2"><i class="fa-solid fa-language mr-1.5"></i> Idiomas</p>
+                        <div id="idiomas-container" class="space-y-1"></div>
                     </div>
 
-                    <div class="space-y-3">
-                        {% if data.profile.curriculo_file %}
-                        <a href="{{ data.profile.curriculo_file }}" target="_blank" class="block w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-file-pdf mr-2"></i>{% if lang == 'en' %}Download Resume{% else %}Baixar Currículo{% endif %}</a>
-                        {% endif %}
-                        {% if data.profile.carta_file %}
-                        <a href="{{ data.profile.carta_file }}" target="_blank" class="block w-full bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-xs transition"><i class="fa-solid fa-envelope-open-text mr-2"></i>{% if lang == 'en' %}Cover Letter{% else %}Carta de Apresentação{% endif %}</a>
-                        {% endif %}
+                    <div class="text-left bg-gray-900 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-6">
+                        <p id="lbl-disp" class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-briefcase mr-1.5"></i> Disponibilidade para Trabalhar:</p>
+                        <p id="disp-main" class="text-gray-200 font-medium"></p>
+                        <p id="disp-sub" class="text-gray-400 pt-1 leading-relaxed"></p>
                     </div>
                 </div>
                 
@@ -188,54 +346,36 @@
                 <div class="lg:col-span-2 space-y-8">
                     <!-- Objetivo Profissional -->
                     <div class="card-glass p-8 rounded-3xl glow-border relative">
-                        {% if session.get('logged_in') %}
-                        <div class="absolute top-6 right-6 z-10">
-                            <button onclick="openEditModal('objetivo')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Objetivo Profissional">
-                                <i class="fa-solid fa-pen mr-1"></i> Editar
-                            </button>
-                        </div>
-                        {% endif %}
-
-                        <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Professional Objectives{% else %}Objetivos Profissionais{% endif %}</h2>
-                        <h3 class="text-lg font-bold text-cyan-400 mb-2">{{ data.profile.titulo_pt }}</h3>
-                        <p class="text-gray-300 leading-relaxed text-sm mb-4 whitespace-pre-line">{{ data.profile.sobre_pt }}</p>
+                        <h2 id="lbl-objetivo" class="text-2xl font-bold text-white mb-4 border-l-4 border-cyan-400 pl-4">Objetivos Profissionais</h2>
+                        <h3 id="profile-titulo" class="text-lg font-bold text-cyan-400 mb-2"></h3>
+                        <p id="profile-sobre" class="text-gray-300 leading-relaxed text-sm mb-4 whitespace-pre-line"></p>
                         <div class="flex flex-wrap gap-4 pt-2">
-                            <a href="{{ data.profile.linkedin or 'https://www.linkedin.com/in/matheus-aleixo-299a05247' }}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-linkedin mr-2 text-cyan-400"></i>LinkedIn</a>
-                            <a href="{{ data.profile.github or 'https://github.com/matheus1996aleixo-wq' }}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
+                            <a id="btn-linkedin" href="#" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-linkedin mr-2 text-cyan-400"></i>LinkedIn</a>
+                            <a id="btn-github" href="#" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
                         </div>
                     </div>
 
                     <!-- Formação Acadêmica (Destaque) -->
                     <div class="card-glass p-8 rounded-3xl glow-border relative">
-                        {% if session.get('logged_in') %}
-                        <div class="absolute top-6 right-6 z-10">
-                            <button onclick="openEditModal('formacao_academica')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Editar Formação em Destaque">
-                                <i class="fa-solid fa-pen mr-1"></i> Editar
-                            </button>
-                        </div>
-                        {% endif %}
-
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 pr-16">
-                            <h2 class="text-2xl font-bold text-white border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Academic Background{% else %}Formação Acadêmica{% endif %}</h2>
+                            <h2 id="lbl-academico" class="text-2xl font-bold text-white border-l-4 border-cyan-400 pl-4">Formação Acadêmica</h2>
                             <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-                                <p class="text-xs text-gray-400">{% if lang == 'en' %}Completion Date:{% else %}Data da Formação:{% endif %} <strong class="text-cyan-400">{{ data.profile.destaque_data or '20/08/2025' }}</strong></p>
+                                <p class="text-xs text-gray-400"><span id="lbl-conclusao">Data da Formação:</span> <strong id="profile-destaque-data" class="text-cyan-400"></strong></p>
                             </div>
                         </div>
                         <div class="text-gray-300 space-y-2 mb-6">
-                            <p class="text-base font-bold text-white">{{ data.profile.destaque_titulo_pt or 'Bacharelado em Tecnologia da Informação' }}</p>
-                            <p class="text-sm text-gray-400 mb-3">{% if lang == 'en' %}University:{% else %}Universidade:{% endif %} {{ data.profile.destaque_inst or 'Universidade Virtual do Estado de São Paulo (UNIVESP)' }}</p>
+                            <p id="profile-destaque-titulo" class="text-base font-bold text-white"></p>
+                            <p class="text-sm text-gray-400 mb-3"><span id="lbl-universidade">Universidade:</span> <span id="profile-destaque-inst"></span></p>
                             
                             <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2">
-                                <p class="font-bold text-cyan-400"><i class="fa-solid fa-graduation-cap mr-1.5"></i> {% if lang == 'en' %}Skills & Competencies acquired:{% else %}Competências e Habilidades Adquiridas:{% endif %}</p>
-                                <p class="leading-relaxed">
-                                    {{ data.profile.destaque_comp_pt or 'Base sólida em algoritmos e programação, estruturas de dados, programação orientada a objetos (POO), modelagem e consultas em bancos de dados (SQL/MER/DER), desenvolvimento web e mobile, infraestrutura de servidores, inteligência artificial, segurança da informação, engenharia de software e execução de projetos integradores práticos.' }}
-                                </p>
+                                <p id="lbl-competencias" class="font-bold text-cyan-400"><i class="fa-solid fa-graduation-cap mr-1.5"></i> Competências e Habilidades Adquiridas:</p>
+                                <p id="profile-destaque-comp" class="leading-relaxed"></p>
                             </div>
                         </div>
 
                         <div>
-                            <button onclick="switchTab('formacao')" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-6 rounded-xl transition text-xs flex items-center shadow-md">
-                                <i class="fa-solid fa-arrow-right mr-2"></i> {% if lang == 'en' %}More Formations{% else %}Mais Formações{% endif %}
+                            <button onclick="switchTab('formacao')" id="btn-mais-formacoes" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-6 rounded-xl transition text-xs flex items-center shadow-md">
+                                <i class="fa-solid fa-arrow-right mr-2"></i> Mais Formações
                             </button>
                         </div>
                     </div>
@@ -245,380 +385,24 @@
 
         <!-- FORMAÇÕES E CURSOS -->
         <div id="formacao" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Formations & Courses{% else %}Formações e Cursos{% endif %}</h2>
-            {% for f in data.formations %}
-            <div class="card-glass p-8 rounded-3xl glow-border mb-10 relative">
-                {% if session.get('logged_in') %}
-                <div class="absolute top-6 right-6 flex items-center space-x-2 z-10">
-                    <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta formação?');">
-                        <input type="hidden" name="action" value="delete_formation">
-                        <input type="hidden" name="form_id" value="{{ f.id }}">
-                        <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center" title="Excluir Formação">
-                            <i class="fa-solid fa-trash mr-1"></i> Excluir
-                        </button>
-                    </form>
-                </div>
-                {% endif %}
-
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-6 gap-4">
-                    <div>
-                        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1"><i class="fa-solid fa-graduation-cap mr-2"></i>{{ f.entity_type }}: {{ f.level }}</span>
-                        <h3 class="text-2xl font-bold text-white">{% if lang == 'en' %}Course:{% else %}Curso:{% endif %} {{ f.course }}</h3>
-                        <p class="text-gray-400 text-sm mt-1">{% if lang == 'en' %}Institution:{% else %}Instituição:{% endif %} {{ f.entity_name }}</p>
-                    </div>
-                    <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800">
-                        <p class="text-xs text-gray-400">{% if lang == 'en' %}Date:{% else %}Data de Formação:{% endif %} <strong class="text-cyan-400">{{ f.completion_date }}</strong></p>
-                    </div>
-                </div>
-
-                {% if f.description %}
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-6 flex items-center">
-                    <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i> {% if lang == 'en' %}Modules, Knowledge & Skills:{% else %}Matérias, Conhecimentos e Capacitações Adquiridas por Módulo:{% endif %}
-                </h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {% for linha in f.description.split('\n') %}
-                        {% if ':' in linha %}
-                            {% set partes = linha.split(':', 1) %}
-                            {% set materia = partes[0].strip() %}
-                            {% set resto = partes[1].strip() %}
-                            {% set icon_url = '' %}
-                            {% if '[icon:' in resto %}
-                                {% set resto_split = resto.split('[icon:') %}
-                                {% set desc = resto_split[0].strip() %}
-                                {% set icon_url = resto_split[1].replace(']', '').strip() %}
-                            {% else %}
-                                {% set desc = resto %}
-                            {% endif %}
-                            
-                            <div class="relative bg-gray-900/80 p-5 rounded-2xl border border-gray-800 hover:border-cyan-400 transition-all shadow-sm">
-                                {% if session.get('logged_in') %}
-                                <div class="absolute top-3 right-3 flex items-center space-x-1.5 z-10">
-                                    <button onclick="openModuleModal('{{ f.id }}', '{{ materia }}', '{{ icon_url }}')" class="bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-2 py-1 rounded-lg text-xs font-bold transition flex items-center" title="Adicionar/Alterar Imagem deste Módulo">
-                                        <i class="fa-solid fa-pen mr-1"></i> Imagem
-                                    </button>
-                                    <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta matéria/módulo?');">
-                                        <input type="hidden" name="action" value="delete_formation_module">
-                                        <input type="hidden" name="form_id" value="{{ f.id }}">
-                                        <input type="hidden" name="materia_nome" value="{{ materia }}">
-                                        <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition" title="Excluir este Módulo">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                {% endif %}
-
-                                <div class="flex items-start space-x-4 cursor-pointer" onclick="toggleAccordion('mod-{{ f.id }}-{{ loop.index }}', 'icon-mod-{{ f.id }}-{{ loop.index }}')">
-                                    {% if icon_url %}
-                                    <img src="{{ icon_url }}" class="w-10 h-10 object-contain mt-1 flex-shrink-0">
-                                    {% else %}
-                                    <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-cyan-400 flex-shrink-0"><i class="fa-solid fa-code"></i></div>
-                                    {% endif %}
-                                    <div class="flex-grow pr-20">
-                                        <div class="flex justify-between items-center">
-                                            <h5 class="text-white font-bold text-base">{{ materia }}</h5>
-                                            <i id="icon-mod-{{ f.id }}-{{ loop.index }}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300"></i>
-                                        </div>
-                                        <div id="mod-{{ f.id }}-{{ loop.index }}" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs text-gray-300 leading-relaxed">
-                                            <strong class="text-cyan-300">{% if lang == 'en' %}Skills:{% else %}Capacitação:{% endif %}</strong> {{ desc }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            {% endfor %}
+            <div id="formations-section"></div>
         </div>
 
         <!-- HABILIDADES -->
         <div id="habilidades" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Skills Overview{% else %}Resumo de Competências Técnicas e Habilidades{% endif %}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for s in data.skills %}
-                <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all flex flex-col hover:border-cyan-400 relative">
-                    {% if session.get('logged_in') %}
-                    <div class="absolute top-4 right-4 flex items-center space-x-1.5 z-10">
-                        <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta habilidade?');">
-                            <input type="hidden" name="action" value="delete_skill">
-                            <input type="hidden" name="skill_id" value="{{ s.id }}">
-                            <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition" title="Excluir Habilidade">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                    {% endif %}
-
-                    <div onclick="toggleAccordion('skill-{{ s.id }}', 'icon-skill-{{ s.id }}')">
-                        <div class="flex items-center justify-between pr-12">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center border border-gray-700 shadow-inner p-2">
-                                    {% if s.icon %}
-                                    <img src="{{ s.icon }}" alt="{{ s.category }}" class="w-10 h-10 object-contain">
-                                    {% else %}
-                                    <i class="fa-solid fa-bolt text-cyan-400 text-2xl"></i>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-bold text-white">{{ s.category }}</h3>
-                                    <p class="text-xs text-cyan-400 mt-1">{{ s.name }}</p>
-                                </div>
-                            </div>
-                            <i id="icon-skill-{{ s.id }}" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
-                        </div>
-                        <div id="skill-{{ s.id }}" class="hidden mt-4 pt-4 border-t border-gray-800 text-sm text-gray-300 leading-relaxed">
-                            <p><strong class="text-cyan-400">{% if lang == 'en' %}Detailed Knowledge:{% else %}Conhecimento Detalhado:{% endif %}</strong> {{ s.detalhes }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="skills-section"></div>
         </div>
 
         <!-- EXPERIÊNCIAS -->
         <div id="experiencia" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Professional Experiences{% else %}Experiências Profissionais{% endif %}</h2>
-            <div class="max-w-4xl mx-auto border-l-2 border-gray-800 ml-4 md:ml-8 space-y-10">
-                {% for e in data.experiences %}
-                <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,204,0.8)] border-2 border-gray-950"></div>
-                    <div class="card-glass p-6 rounded-2xl glow-border cursor-pointer transition-all hover:bg-gray-800/50 relative">
-                        {% if session.get('logged_in') %}
-                        <div class="absolute top-4 right-4 flex items-center space-x-1.5 z-10">
-                            <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir esta experiência?');">
-                                <input type="hidden" name="action" value="delete_experience">
-                                <input type="hidden" name="exp_id" value="{{ e.id }}">
-                                <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition" title="Excluir Experiência">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                        {% endif %}
-
-                        <div onclick="toggleAccordion('exp-{{ e.id }}', 'icon-exp-{{ e.id }}')">
-                            <div class="flex flex-col md:flex-row justify-between md:items-start mb-2 gap-2 pr-16">
-                                <div><h3 class="text-xl font-bold text-white">{{ e.title }}</h3></div>
-                                <div class="flex items-center gap-4">
-                                    <span class="inline-block bg-gray-900 border border-gray-700 text-cyan-400 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> {{ e.period }}</span>
-                                    <i id="icon-exp-{{ e.id }}" class="fa-solid fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
-                                </div>
-                            </div>
-                            <div id="exp-{{ e.id }}" class="hidden mt-4 pt-4 border-t border-gray-800">
-                                <p class="text-sm text-gray-300 leading-relaxed">{{ e.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="experiences-section"></div>
         </div>
 
         <!-- PROJETOS -->
         <div id="projetos" class="tab-content">
-            <h2 class="text-3xl font-bold text-white mb-10 border-l-4 border-cyan-400 pl-4">{% if lang == 'en' %}Developed Projects{% else %}Projetos Desenvolvidos{% endif %}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {% for p in data.projects %}
-                <div class="card-glass rounded-2xl overflow-hidden glow-border flex flex-col relative">
-                    {% if session.get('logged_in') %}
-                    <div class="absolute top-4 right-4 flex items-center space-x-1.5 z-10">
-                        <form method="POST" action="/admin" onsubmit="return confirm('Deseja realmente excluir este projeto?');">
-                            <input type="hidden" name="action" value="delete_project">
-                            <input type="hidden" name="project_id" value="{{ p.id }}">
-                            <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition" title="Excluir Projeto">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                    {% endif %}
-
-                    <div class="h-40 bg-gray-900 flex items-center justify-center border-b border-gray-800 relative">
-                        <i class="fa-solid fa-rocket text-4xl text-cyan-400"></i>
-                    </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold text-white mb-2">{{ p.title }}</h3>
-                        <p class="text-sm text-gray-400 mb-4 leading-relaxed whitespace-pre-line">{{ p.description }}</p>
-                        <div class="flex flex-wrap gap-2 mb-6">
-                            {% for tag in p.tech.split(',') %}
-                            <span class="text-xs bg-gray-800 border border-gray-700 text-cyan-300 px-3 py-1 rounded-full">{{ tag.strip() }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="flex gap-4 mt-auto">
-                            {% if p.link_github %}
-                            <a href="{{ p.link_github }}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm border border-gray-700 transition"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
-                            {% endif %}
-                            {% if p.link_live %}
-                            <a href="{{ p.link_live }}" target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition"><i class="fa-solid fa-globe mr-2"></i>Online</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <div id="projects-section"></div>
         </div>
 
     </main>
-
-    <!-- Modal para inclusão/alteração rápida de ícone da Matéria -->
-    <div id="moduleModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="card-glass w-full max-w-md p-6 rounded-3xl border border-gray-700 shadow-2xl">
-            <h3 id="modal_materia_titulo" class="text-lg font-bold text-white mb-4">Editar Ícone do Módulo</h3>
-            <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
-                <input type="hidden" name="action" value="update_formation_module_icon">
-                <input type="hidden" id="modal_form_id" name="form_id">
-                <input type="hidden" id="modal_materia_nome" name="materia_nome">
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Link da Imagem / Símbolo</label>
-                    <input type="text" id="modal_icon_url" name="icon_url" placeholder="https://..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs text-cyan-400 mb-1">Ou Anexar Imagem do Computador</label>
-                    <input type="file" name="icon_file" accept="image/*" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded file:text-xs">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeModuleModal()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Cancelar</button>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold px-5 py-2 rounded-xl text-xs">Salvar Imagem</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Global de Edição Rápida com caixas específicas para cada informação -->
-    <div id="globalEditModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="card-glass w-full max-w-lg p-6 rounded-3xl border border-gray-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-
-            <!-- Painel: Informações Pessoais -->
-            <div id="modal-panel-perfil" class="edit-modal-panel hidden space-y-4">
-                <h3 class="text-lg font-bold text-white mb-2">Editar Informações Pessoais</h3>
-                <form method="POST" action="/admin" enctype="multipart/form-data" class="space-y-4">
-                    <input type="hidden" name="action" value="update_profile">
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Nome Completo</label>
-                            <input type="text" name="nome" value="{{ data.profile.nome }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Data Nascimento</label>
-                            <input type="text" name="nascimento" value="{{ data.profile.nascimento }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Cidade</label>
-                            <input type="text" name="cidade" value="{{ data.profile.cidade }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Estado</label>
-                            <input type="text" name="estado" value="{{ data.profile.estado }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">País</label>
-                            <input type="text" name="pais" value="{{ data.profile.pais }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Link LinkedIn</label>
-                            <input type="text" name="linkedin" value="{{ data.profile.linkedin }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Link GitHub</label>
-                            <input type="text" name="github" value="{{ data.profile.github }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Foto URL (ou deixe vazio para padrão)</label>
-                        <input type="text" name="foto_url" value="{{ data.profile.foto }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs text-cyan-400 mb-1">Currículo (PDF)</label>
-                        <input type="file" name="curriculo_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-cyan-400 mb-1">Carta de Apresentação (PDF)</label>
-                        <input type="file" name="carta_file" accept=".pdf" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2 text-white text-xs">
-                    </div>
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
-                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Painel: Idioma -->
-            <div id="modal-panel-idioma" class="edit-modal-panel hidden space-y-4">
-                <h3 class="text-lg font-bold text-white mb-2">Editar e Incluir Idiomas</h3>
-                <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="update_profile">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Caixa de Edição de Idiomas (Digite um por linha: Idioma: Nível)</label>
-                        <textarea name="idiomas_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.idiomas_pt or 'Português: Nativo\nInglês: Intermediário / Técnico' }}</textarea>
-                    </div>
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
-                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar e Incluir</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Painel: Objetivo Profissional -->
-            <div id="modal-panel-objetivo" class="edit-modal-panel hidden space-y-4">
-                <h3 class="text-lg font-bold text-white mb-2">Editar Objetivo Profissional</h3>
-                <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="update_profile">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Título / Cargo</label>
-                        <input type="text" name="titulo_pt" value="{{ data.profile.titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Descrição / Sobre</label>
-                        <textarea name="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.sobre_pt }}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Disponibilidade de Trabalho</label>
-                        <textarea name="disponibilidade_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.disponibilidade_pt }}</textarea>
-                    </div>
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
-                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Painel: Formação Acadêmica (Destaque) -->
-            <div id="modal-panel-formacao_academica" class="edit-modal-panel hidden space-y-4">
-                <h3 class="text-lg font-bold text-white mb-2">Editar Formação em Destaque</h3>
-                <form method="POST" action="/admin" class="space-y-4">
-                    <input type="hidden" name="action" value="update_profile">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Nome do Curso / Título</label>
-                        <input type="text" name="destaque_titulo_pt" value="{{ data.profile.destaque_titulo_pt }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Instituição</label>
-                        <input type="text" name="destaque_inst" value="{{ data.profile.destaque_inst }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Data de Formação</label>
-                        <input type="text" name="destaque_data" value="{{ data.profile.destaque_data }}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Competências Adquiridas</label>
-                        <textarea name="destaque_comp_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-xs">{{ data.profile.destaque_comp_pt }}</textarea>
-                    </div>
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" onclick="closeEditModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>
-                        <button type="submit" class="bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl text-xs font-bold">Salvar Alterações</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
