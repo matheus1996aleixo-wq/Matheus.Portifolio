@@ -41,8 +41,11 @@
             const pass = document.getElementById('password').value;
             const errorDiv = document.getElementById('error-container');
 
-            // Defina seu usuário e senha de acesso padrão aqui
-            if (user === "admin" && pass === "admin123") {
+            // Configure seu usuário e senha desejados abaixo:
+            const USUARIO_CORRETO = "admin";
+            const SENHA_CORRETA = "admin123";
+
+            if (user === USUARIO_CORRETO && pass === SENHA_CORRETA) {
                 localStorage.setItem('admin_logged', 'true');
                 window.location.href = 'admin.html';
             } else {

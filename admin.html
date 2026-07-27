@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin | Matheus Aleixo</title>
+    <title>Painel Admin Profissional | Matheus Aleixo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0b0f19; color: #94a3b8; font-family: 'Inter', sans-serif; }
-        .card-glass { background: #111827; border: 1px solid #1f2937; box-shadow: 0 0 15px rgba(0, 255, 204, 0.05); }
-        .glow-border:focus-within { border-color: rgba(0, 242, 254, 0.5); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .card-glass { background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(11, 15, 25, 0.98) 100%); border: 1px solid #1f2937; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); backdrop-filter: blur(8px); }
+        .glow-border:focus-within { border-color: rgba(0, 242, 254, 0.6); box-shadow: 0 0 15px rgba(0, 242, 254, 0.25); }
+        .tab-content { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .tab-content.active { display: block; opacity: 1; }
+        .input-stylish { background: #0f172a; border: 1px solid #334155; color: #f8fafc; transition: all 0.2s ease; }
+        .input-stylish:focus { border-color: #06b6d4; background: #0b0f19; outline: none; box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
     </style>
     <script>
         if(localStorage.getItem('admin_logged') !== 'true') {
@@ -22,9 +24,16 @@
 
         async function loadAdminData() {
             try {
-                const response = await fetch('data.json');
-                siteData = await response.json();
-                populateAll();
+                const saved = localStorage.getItem('site_data');
+                if (saved) {
+                    siteData = JSON.parse(saved);
+                    populateAll();
+                } else {
+                    const response = await fetch('data.json');
+                    siteData = await response.json();
+                    localStorage.setItem('site_data', JSON.stringify(siteData));
+                    populateAll();
+                }
             } catch (e) {
                 alert("Erro ao carregar o data.json. Certifique-se de que o arquivo está na mesma pasta.");
             }
@@ -63,13 +72,47 @@
             document.getElementById('destaque_comp_pt').value = p.destaque_comp_pt || '';
             document.getElementById('destaque_comp_en').value = p.destaque_comp_en || '';
 
+            // Novos campos de arquivos e links
+            document.getElementById('curriculo_pt').value = p.curriculo_pt || '';
+            document.getElementById('curriculo_en').value = p.curriculo_en || '';
+            document.getElementById('carta_pt').value = p.carta_pt || '';
+            document.getElementById('carta_en').value = p.carta_en || '';
+
+            updateFileNameDisplay('curriculo_pt_file', 'file_name_curriculo_pt', p.curriculo_pt_name);
+            updateFileNameDisplay('curriculo_en_file', 'file_name_curriculo_en', p.curriculo_en_name);
+            updateFileNameDisplay('carta_pt_file', 'file_name_carta_pt', p.carta_pt_name);
+            updateFileNameDisplay('carta_en_file', 'file_name_carta_en', p.carta_en_name);
+
             renderFormations();
             renderSkills();
             renderExperiences();
             renderProjects();
         }
 
+        function updateFileNameDisplay(fileInputId, displayId, savedName) {
+            const displayEl = document.getElementById(displayId);
+            if (savedName) {
+                displayEl.innerHTML = `<span class="text-cyan-400 font-medium">Arquivo atual: ${savedName}</span>`;
+            } else {
+                displayEl.innerHTML = `<span class="text-gray-500">Nenhum arquivo enviado</span>`;
+            }
+        }
+
+        function handleFileAttachment(inputElement, targetKeyName, targetKeyUrl) {
+            const file = inputElement.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    siteData.profile[targetKeyUrl] = e.target.result;
+                    siteData.profile[targetKeyName] = file.name;
+                    updateFileNameDisplay(inputElement.id, 'file_name_' + targetKeyUrl, file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function downloadJson() {
+            localStorage.setItem('site_data', JSON.stringify(siteData));
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(siteData, null, 4));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -77,7 +120,19 @@
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-            alert("data.json atualizado gerado com sucesso! Substitua-o na raiz do seu projeto.");
+            
+            showToast("✨ Alterações salvas com sucesso! Sincronizado com o site.");
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 z-50 bg-cyan-500 text-gray-950 font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 transition-all transform translate-y-0 animate-bounce';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-lg"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
         }
 
         function saveProfile(e) {
@@ -109,21 +164,52 @@
             siteData.profile.destaque_titulo_en = document.getElementById('destaque_titulo_en').value;
             siteData.profile.destaque_comp_pt = document.getElementById('destaque_comp_pt').value;
             siteData.profile.destaque_comp_en = document.getElementById('destaque_comp_en').value;
+            
+            siteData.profile.curriculo_pt = document.getElementById('curriculo_pt').value;
+            siteData.profile.curriculo_en = document.getElementById('curriculo_en').value;
+            siteData.profile.carta_pt = document.getElementById('carta_pt').value;
+            siteData.profile.carta_en = document.getElementById('carta_en').value;
+
             downloadJson();
         }
 
-        // Renderizadores de Listas (Formações, Habilidades, Experiências, Projetos)
+        function updateEnglishType(val) {
+            const map = {
+                'EAD': 'Distance Learning',
+                'Presencial': 'On-site',
+                'Semi Presencial': 'Blended'
+            };
+            if(map[val]) {
+                document.getElementById('f_type_en').value = map[val];
+            }
+        }
+
+        // Renderizadores e Ações de Formações
         function renderFormations() {
             const container = document.getElementById('formations-list');
             container.innerHTML = '';
             (siteData.formations || []).forEach((f, idx) => {
                 container.innerHTML += `
-                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">${f.course}</h4>
-                            <p class="text-xs text-gray-400">${f.entity_name} - ${f.completion_date}</p>
+                    <div class="card-glass p-5 rounded-2xl flex justify-between items-center border border-gray-800 hover:border-cyan-500/40 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-base">${f.course}</h4>
+                                <p class="text-xs text-gray-400 flex items-center space-x-2 mt-0.5">
+                                    <span class="text-cyan-400 font-medium">${f.entity_name}</span>
+                                    <span>•</span>
+                                    <span>${f.completion_date}</span>
+                                    <span>•</span>
+                                    <span class="bg-gray-800 text-cyan-300 px-2 py-0.5 rounded text-[10px]">${f.entity_type || 'Presencial'}</span>
+                                </p>
+                            </div>
                         </div>
-                        <button onclick="deleteItem('formations', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openEditModal('formations', ${idx})" class="bg-cyan-500/15 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-pen"></i><span>Editar</span></button>
+                            <button onclick="deleteItem('formations', ${idx})" class="bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-trash"></i><span>Excluir</span></button>
+                        </div>
                     </div>`;
             });
         }
@@ -148,19 +234,30 @@
             });
             downloadJson();
             populateAll();
+            e.target.reset();
         }
 
+        // Renderizadores e Ações de Habilidades
         function renderSkills() {
             const container = document.getElementById('skills-list');
             container.innerHTML = '';
             (siteData.skills || []).forEach((s, idx) => {
                 container.innerHTML += `
-                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">${s.category}</h4>
-                            <p class="text-xs text-gray-400">${s.name}</p>
+                    <div class="card-glass p-5 rounded-2xl flex justify-between items-center border border-gray-800 hover:border-cyan-500/40 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center p-2">
+                                ${s.icon ? `<img src="${s.icon}" class="w-full h-full object-contain">` : `<i class="fa-solid fa-bolt text-cyan-400 text-lg"></i>`}
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-base">${s.category}</h4>
+                                <p class="text-xs text-cyan-400 font-medium">${s.name}</p>
+                            </div>
                         </div>
-                        <button onclick="deleteItem('skills', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openImageModal('skills', ${idx}, '${s.icon || ''}')" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1" title="Editar Imagem"><i class="fa-solid fa-camera"></i><span>Imagem</span></button>
+                            <button onclick="openEditModal('skills', ${idx})" class="bg-cyan-500/15 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-pen"></i><span>Editar</span></button>
+                            <button onclick="deleteItem('skills', ${idx})" class="bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-trash"></i><span>Excluir</span></button>
+                        </div>
                     </div>`;
             });
         }
@@ -180,19 +277,29 @@
             });
             downloadJson();
             populateAll();
+            e.target.reset();
         }
 
+        // Renderizadores e Ações de Experiências
         function renderExperiences() {
             const container = document.getElementById('experiences-list');
             container.innerHTML = '';
             (siteData.experiences || []).forEach((ex, idx) => {
                 container.innerHTML += `
-                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">${ex.title}</h4>
-                            <p class="text-xs text-gray-400">${ex.period}</p>
+                    <div class="card-glass p-5 rounded-2xl flex justify-between items-center border border-gray-800 hover:border-cyan-500/40 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-base">${ex.title}</h4>
+                                <p class="text-xs text-gray-400 mt-0.5"><span class="text-cyan-400 font-medium">${ex.period}</span></p>
+                            </div>
                         </div>
-                        <button onclick="deleteItem('experiences', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openEditModal('experiences', ${idx})" class="bg-cyan-500/15 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-pen"></i><span>Editar</span></button>
+                            <button onclick="deleteItem('experiences', ${idx})" class="bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-trash"></i><span>Excluir</span></button>
+                        </div>
                     </div>`;
             });
         }
@@ -211,19 +318,30 @@
             });
             downloadJson();
             populateAll();
+            e.target.reset();
         }
 
+        // Renderizadores e Ações de Projetos
         function renderProjects() {
             const container = document.getElementById('projects-list');
             container.innerHTML = '';
             (siteData.projects || []).forEach((pr, idx) => {
                 container.innerHTML += `
-                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h4 class="text-white font-bold">${pr.title}</h4>
-                            <p class="text-xs text-cyan-400">${pr.tech}</p>
+                    <div class="card-glass p-5 rounded-2xl flex justify-between items-center border border-gray-800 hover:border-cyan-500/40 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center overflow-hidden">
+                                ${pr.imagem ? `<img src="${pr.imagem}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-rocket text-cyan-400 text-lg"></i>`}
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-base">${pr.title}</h4>
+                                <p class="text-xs text-cyan-400 font-medium mt-0.5">${pr.tech}</p>
+                            </div>
                         </div>
-                        <button onclick="deleteItem('projects', ${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openImageModal('projects', ${idx}, '${pr.imagem || ''}')" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1" title="Editar Imagem"><i class="fa-solid fa-camera"></i><span>Imagem</span></button>
+                            <button onclick="openEditModal('projects', ${idx})" class="bg-cyan-500/15 hover:bg-cyan-500 text-cyan-400 hover:text-gray-950 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-pen"></i><span>Editar</span></button>
+                            <button onclick="deleteItem('projects', ${idx})" class="bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1"><i class="fa-solid fa-trash"></i><span>Excluir</span></button>
+                        </div>
                     </div>`;
             });
         }
@@ -240,10 +358,12 @@
                 link_github: document.getElementById('pr_github').value,
                 link_live: document.getElementById('pr_live').value,
                 description: document.getElementById('pr_desc').value,
-                description_en: document.getElementById('pr_desc_en').value
+                description_en: document.getElementById('pr_desc_en').value,
+                imagem: ''
             });
             downloadJson();
             populateAll();
+            e.target.reset();
         }
 
         function deleteItem(arrayName, index) {
@@ -254,15 +374,116 @@
             }
         }
 
+        // Modal de Edição de Texto
+        function openEditModal(arrayName, index) {
+            document.getElementById('edit_array_name').value = arrayName;
+            document.getElementById('edit_item_index').value = index;
+            const item = siteData[arrayName][index];
+
+            let titleVal = '';
+            let descVal = '';
+
+            if (arrayName === 'formations') {
+                titleVal = item.course || '';
+                descVal = item.description || '';
+            } else if (arrayName === 'skills') {
+                titleVal = item.category || '';
+                descVal = item.detalhes || '';
+            } else if (arrayName === 'experiences') {
+                titleVal = item.title || '';
+                descVal = item.description || '';
+            } else if (arrayName === 'projects') {
+                titleVal = item.title || '';
+                descVal = item.description || '';
+            }
+
+            document.getElementById('edit_title_input').value = titleVal;
+            document.getElementById('edit_desc_input').value = descVal;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function saveEditedItem() {
+            const arrayName = document.getElementById('edit_array_name').value;
+            const index = document.getElementById('edit_item_index').value;
+            const newTitle = document.getElementById('edit_title_input').value;
+            const newDesc = document.getElementById('edit_desc_input').value;
+
+            if (siteData[arrayName] && siteData[arrayName][index]) {
+                if (arrayName === 'formations') {
+                    siteData[arrayName][index].course = newTitle;
+                    siteData[arrayName][index].description = newDesc;
+                } else if (arrayName === 'skills') {
+                    siteData[arrayName][index].category = newTitle;
+                    siteData[arrayName][index].detalhes = newDesc;
+                } else if (arrayName === 'experiences') {
+                    siteData[arrayName][index].title = newTitle;
+                    siteData[arrayName][index].description = newDesc;
+                } else if (arrayName === 'projects') {
+                    siteData[arrayName][index].title = newTitle;
+                    siteData[arrayName][index].description = newDesc;
+                }
+                downloadJson();
+                populateAll();
+                closeEditModal();
+            }
+        }
+
+        // Modal de Imagem / Ícone
+        function openImageModal(arrayName, index, currentUrl) {
+            document.getElementById('img_array_name').value = arrayName;
+            document.getElementById('img_item_index').value = index;
+            document.getElementById('img_url_input').value = currentUrl && !currentUrl.startsWith('data:') ? currentUrl : '';
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        function saveImageItem() {
+            const arrayName = document.getElementById('img_array_name').value;
+            const index = document.getElementById('img_item_index').value;
+            let url = document.getElementById('img_url_input').value;
+            const fileInput = document.getElementById('img_file_input');
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    applyImageToData(arrayName, index, e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                applyImageToData(arrayName, index, url);
+            }
+        }
+
+        function applyImageToData(arrayName, index, newSrc) {
+            if (siteData[arrayName] && siteData[arrayName][index]) {
+                if (arrayName === 'skills') {
+                    siteData[arrayName][index].icon = newSrc;
+                } else if (arrayName === 'projects') {
+                    siteData[arrayName][index].imagem = newSrc;
+                }
+                downloadJson();
+                populateAll();
+                closeImageModal();
+            }
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('bg-cyan-500', 'text-gray-950');
-                link.classList.add('bg-gray-800', 'text-cyan-400');
+                link.classList.remove('bg-cyan-500', 'text-gray-950', 'shadow-lg', 'shadow-cyan-500/20');
+                link.classList.add('bg-gray-900', 'text-gray-400', 'border', 'border-gray-800');
             });
             document.getElementById(tabId).classList.add('active');
-            document.getElementById('btn-' + tabId).classList.remove('bg-gray-800', 'text-cyan-400');
-            document.getElementById('btn-' + tabId).classList.add('bg-cyan-500', 'text-gray-950');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('bg-gray-900', 'text-gray-400', 'border', 'border-gray-800');
+            activeBtn.classList.add('bg-cyan-500', 'text-gray-950', 'shadow-lg', 'shadow-cyan-500/20');
         }
 
         function logout() {
@@ -273,85 +494,189 @@
         document.addEventListener('DOMContentLoaded', loadAdminData);
     </script>
 </head>
-<body class="antialiased selection:bg-cyan-500 selection:text-white pb-20">
+<body class="antialiased selection:bg-cyan-500 selection:text-white pb-24">
 
-    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+    <!-- Header Profissional -->
+    <header class="bg-gray-900/90 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-code-branch text-cyan-400 text-2xl"></i>
-                <span class="text-xl font-bold text-white tracking-wider">PAINEL ADMIN</span>
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <i class="fa-solid fa-code-branch text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold text-white tracking-wide block">PAINEL ADMINISTRATIVO</span>
+                    <span class="text-xs text-cyan-400 font-medium">Gerenciamento de Portfólio</span>
+                </div>
             </div>
-            <div class="space-x-4 flex items-center">
-                <a href="index.html" class="text-cyan-400 text-sm font-bold hover:underline"><i class="fa-solid fa-eye mr-2"></i>Ver Site</a>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition"><i class="fa-solid fa-power-off mr-2"></i>Sair</button>
+            <div class="space-x-3 flex items-center">
+                <a href="index.html" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 border border-gray-700">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>Ver Site</span>
+                </a>
+                <button onclick="logout()" class="bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 border border-red-500/30">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Sair</span>
+                </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-6 pt-10">
-        <div class="flex flex-wrap gap-4 mb-10">
-            <button id="btn-perfil" onclick="switchTab('perfil')" class="nav-link active bg-cyan-500 text-gray-950 px-5 py-2 rounded-xl font-bold text-sm transition">Informações Pessoais</button>
-            <button id="btn-formacao" onclick="switchTab('formacao')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Formações</button>
-            <button id="btn-habilidades" onclick="switchTab('habilidades')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Habilidades</button>
-            <button id="btn-experiencias" onclick="switchTab('experiencias')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Experiências</button>
-            <button id="btn-projetos" onclick="switchTab('projetos')" class="nav-link bg-gray-800 text-cyan-400 border border-gray-700 px-5 py-2 rounded-xl font-bold text-sm transition">Projetos</button>
+        <!-- Navegação de Abas Estilizada -->
+        <div class="flex flex-wrap gap-3 mb-10 bg-gray-900/60 p-2 rounded-2xl border border-gray-800">
+            <button id="btn-perfil" onclick="switchTab('perfil')" class="nav-link active bg-cyan-500 text-gray-950 px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-2 shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-user"></i>
+                <span>Informações Pessoais</span>
+            </button>
+            <button id="btn-formacao" onclick="switchTab('formacao')" class="nav-link bg-gray-900 text-gray-400 border border-gray-800 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-2">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Formações</span>
+            </button>
+            <button id="btn-habilidades" onclick="switchTab('habilidades')" class="nav-link bg-gray-900 text-gray-400 border border-gray-800 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-2">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Habilidades</span>
+            </button>
+            <button id="btn-experiencias" onclick="switchTab('experiencias')" class="nav-link bg-gray-900 text-gray-400 border border-gray-800 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-2">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Experiências</span>
+            </button>
+            <button id="btn-projetos" onclick="switchTab('projetos')" class="nav-link bg-gray-900 text-gray-400 border border-gray-800 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-2">
+                <i class="fa-solid fa-rocket"></i>
+                <span>Projetos</span>
+            </button>
         </div>
 
         <!-- PERFIL -->
         <div id="perfil" class="tab-content active">
             <div class="card-glass p-8 rounded-3xl mb-8">
-                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Editar Toda Página Inicial</h2>
-                <form onsubmit="saveProfile(event)" class="space-y-4">
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-6">Dados Pessoais</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">Nome Completo</label><input type="text" id="nome" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Data Nascimento</label><input type="text" id="nascimento" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-800">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-user-pen"></i>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">URL Foto Perfil</label><input type="text" id="foto_url" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Editar Perfil e Dados Gerais</h2>
+                        <p class="text-xs text-gray-400">Atualize suas informações principais exibidas no topo e na aba inicial do site.</p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">Cidade (PT)</label><input type="text" id="cidade" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Cidade (EN)</label><input type="text" id="cidade_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Estado (PT)</label><input type="text" id="estado" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Estado (EN)</label><input type="text" id="estado_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">País (PT)</label><input type="text" id="pais" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">País (EN)</label><input type="text" id="pais_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">URL LinkedIn</label><input type="text" id="linkedin" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">URL GitHub</label><input type="text" id="github" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
+                </div>
+
+                <form onsubmit="saveProfile(event)" class="space-y-6">
+                    <div>
+                        <h3 class="text-cyan-400 text-sm font-bold flex items-center space-x-2 mb-4"><i class="fa-solid fa-id-card"></i><span>Dados Pessoais</span></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Nome Completo</label><input type="text" id="nome" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Data Nascimento</label><input type="text" id="nascimento" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mt-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">URL Foto Perfil</label><input type="text" id="foto_url" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Cidade (PT)</label><input type="text" id="cidade" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Cidade (EN)</label><input type="text" id="cidade_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Estado (PT)</label><input type="text" id="estado" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Estado (EN)</label><input type="text" id="estado_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">País (PT)</label><input type="text" id="pais" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">País (EN)</label><input type="text" id="pais_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">URL LinkedIn</label><input type="text" id="linkedin" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">URL GitHub</label><input type="text" id="github" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                        </div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Resumo Profissional</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">Título (PT)</label><input type="text" id="titulo_pt" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Título (EN)</label><input type="text" id="titulo_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Sobre (PT)</label><textarea id="sobre_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Sobre (EN)</label><textarea id="sobre_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Disponibilidade (PT)</label><textarea id="disponibilidade_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Disponibilidade (EN)</label><textarea id="disponibilidade_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-cyan-400 text-sm font-bold flex items-center space-x-2 mb-4"><i class="fa-solid fa-file-arrow-down"></i><span>Currículos e Cartas de Apresentação</span></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
+                                <label class="block text-xs text-cyan-300 font-bold">Currículo (Português)</label>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Link do Currículo (PT)</label>
+                                    <input type="text" id="curriculo_pt" placeholder="https://..." class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (PT)</label>
+                                    <input type="file" id="curriculo_pt_file" onchange="handleFileAttachment(this, 'curriculo_pt_name', 'curriculo_pt')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_curriculo_pt" class="text-xs mt-1"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
+                                <label class="block text-xs text-cyan-300 font-bold">Currículo (Inglês)</label>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Link do Currículo (EN)</label>
+                                    <input type="text" id="curriculo_en" placeholder="https://..." class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (EN)</label>
+                                    <input type="file" id="curriculo_en_file" onchange="handleFileAttachment(this, 'curriculo_en_name', 'curriculo_en')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_curriculo_en" class="text-xs mt-1"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
+                                <label class="block text-xs text-cyan-300 font-bold">Carta de Apresentação (Português)</label>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Link da Carta (PT)</label>
+                                    <input type="text" id="carta_pt" placeholder="https://..." class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (PT)</label>
+                                    <input type="file" id="carta_pt_file" onchange="handleFileAttachment(this, 'carta_pt_name', 'carta_pt')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_carta_pt" class="text-xs mt-1"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
+                                <label class="block text-xs text-cyan-300 font-bold">Carta de Apresentação (Inglês)</label>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Link da Carta (EN)</label>
+                                    <input type="text" id="carta_en" placeholder="https://..." class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (EN)</label>
+                                    <input type="file" id="carta_en_file" onchange="handleFileAttachment(this, 'carta_en_name', 'carta_en')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_carta_en" class="text-xs mt-1"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Idiomas</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">Idiomas (PT)</label><textarea id="idiomas_pt" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Idiomas (EN)</label><textarea id="idiomas_en" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-cyan-400 text-sm font-bold flex items-center space-x-2 mb-4"><i class="fa-solid fa-bullseye"></i><span>Resumo Profissional & Objetivo</span></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Título (PT)</label><input type="text" id="titulo_pt" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Título (EN)</label><input type="text" id="titulo_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Sobre (PT)</label><textarea id="sobre_pt" rows="4" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Sobre (EN)</label><textarea id="sobre_en" rows="4" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Disponibilidade (PT)</label><textarea id="disponibilidade_pt" rows="3" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Disponibilidade (EN)</label><textarea id="disponibilidade_en" rows="3" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                        </div>
                     </div>
 
-                    <h3 class="text-cyan-400 font-bold border-b border-gray-700 pb-2 mt-8">Formação em Destaque</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-gray-400 mb-1">Data Conclusão (PT)</label><input type="text" id="destaque_data" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Data Conclusão (EN)</label><input type="text" id="destaque_data_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Instituição (PT)</label><input type="text" id="destaque_inst" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Instituição (EN)</label><input type="text" id="destaque_inst_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Título Formação (PT)</label><input type="text" id="destaque_titulo_pt" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Título Formação (EN)</label><input type="text" id="destaque_titulo_en" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Competências (PT)</label><textarea id="destaque_comp_pt" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
-                        <div><label class="block text-xs text-gray-400 mb-1">Competências (EN)</label><textarea id="destaque_comp_en" rows="4" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm glow-border focus:outline-none"></textarea></div>
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-cyan-400 text-sm font-bold flex items-center space-x-2 mb-4"><i class="fa-solid fa-language"></i><span>Idiomas</span></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Idiomas (PT)</label><textarea id="idiomas_pt" rows="3" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Idiomas (EN)</label><textarea id="idiomas_en" rows="3" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                        </div>
                     </div>
 
-                    <div class="pt-6"><button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-4 px-6 rounded-xl transition text-sm text-center">Salvar Informações</button></div>
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-cyan-400 text-sm font-bold flex items-center space-x-2 mb-4"><i class="fa-solid fa-award"></i><span>Formação em Destaque</span></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Data Conclusão (PT)</label><input type="text" id="destaque_data" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Data Conclusão (EN)</label><input type="text" id="destaque_data_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Instituição (PT)</label><input type="text" id="destaque_inst" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Instituição (EN)</label><input type="text" id="destaque_inst_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Título Formação (PT)</label><input type="text" id="destaque_titulo_pt" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Título Formação (EN)</label><input type="text" id="destaque_titulo_en" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Competências (PT)</label><textarea id="destaque_comp_pt" rows="4" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                            <div><label class="block text-xs text-gray-400 mb-1 font-medium">Competências (EN)</label><textarea id="destaque_comp_en" rows="4" class="w-full input-stylish rounded-xl p-3 text-sm glow-border"></textarea></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold py-4 px-6 rounded-2xl transition text-sm text-center shadow-lg shadow-cyan-500/20 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-floppy-disk text-base"></i>
+                            <span>Salvar Informações e Atualizar Site</span>
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -359,23 +684,42 @@
         <!-- FORMAÇÕES -->
         <div id="formacao" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
-                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Formação</h2>
+                <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-800">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Adicionar Nova Formação ou Curso</h2>
+                        <p class="text-xs text-gray-400">Preencha os dados acadêmicos ou cursos extracurriculares.</p>
+                    </div>
+                </div>
+
                 <form onsubmit="addFormation(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="f_level" placeholder="Nível PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_level_en" placeholder="Nível EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_course" placeholder="Curso PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_course_en" placeholder="Curso EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_type" placeholder="Tipo PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_type_en" placeholder="Tipo EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_name" placeholder="Instituição PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_name_en" placeholder="Instituição EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_date" placeholder="Data PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="f_date_en" placeholder="Data EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="f_level" placeholder="Nível PT (ex: Graduação)" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="f_level_en" placeholder="Nível EN (ex: Bachelor Degree)" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="f_course" placeholder="Curso PT" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="f_course_en" placeholder="Curso EN" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <select id="f_type" required class="w-full input-stylish rounded-xl p-3 text-sm" onchange="updateEnglishType(this.value)">
+                            <option value="" disabled selected>Tipo (PT)</option>
+                            <option value="EAD">EAD</option>
+                            <option value="Presencial">Presencial</option>
+                            <option value="Semi Presencial">Semi Presencial</option>
+                        </select>
+                        <select id="f_type_en" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                            <option value="" disabled selected>Type (EN)</option>
+                            <option value="Distance Learning">Distance Learning</option>
+                            <option value="On-site">On-site</option>
+                            <option value="Blended">Blended</option>
+                        </select>
+                        <input type="text" id="f_name" placeholder="Instituição PT" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="f_name_en" placeholder="Instituição EN" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="f_date" placeholder="Data PT (ex: 2026)" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="f_date_en" placeholder="Data EN" class="w-full input-stylish rounded-xl p-3 text-sm">
                     </div>
-                    <textarea id="f_desc" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <textarea id="f_desc_en" rows="3" placeholder="Descrição EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Formação</button>
+                    <textarea id="f_desc" rows="3" placeholder="Descrição e módulos PT..." required class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <textarea id="f_desc_en" rows="3" placeholder="Descrição e módulos EN..." class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold py-3.5 px-6 rounded-xl text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20"><i class="fa-solid fa-plus"></i><span>Adicionar Formação</span></button>
                 </form>
             </div>
             <div id="formations-list" class="space-y-4"></div>
@@ -384,18 +728,27 @@
         <!-- HABILIDADES -->
         <div id="habilidades" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
-                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Habilidade</h2>
+                <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-800">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Adicionar Habilidade ou Competência</h2>
+                        <p class="text-xs text-gray-400">Cadastre ferramentas, hard skills ou conhecimentos técnicos.</p>
+                    </div>
+                </div>
+
                 <form onsubmit="addSkill(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="s_cat" placeholder="Categoria PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="s_cat_en" placeholder="Categoria EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="s_name" placeholder="Título PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="s_name_en" placeholder="Título EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="s_cat" placeholder="Categoria PT (ex: Desenvolvimento)" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="s_cat_en" placeholder="Categoria EN" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="s_name" placeholder="Título PT (ex: Python)" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="s_name_en" placeholder="Título EN" class="w-full input-stylish rounded-xl p-3 text-sm">
                     </div>
-                    <input type="text" id="s_icon" placeholder="Link da Imagem/Ícone (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                    <textarea id="s_det" rows="2" placeholder="Detalhes PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <textarea id="s_det_en" rows="2" placeholder="Detalhes EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Habilidade</button>
+                    <input type="text" id="s_icon" placeholder="Link da Imagem / Ícone (Opcional)" class="w-full input-stylish rounded-xl p-3 text-sm">
+                    <textarea id="s_det" rows="2" placeholder="Detalhes PT..." required class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <textarea id="s_det_en" rows="2" placeholder="Detalhes EN..." class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold py-3.5 px-6 rounded-xl text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20"><i class="fa-solid fa-plus"></i><span>Adicionar Habilidade</span></button>
                 </form>
             </div>
             <div id="skills-list" class="space-y-4"></div>
@@ -404,17 +757,26 @@
         <!-- EXPERIÊNCIAS -->
         <div id="experiencias" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
-                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Experiência</h2>
+                <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-800">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Adicionar Experiência Profissional</h2>
+                        <p class="text-xs text-gray-400">Insira suas vivências de mercado, cargos e responsabilidades.</p>
+                    </div>
+                </div>
+
                 <form onsubmit="addExperience(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="ex_title" placeholder="Cargo e Empresa PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="ex_title_en" placeholder="Cargo e Empresa EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="ex_period" placeholder="Período PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="ex_period_en" placeholder="Período EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="ex_title" placeholder="Cargo e Empresa PT" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="ex_title_en" placeholder="Cargo e Empresa EN" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="ex_period" placeholder="Período PT (ex: 2023 - 2025)" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="ex_period_en" placeholder="Período EN" class="w-full input-stylish rounded-xl p-3 text-sm">
                     </div>
-                    <textarea id="ex_desc" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <textarea id="ex_desc_en" rows="3" placeholder="Descrição EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Experiência</button>
+                    <textarea id="ex_desc" rows="3" placeholder="Descrição PT..." required class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <textarea id="ex_desc_en" rows="3" placeholder="Descrição EN..." class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold py-3.5 px-6 rounded-xl text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20"><i class="fa-solid fa-plus"></i><span>Adicionar Experiência</span></button>
                 </form>
             </div>
             <div id="experiences-list" class="space-y-4"></div>
@@ -423,24 +785,79 @@
         <!-- PROJETOS -->
         <div id="projetos" class="tab-content">
             <div class="card-glass p-8 rounded-3xl mb-8">
-                <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-cyan-400 pl-4">Adicionar Projeto</h2>
+                <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-800">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Adicionar Novo Projeto</h2>
+                        <p class="text-xs text-gray-400">Divulgue seus desenvolvimentos com links e tecnologias.</p>
+                    </div>
+                </div>
+
                 <form onsubmit="addProject(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="pr_title" placeholder="Título PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="pr_title_en" placeholder="Título EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="pr_tech" placeholder="Tecnologias PT" required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="pr_tech_en" placeholder="Tecnologias EN" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="pr_github" placeholder="Link GitHub" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
-                        <input type="text" id="pr_live" placeholder="Link Online" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                        <input type="text" id="pr_title" placeholder="Título PT" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="pr_title_en" placeholder="Título EN" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="pr_tech" placeholder="Tecnologias PT (ex: React, Node)" required class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="pr_tech_en" placeholder="Tecnologias EN" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="pr_github" placeholder="Link GitHub" class="w-full input-stylish rounded-xl p-3 text-sm">
+                        <input type="text" id="pr_live" placeholder="Link Online" class="w-full input-stylish rounded-xl p-3 text-sm">
                     </div>
-                    <textarea id="pr_desc" rows="3" placeholder="Descrição PT..." required class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <textarea id="pr_desc_en" rows="3" placeholder="Descrição EN..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm"></textarea>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 px-6 rounded-xl text-sm">Adicionar Projeto</button>
+                    <textarea id="pr_desc" rows="3" placeholder="Descrição PT..." required class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <textarea id="pr_desc_en" rows="3" placeholder="Descrição EN..." class="w-full input-stylish rounded-xl p-3 text-sm"></textarea>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold py-3.5 px-6 rounded-xl text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20"><i class="fa-solid fa-plus"></i><span>Adicionar Projeto</span></button>
                 </form>
             </div>
             <div id="projects-list" class="space-y-4"></div>
         </div>
 
     </main>
+
+    <!-- Modal de Edição de Texto -->
+    <div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="card-glass w-full max-w-md p-6 rounded-3xl border border-gray-700 shadow-2xl">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center space-x-2"><i class="fa-solid fa-pen text-cyan-400"></i><span>Editar Item</span></h3>
+            <div class="space-y-4">
+                <input type="hidden" id="edit_array_name">
+                <input type="hidden" id="edit_item_index">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 font-medium">Título / Nome / Curso</label>
+                    <input type="text" id="edit_title_input" class="w-full input-stylish rounded-xl p-3 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 font-medium">Descrição / Detalhes</label>
+                    <textarea id="edit_desc_input" rows="4" class="w-full input-stylish rounded-xl p-3 text-xs"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Cancelar</button>
+                    <button type="button" onclick="saveEditedItem()" class="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-cyan-500/20">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Imagem / Ícone -->
+    <div id="imageModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="card-glass w-full max-w-md p-6 rounded-3xl border border-gray-700 shadow-2xl">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center space-x-2"><i class="fa-solid fa-camera text-cyan-400"></i><span>Editar Imagem / Ícone</span></h3>
+            <div class="space-y-4">
+                <input type="hidden" id="img_array_name">
+                <input type="hidden" id="img_item_index">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 font-medium">Link da Imagem</label>
+                    <input type="text" id="img_url_input" placeholder="https://..." class="w-full input-stylish rounded-xl p-3 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-cyan-400 mb-1 font-medium">Ou Anexar Arquivo do Computador</label>
+                    <input type="file" id="img_file_input" accept="image/*" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeImageModal()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Cancelar</button>
+                    <button type="button" onclick="saveImageItem()" class="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-cyan-500/20">Salvar Imagem</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
