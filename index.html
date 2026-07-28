@@ -340,7 +340,6 @@
             document.getElementById('disp-main').innerText = dispLines[0] || '';
             document.getElementById('disp-sub').innerHTML = dispLines.slice(1).join('<br>');
 
-            // AQUI O JS APENAS ADICIONA A CARTA DE APRESENTAÇÃO, SE EXISTIR
             const clLink = isEn ? (p.carta_en || '') : (p.carta_pt || '');
             const clLabel = isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação';
             let filesHtml = '';

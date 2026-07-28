@@ -40,7 +40,7 @@
         }
 
         function populateAll() {
-            if (!siteData.profile) return;
+            if (!siteData.profile) siteData.profile = {};
             const p = siteData.profile;
 
             // Perfil
@@ -72,16 +72,16 @@
             document.getElementById('destaque_comp_pt').value = p.destaque_comp_pt || '';
             document.getElementById('destaque_comp_en').value = p.destaque_comp_en || '';
 
-            // Novos campos de arquivos e links
+            // Campos de arquivos e links
             document.getElementById('curriculo_pt').value = p.curriculo_pt || '';
             document.getElementById('curriculo_en').value = p.curriculo_en || '';
             document.getElementById('carta_pt').value = p.carta_pt || '';
             document.getElementById('carta_en').value = p.carta_en || '';
 
-            updateFileNameDisplay('curriculo_pt_file', 'file_name_curriculo_pt', p.curriculo_pt_name);
-            updateFileNameDisplay('curriculo_en_file', 'file_name_curriculo_en', p.curriculo_en_name);
-            updateFileNameDisplay('carta_pt_file', 'file_name_carta_pt', p.carta_pt_name);
-            updateFileNameDisplay('carta_en_file', 'file_name_carta_en', p.carta_en_name);
+            updateFileDisplay('curriculo_pt', p.curriculo_pt, p.curriculo_pt_name, 'file_name_curriculo_pt');
+            updateFileDisplay('curriculo_en', p.curriculo_en, p.curriculo_en_name, 'file_name_curriculo_en');
+            updateFileDisplay('carta_pt', p.carta_pt, p.carta_pt_name, 'file_name_carta_pt');
+            updateFileDisplay('carta_en', p.carta_en, p.carta_en_name, 'file_name_carta_en');
 
             renderFormations();
             renderSkills();
@@ -89,23 +89,35 @@
             renderProjects();
         }
 
-        function updateFileNameDisplay(fileInputId, displayId, savedName) {
+        function updateFileDisplay(inputId, urlValue, savedName, displayId) {
             const displayEl = document.getElementById(displayId);
+            const inputEl = document.getElementById(inputId);
+            
+            let html = '';
             if (savedName) {
-                displayEl.innerHTML = `<span class="text-cyan-400 font-medium">Arquivo atual: ${savedName}</span>`;
+                html += `<span class="text-cyan-400 font-medium mr-2">Arquivo: ${savedName}</span>`;
+            } else if (urlValue) {
+                html += `<span class="text-cyan-400 font-medium mr-2">Link configurado</span>`;
             } else {
-                displayEl.innerHTML = `<span class="text-gray-500">Nenhum arquivo enviado</span>`;
+                html += `<span class="text-gray-500 mr-2">Nenhum arquivo enviado</span>`;
             }
+
+            if (urlValue) {
+                html += `<a href="${urlValue}" download target="_blank" class="inline-flex items-center text-xs bg-cyan-500/20 hover:bg-cyan-500 hover:text-gray-950 text-cyan-400 px-2 py-0.5 rounded transition ml-1 font-bold"><i class="fa-solid fa-download mr-1"></i>Baixar</a>`;
+            }
+
+            displayEl.innerHTML = html;
         }
 
-        function handleFileAttachment(inputElement, targetKeyName, targetKeyUrl) {
+        function handleFileAttachment(inputElement, targetKeyName, targetKeyUrl, displayId) {
             const file = inputElement.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     siteData.profile[targetKeyUrl] = e.target.result;
                     siteData.profile[targetKeyName] = file.name;
-                    updateFileNameDisplay(inputElement.id, 'file_name_' + targetKeyUrl, file.name);
+                    document.getElementById(targetKeyUrl).value = e.target.result;
+                    updateFileDisplay(targetKeyUrl, e.target.result, file.name, displayId);
                 };
                 reader.readAsDataURL(file);
             }
@@ -138,7 +150,6 @@
         function saveProfile(e) {
             e.preventDefault();
             
-            // Garantia de que o objeto profile existe
             if (!siteData.profile) siteData.profile = {};
 
             siteData.profile.nome = document.getElementById('nome').value;
@@ -598,8 +609,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (Português)</label>
-                                    <input type="file" id="curriculo_pt_file" onchange="handleFileAttachment(this, 'curriculo_pt_name', 'curriculo_pt')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
-                                    <div id="file_name_curriculo_pt" class="text-xs mt-1"></div>
+                                    <input type="file" id="curriculo_pt_file" onchange="handleFileAttachment(this, 'curriculo_pt_name', 'curriculo_pt', 'file_name_curriculo_pt')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_curriculo_pt" class="text-xs mt-1 flex items-center flex-wrap"></div>
                                 </div>
                             </div>
                             <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
@@ -610,8 +621,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Or Attach File (English)</label>
-                                    <input type="file" id="curriculo_en_file" onchange="handleFileAttachment(this, 'curriculo_en_name', 'curriculo_en')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
-                                    <div id="file_name_curriculo_en" class="text-xs mt-1"></div>
+                                    <input type="file" id="curriculo_en_file" onchange="handleFileAttachment(this, 'curriculo_en_name', 'curriculo_en', 'file_name_curriculo_en')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_curriculo_en" class="text-xs mt-1 flex items-center flex-wrap"></div>
                                 </div>
                             </div>
                             <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
@@ -622,8 +633,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (Português)</label>
-                                    <input type="file" id="carta_pt_file" onchange="handleFileAttachment(this, 'carta_pt_name', 'carta_pt')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
-                                    <div id="file_name_carta_pt" class="text-xs mt-1"></div>
+                                    <input type="file" id="carta_pt_file" onchange="handleFileAttachment(this, 'carta_pt_name', 'carta_pt', 'file_name_carta_pt')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_carta_pt" class="text-xs mt-1 flex items-center flex-wrap"></div>
                                 </div>
                             </div>
                             <div class="space-y-3 bg-gray-900/40 p-4 rounded-2xl border border-gray-800">
@@ -634,8 +645,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Or Attach File (English)</label>
-                                    <input type="file" id="carta_en_file" onchange="handleFileAttachment(this, 'carta_en_name', 'carta_en')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
-                                    <div id="file_name_carta_en" class="text-xs mt-1"></div>
+                                    <input type="file" id="carta_en_file" onchange="handleFileAttachment(this, 'carta_en_name', 'carta_en', 'file_name_carta_en')" class="w-full input-stylish rounded-xl p-2 text-xs file:bg-cyan-500 file:text-gray-950 file:border-0 file:rounded-lg file:text-xs file:font-bold file:px-3 file:py-1 file:cursor-pointer">
+                                    <div id="file_name_carta_en" class="text-xs mt-1 flex items-center flex-wrap"></div>
                                 </div>
                             </div>
                         </div>
