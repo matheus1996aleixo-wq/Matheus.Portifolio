@@ -340,15 +340,18 @@
             document.getElementById('disp-main').innerText = dispLines[0] || '';
             document.getElementById('disp-sub').innerHTML = dispLines.slice(1).join('<br>');
 
-            const cvLink = isEn ? (p.curriculo_en || '') : (p.curriculo_pt || '');
+            const cvLinkPT = p.curriculo_pt || 'CV.Matheus.Aleixo.pdf';
+            const cvLinkEN = p.curriculo_en || 'CV_Matheus_Aleixo_English_final.pdf';
             const clLink = isEn ? (p.carta_en || '') : (p.carta_pt || '');
-            const cvLabel = isEn ? 'Download Resume' : 'Baixar Currículo';
             const clLabel = isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação';
 
             let filesHtml = '';
             
-            // AQUI ESTÁ A ÚNICA MUDANÇA: O botão agora renderiza independentemente de já haver um link, sendo exibido como "sempre disponível".
-            filesHtml += `<a href="${cvLink || '#'}" ${cvLink ? 'target="_blank"' : ''} class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>${cvLabel}</a>`;
+            // Botão para o Currículo em Português habilitado para clique e download
+            filesHtml += `<a href="${cvLinkPT}" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>Baixar Currículo (PT)</a>`;
+            
+            // Botão para o Currículo em Inglês habilitado para clique e download
+            filesHtml += `<a href="${cvLinkEN}" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>Download Resume (EN)</a>`;
             
             if (clLink) {
                 filesHtml += `<a href="${clLink}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-envelope-open-text mr-2"></i>${clLabel}</a>`;
