@@ -20,7 +20,7 @@
         let currentLang = localStorage.getItem('site_lang') || 'pt';
         let siteData = {};
 
-        // Sincroniza abas abertas em tempo real (Se salvar no Admin, o Index atualiza sozinho)
+        // Sincroniza abas abertas em tempo real
         window.addEventListener('storage', function(e) {
             if (e.key === 'site_data' && e.newValue) {
                 siteData = JSON.parse(e.newValue);
@@ -340,23 +340,13 @@
             document.getElementById('disp-main').innerText = dispLines[0] || '';
             document.getElementById('disp-sub').innerHTML = dispLines.slice(1).join('<br>');
 
-            const cvLinkPT = p.curriculo_pt || 'CV.Matheus.Aleixo.pdf';
-            const cvLinkEN = p.curriculo_en || 'CV_Matheus_Aleixo_English_final.pdf';
+            // AQUI O JS APENAS ADICIONA A CARTA DE APRESENTAÇÃO, SE EXISTIR
             const clLink = isEn ? (p.carta_en || '') : (p.carta_pt || '');
             const clLabel = isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação';
-
             let filesHtml = '';
-            
-            // Botão para o Currículo em Português habilitado para clique e download
-            filesHtml += `<a href="${cvLinkPT}" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>Baixar Currículo (PT)</a>`;
-            
-            // Botão para o Currículo em Inglês habilitado para clique e download
-            filesHtml += `<a href="${cvLinkEN}" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-file-arrow-down mr-2"></i>Download Resume (EN)</a>`;
-            
             if (clLink) {
                 filesHtml += `<a href="${clLink}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-envelope-open-text mr-2"></i>${clLabel}</a>`;
             }
-            
             const docsSection = document.getElementById('profile-documents-section');
             if (docsSection) {
                 docsSection.innerHTML = filesHtml;
@@ -683,6 +673,15 @@
                         <p id="disp-sub" class="text-gray-400 pt-1 leading-relaxed"></p>
                     </div>
 
+                    <!-- BOTÕES FIXOS AQUI -->
+                    <div class="flex flex-col gap-3 mb-3">
+                        <a href="CV.Matheus.Aleixo.pdf" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-file-arrow-down mr-2"></i>Baixar Currículo (PT)
+                        </a>
+                        <a href="CV_Matheus_Aleixo_English_final.pdf" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-file-arrow-down mr-2"></i>Download Resume (EN)
+                        </a>
+                    </div>
                     <div id="profile-documents-section" class="flex flex-col gap-3"></div>
                 </div>
                 
