@@ -298,6 +298,18 @@
             document.getElementById('nav-experiencia').innerText = isEn ? 'Experiences' : 'Experiências';
             document.getElementById('nav-projetos').innerText = isEn ? 'Projects' : 'Projetos';
 
+            // Atualização dinâmica dos links de currículo
+            const cvPtLink = document.getElementById('cv-pt-link');
+            if (cvPtLink) {
+                cvPtLink.href = p.curriculo_pt || 'assets/curriculos/CV_Matheus_Aleixo.pdf';
+                cvPtLink.download = p.curriculo_pt_name || 'CV_Matheus_Aleixo.pdf';
+            }
+            const cvEnLink = document.getElementById('cv-en-link');
+            if (cvEnLink) {
+                cvEnLink.href = p.curriculo_en || 'assets/curriculos/Matheus_Aleixo_Resume.pdf';
+                cvEnLink.download = p.curriculo_en_name || 'Matheus_Aleixo_Resume.pdf';
+            }
+
             const profileImgContainer = document.getElementById('profile-img-container');
             const profileFoto = p.foto || 'https://github.com/matheus1996aleixo-wq.png';
             let profileImgHtml = `<img src="${profileFoto}" alt="Perfil" class="w-full h-full object-cover">`;
@@ -659,33 +671,19 @@
                         <p id="disp-sub" class="text-gray-400 pt-1 leading-relaxed"></p>
                     </div>
 
-                    <!-- BOTÕES DE DOWNLOAD -->
+                    <!-- BOTÕES DE DOWNLOAD DINÂMICOS -->
                     <div class="flex flex-col gap-3 mb-3">
-
                         <!-- Currículo em Português -->
-                        <a
-                            href="./assets/curriculos/CV_Matheus_Aleixo.pdf"
-                            download="CV_Matheus_Aleixo.pdf"
-                            target="_blank"
-                            class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md">
-
+                        <a id="cv-pt-link" href="assets/curriculos/CV_Matheus_Aleixo.pdf" download="CV_Matheus_Aleixo.pdf" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md">
                             <i class="fa-solid fa-file-arrow-down"></i>
                             Baixar Currículo (PT)
-
                         </a>
 
                         <!-- Resume em Inglês -->
-                        <a
-                            href="./assets/curriculos/Matheus_Aleixo_Resume.pdf"
-                            download="Matheus_Aleixo_Resume.pdf"
-                            target="_blank"
-                            class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md">
-
+                        <a id="cv-en-link" href="assets/curriculos/Matheus_Aleixo_Resume.pdf" download="Matheus_Aleixo_Resume.pdf" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md">
                             <i class="fa-solid fa-file-arrow-down"></i>
                             Download Resume (EN)
-
                         </a>
-
                     </div>
                 </div>
                 
