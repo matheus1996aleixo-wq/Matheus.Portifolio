@@ -43,7 +43,6 @@
             if (!siteData.profile) siteData.profile = {};
             const p = siteData.profile;
 
-            // Perfil
             document.getElementById('nome').value = p.nome || '';
             document.getElementById('nascimento').value = p.nascimento || '';
             document.getElementById('foto_url').value = p.foto || '';
@@ -72,13 +71,13 @@
             document.getElementById('destaque_comp_pt').value = p.destaque_comp_pt || '';
             document.getElementById('destaque_comp_en').value = p.destaque_comp_en || '';
 
-            // Campos de arquivos e links com os nomes corretos sem espaços
-            document.getElementById('curriculo_pt').value = p.curriculo_pt || 'CV.Matheus.Aleixo.pdf';
+            // Nomes corretos dos PDFs sem espaços extras ou extensões duplas
+            document.getElementById('curriculo_pt').value = p.curriculo_pt || 'CV_Matheus_Aleixo.pdf';
             document.getElementById('curriculo_en').value = p.curriculo_en || 'Matheus_Aleixo_Resume.pdf';
             document.getElementById('carta_pt').value = p.carta_pt || '';
             document.getElementById('carta_en').value = p.carta_en || '';
 
-            updateFileDisplay('curriculo_pt', p.curriculo_pt || 'CV.Matheus.Aleixo.pdf', p.curriculo_pt_name || 'CV.Matheus.Aleixo.pdf', 'file_name_curriculo_pt');
+            updateFileDisplay('curriculo_pt', p.curriculo_pt || 'CV_Matheus_Aleixo.pdf', p.curriculo_pt_name || 'CV_Matheus_Aleixo.pdf', 'file_name_curriculo_pt');
             updateFileDisplay('curriculo_en', p.curriculo_en || 'Matheus_Aleixo_Resume.pdf', p.curriculo_en_name || 'Matheus_Aleixo_Resume.pdf', 'file_name_curriculo_en');
             updateFileDisplay('carta_pt', p.carta_pt, p.carta_pt_name, 'file_name_carta_pt');
             updateFileDisplay('carta_en', p.carta_en, p.carta_en_name, 'file_name_carta_en');
@@ -91,7 +90,6 @@
 
         function updateFileDisplay(inputId, urlValue, savedName, displayId) {
             const displayEl = document.getElementById(displayId);
-            const inputEl = document.getElementById(inputId);
             
             let html = '';
             if (savedName) {
@@ -199,7 +197,6 @@
             }
         }
 
-        // Renderizadores e Ações de Formações
         function renderFormations() {
             const container = document.getElementById('formations-list');
             container.innerHTML = '';
@@ -252,7 +249,6 @@
             e.target.reset();
         }
 
-        // Renderizadores e Ações de Habilidades
         function renderSkills() {
             const container = document.getElementById('skills-list');
             container.innerHTML = '';
@@ -295,7 +291,6 @@
             e.target.reset();
         }
 
-        // Renderizadores e Ações de Experiências
         function renderExperiences() {
             const container = document.getElementById('experiences-list');
             container.innerHTML = '';
@@ -336,7 +331,6 @@
             e.target.reset();
         }
 
-        // Renderizadores e Ações de Projetos
         function renderProjects() {
             const container = document.getElementById('projects-list');
             container.innerHTML = '';
@@ -389,7 +383,6 @@
             }
         }
 
-        // Modal de Edição de Texto
         function openEditModal(arrayName, index) {
             document.getElementById('edit_array_name').value = arrayName;
             document.getElementById('edit_item_index').value = index;
@@ -447,7 +440,6 @@
             }
         }
 
-        // Modal de Imagem / Ícone
         function openImageModal(arrayName, index, currentUrl) {
             document.getElementById('img_array_name').value = arrayName;
             document.getElementById('img_item_index').value = index;
@@ -511,7 +503,6 @@
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white pb-24">
 
-    <!-- Header Profissional -->
     <header class="bg-gray-900/90 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -537,7 +528,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6 pt-10">
-        <!-- Navegação de Abas Estilizada -->
         <div class="flex flex-wrap gap-3 mb-10 bg-gray-900/60 p-2 rounded-2xl border border-gray-800">
             <button id="btn-perfil" onclick="switchTab('perfil')" class="nav-link active bg-cyan-500 text-gray-950 px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-2 shadow-lg shadow-cyan-500/20">
                 <i class="fa-solid fa-user"></i>
@@ -605,7 +595,7 @@
                                 <label class="block text-xs text-cyan-300 font-bold">Currículo (Português)</label>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Link do Currículo (Português)</label>
-                                    <input type="text" id="curriculo_pt" placeholder="CV.Matheus.Aleixo.pdf" class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
+                                    <input type="text" id="curriculo_pt" placeholder="CV_Matheus_Aleixo.pdf" class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Ou Anexar Arquivo (Português)</label>

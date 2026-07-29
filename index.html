@@ -20,7 +20,6 @@
         let currentLang = localStorage.getItem('site_lang') || 'pt';
         let siteData = {};
 
-        // Sincroniza abas abertas em tempo real
         window.addEventListener('storage', function(e) {
             if (e.key === 'site_data' && e.newValue) {
                 siteData = JSON.parse(e.newValue);
@@ -341,10 +340,9 @@
             document.getElementById('disp-sub').innerHTML = dispLines.slice(1).join('<br>');
 
             const clLink = isEn ? (p.carta_en || '') : (p.carta_pt || '');
-            const clLabel = isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação';
             let filesHtml = '';
             if (clLink) {
-                filesHtml += `<a href="${clLink}" download target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2"><i class="fa-solid fa-envelope-open-text"></i>${clLabel}</a>`;
+                filesHtml += `<a href="${clLink}" download target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2"><i class="fa-solid fa-envelope-open-text"></i>${isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação'}</a>`;
             }
             const docsSection = document.getElementById('profile-documents-section');
             if (docsSection) {
@@ -650,7 +648,6 @@
                 <!-- Coluna Esquerda: Informações Pessoais -->
                 <div class="card-glass p-8 rounded-3xl glow-border text-center relative">
                     <div id="profile-img-container" class="relative group w-32 h-32 mx-auto bg-gray-800 rounded-full border-4 border-cyan-400 mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,204,0.4)]">
-                        <!-- Renderizado via JS -->
                     </div>
                     <h1 id="profile-name" class="text-2xl font-bold text-white mb-2"></h1>
                     <p class="text-xs text-gray-400 mb-6"><span id="lbl-nascimento">Data de Nascimento:</span> <strong id="profile-nascimento" class="text-gray-200"></strong></p>
@@ -672,9 +669,9 @@
                         <p id="disp-sub" class="text-gray-400 pt-1 leading-relaxed"></p>
                     </div>
 
-                    <!-- BOTÕES FIXOS AQUI -->
+                    <!-- BOTÕES DE DOWNLOAD CORRIGIDOS -->
                     <div class="flex flex-col gap-3 mb-3">
-                        <a href="CV.Matheus.Aleixo.pdf" download class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2 shadow-md">
+                        <a href="CV_Matheus_Aleixo.pdf" download class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2 shadow-md">
                             <i class="fa-solid fa-file-arrow-down"></i>Baixar Currículo (PT)
                         </a>
                         <a href="Matheus_Aleixo_Resume.pdf" download class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2 shadow-md">
