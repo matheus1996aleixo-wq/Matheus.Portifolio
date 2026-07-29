@@ -71,7 +71,6 @@
             document.getElementById('destaque_comp_pt').value = p.destaque_comp_pt || '';
             document.getElementById('destaque_comp_en').value = p.destaque_comp_en || '';
 
-            // Caminho correto apontando para a pasta assets/curriculos/
             document.getElementById('curriculo_pt').value = p.curriculo_pt || 'assets/curriculos/CV_Matheus_Aleixo.pdf';
             document.getElementById('curriculo_en').value = p.curriculo_en || 'assets/curriculos/Matheus_Aleixo_Resume.pdf';
             document.getElementById('carta_pt').value = p.carta_pt || '';
@@ -178,8 +177,18 @@
             siteData.profile.destaque_comp_pt = document.getElementById('destaque_comp_pt').value;
             siteData.profile.destaque_comp_en = document.getElementById('destaque_comp_en').value;
             
-            siteData.profile.curriculo_pt = document.getElementById('curriculo_pt').value;
-            siteData.profile.curriculo_en = document.getElementById('curriculo_en').value;
+            const newCvPt = document.getElementById('curriculo_pt').value;
+            const newCvEn = document.getElementById('curriculo_en').value;
+
+            if (siteData.profile.curriculo_pt !== newCvPt) {
+                siteData.profile.curriculo_pt = newCvPt;
+                siteData.profile.curriculo_pt_name = newCvPt.split('/').pop() || 'CV_Matheus_Aleixo.pdf';
+            }
+            if (siteData.profile.curriculo_en !== newCvEn) {
+                siteData.profile.curriculo_en = newCvEn;
+                siteData.profile.curriculo_en_name = newCvEn.split('/').pop() || 'Matheus_Aleixo_Resume.pdf';
+            }
+
             siteData.profile.carta_pt = document.getElementById('carta_pt').value;
             siteData.profile.carta_en = document.getElementById('carta_en').value;
 

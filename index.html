@@ -298,16 +298,18 @@
             document.getElementById('nav-experiencia').innerText = isEn ? 'Experiences' : 'Experiências';
             document.getElementById('nav-projetos').innerText = isEn ? 'Projects' : 'Projetos';
 
-            // Atualização dinâmica dos links de currículo
+            // Correção aplicada aqui para o link de download do currículo em português funcionar perfeitamente de forma dinâmica:
             const cvPtLink = document.getElementById('cv-pt-link');
             if (cvPtLink) {
                 cvPtLink.href = p.curriculo_pt || 'assets/curriculos/CV_Matheus_Aleixo.pdf';
                 cvPtLink.download = p.curriculo_pt_name || 'CV_Matheus_Aleixo.pdf';
+                cvPtLink.setAttribute('target', '_blank');
             }
             const cvEnLink = document.getElementById('cv-en-link');
             if (cvEnLink) {
                 cvEnLink.href = p.curriculo_en || 'assets/curriculos/Matheus_Aleixo_Resume.pdf';
                 cvEnLink.download = p.curriculo_en_name || 'Matheus_Aleixo_Resume.pdf';
+                cvEnLink.setAttribute('target', '_blank');
             }
 
             const profileImgContainer = document.getElementById('profile-img-container');
