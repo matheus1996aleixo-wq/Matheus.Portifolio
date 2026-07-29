@@ -344,7 +344,7 @@
             const clLabel = isEn ? 'Download Cover Letter' : 'Baixar Carta de Apresentação';
             let filesHtml = '';
             if (clLink) {
-                filesHtml += `<a href="${clLink}" target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center"><i class="fa-solid fa-envelope-open-text mr-2"></i>${clLabel}</a>`;
+                filesHtml += `<a href="${clLink}" download target="_blank" class="w-full text-center bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 font-bold py-2.5 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2"><i class="fa-solid fa-envelope-open-text"></i>${clLabel}</a>`;
             }
             const docsSection = document.getElementById('profile-documents-section');
             if (docsSection) {
@@ -674,11 +674,11 @@
 
                     <!-- BOTÕES FIXOS AQUI -->
                     <div class="flex flex-col gap-3 mb-3">
-                        <a href="CV.Matheus.Aleixo.pdf" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-md">
-                            <i class="fa-solid fa-file-arrow-down mr-2"></i>Baixar Currículo (PT)
+                        <a href="CV.Matheus.Aleixo.pdf" download class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2 shadow-md">
+                            <i class="fa-solid fa-file-arrow-down"></i>Baixar Currículo (PT)
                         </a>
-                        <a href="Matheus_Aleixo_Resume.pdf" download target="_blank" class="w-full text-center bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-md">
-                            <i class="fa-solid fa-file-arrow-down mr-2"></i>Download Resume (EN)
+                        <a href="Matheus_Aleixo_Resume.pdf" download class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm transition flex flex-row items-center justify-center gap-2 shadow-md">
+                            <i class="fa-solid fa-file-arrow-down"></i>Download Resume (EN)
                         </a>
                     </div>
                     <div id="profile-documents-section" class="flex flex-col gap-3"></div>

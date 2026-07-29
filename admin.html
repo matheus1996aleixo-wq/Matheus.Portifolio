@@ -72,14 +72,14 @@
             document.getElementById('destaque_comp_pt').value = p.destaque_comp_pt || '';
             document.getElementById('destaque_comp_en').value = p.destaque_comp_en || '';
 
-            // Campos de arquivos e links com os novos defaults
+            // Campos de arquivos e links com os nomes corretos sem espaços
             document.getElementById('curriculo_pt').value = p.curriculo_pt || 'CV.Matheus.Aleixo.pdf';
-            document.getElementById('curriculo_en').value = p.curriculo_en || 'Matheus Aleixo Resume.pdf';
+            document.getElementById('curriculo_en').value = p.curriculo_en || 'Matheus_Aleixo_Resume.pdf';
             document.getElementById('carta_pt').value = p.carta_pt || '';
             document.getElementById('carta_en').value = p.carta_en || '';
 
             updateFileDisplay('curriculo_pt', p.curriculo_pt || 'CV.Matheus.Aleixo.pdf', p.curriculo_pt_name || 'CV.Matheus.Aleixo.pdf', 'file_name_curriculo_pt');
-            updateFileDisplay('curriculo_en', p.curriculo_en || 'Matheus Aleixo Resume.pdf', p.curriculo_en_name || 'Matheus Aleixo Resume.pdf', 'file_name_curriculo_en');
+            updateFileDisplay('curriculo_en', p.curriculo_en || 'Matheus_Aleixo_Resume.pdf', p.curriculo_en_name || 'Matheus_Aleixo_Resume.pdf', 'file_name_curriculo_en');
             updateFileDisplay('carta_pt', p.carta_pt, p.carta_pt_name, 'file_name_carta_pt');
             updateFileDisplay('carta_en', p.carta_en, p.carta_en_name, 'file_name_carta_en');
 
@@ -617,7 +617,7 @@
                                 <label class="block text-xs text-cyan-300 font-bold">Resume (English)</label>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Resume Link (English)</label>
-                                    <input type="text" id="curriculo_en" placeholder="Matheus Aleixo Resume.pdf" class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
+                                    <input type="text" id="curriculo_en" placeholder="Matheus_Aleixo_Resume.pdf" class="w-full input-stylish rounded-xl p-2.5 text-xs glow-border">
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-gray-400 mb-1">Or Attach File (English)</label>
